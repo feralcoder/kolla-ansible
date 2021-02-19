@@ -19,6 +19,13 @@ use_venv () {
   source ~/CODE/venvs/kolla-ansible/bin/activate
 }
 
+add_stack_user () {
+  cat $SUDO_PASS_FILE | sudo -S ls > /dev/null
+  sudo useradd stack
+  echo st@ck | sudo passwd stack --stdin
+  ( sudo grep "stack ALL" /etc/sudoers.d/stack ) || { echo "stack ALL=(root) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/stack; }
+  sudo chmod 0440 /etc/sudoers.d/stack
+}
 
 install_prereqs () {
   cat $SUDO_PASS_FILE | sudo -S ls > /dev/null
@@ -60,6 +67,7 @@ install_prereqs
 install_kolla_for_admin
 #install_kolla_for_dev
 config_ansible
+add_stack_user
 
 
 rm $SUDO_PASS_FILE
