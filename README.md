@@ -11,3 +11,7 @@ run: . stack_setup_hackery.sh
 
 test inventory: ansible -i inventory-feralstack all -m ping
 
+run: . deploy.sh
+
+Bond interfaces may become unconfigured, more experience is needed to determine onset and causes.
+For now: run fix_bonds/start_bond_ifs.sh when the bonds become inactive.
