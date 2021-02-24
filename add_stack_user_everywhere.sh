@@ -4,11 +4,17 @@
 
 add_stack_user () {
   ssh_control_run_as_user_these_hosts root "adduser stack" "$ALL_HOSTS"
+  echo "Enter stack user password:"
   PASSFILE=`ssh_control_get_password`
   mv $PASSFILE ~/.stack_password
   chmod 600 ~/.stack_password
   ssh_control_sync_as_user_these_hosts root ~/.stack_password /tmp/.stack_password "$ALL_HOSTS"
   ssh_control_run_as_user_these_hosts  root "cat /tmp/.stack_password /tmp/.stack_password | passwd stack" "$ALL_HOSTS"
+
+  sudo cp /etc/sudoers.d/stack /tmp/stack && sudo chown cliff:cliff /tmp/stack
+  ssh_control_sync_as_user_these_hosts root /tmp/stack /etc/sudoers.d/stack "$ALL_HOSTS"
+  ssh_control_run_as_user_these_hosts root "chown root:root /etc/sudoers.d/stack" "$ALL_HOSTS"
+  rm -f /tmp/stack
 }
 
 setup_keys () {

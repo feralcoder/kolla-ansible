@@ -1,4 +1,7 @@
 #!/bin/bash
+KOLLA_SETUP_SOURCE="${BASH_SOURCE[0]}"
+KOLLA_SETUP_DIR=$( dirname $KOLLA_SETUP_SOURCE )
+
 
 get_sudo_password () {
   local PASSWORD
@@ -66,13 +69,8 @@ config_ansible () {
 install_extra_packages () {
   cat $SUDO_PASS_FILE | sudo -S ls > /dev/null
   sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-  sudo -y dnf install sshpass
+  sudo dnf -y install sshpass
   sudo dnf config-manager --set-disabled epel-modular epel
-  sudo cp /etc/sudoers.d/stack /tmp/stack && sudo chown cliff:cliff /tmp/stack
-  ssh_control_sync_as_user_these_hosts root /tmp/stack /etc/sudoers.d/stack "$ALL_HOSTS"
-  ssh_control_run_as_user_these_hosts root "chown root:root /etc/sudoers.d/stack" "$ALL_HOSTS"
-
-
 }
 
 SUDO_PASS_FILE=`get_sudo_password`
@@ -81,6 +79,6 @@ install_kolla_for_admin
 #install_kolla_for_dev
 config_ansible
 add_stack_user
-
+install_extra_packages
 
 rm $SUDO_PASS_FILE
