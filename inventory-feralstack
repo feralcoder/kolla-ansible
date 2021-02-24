@@ -23,6 +23,70 @@ compute
 localhost       ansible_connection=local become=true
 
 
+[strange:vars]
+network_interface: eno1
+neutron_external_interface: eno2
+api_interface: eno3
+storage_interface: eno4
+swift_storage_interface: eno5
+tunnel_interface: eno6
+
+[merlin:vars]
+network_interface: enp2s0f0
+neutron_external_interface: enp2s0f1
+api_interface: enp2s0f2
+storage_interface: enp2s0f3
+swift_storage_interface: enp2s0f4
+tunnel_interface: enp2s0f5
+
+[gandalf:vars]
+network_interface: enp2s0f0
+neutron_external_interface: enp2s0f1
+api_interface: enp2s0f2
+storage_interface: enp2s0f3
+swift_storage_interface: enp2s0f4
+tunnel_interface: enp2s0f5
+
+[kerrigan:vars]
+network_interface: eno1
+neutron_external_interface: eno2
+api_interface: eno3
+storage_interface: eno4
+swift_storage_interface: ens5f0
+tunnel_interface: ens5f1
+
+[neo:vars]
+network_interface: eno1
+neutron_external_interface: eno2
+api_interface: eno3
+storage_interface: eno4
+swift_storage_interface: ens5f0
+tunnel_interface: ens5f1
+
+[bowman:vars]
+network_interface: eno1
+neutron_external_interface: eno2
+api_interface: eno3
+storage_interface: eno4
+swift_storage_interface: ens5f0
+tunnel_interface: ens5f1
+
+[lawnmowerman:vars]
+network_interface: eno1
+neutron_external_interface: eno2
+api_interface: eno3
+storage_interface: eno4
+swift_storage_interface: ens5f0
+tunnel_interface: ens5f1
+
+[manhattan:vars]
+network_interface: eno1
+kolla_external_vip_interface: eno2
+api_interface: eno3
+storage_interface: eno4
+swift_storage_interface: ens5f0
+tunnel_interface: ens5f1
+
 
 
 # When compute nodes and control nodes use different interfaces,
