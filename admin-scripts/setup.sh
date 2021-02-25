@@ -129,6 +129,10 @@ install_extra_packages () {
   sudo dnf config-manager --set-disabled epel-modular epel
 }
 
+other_sytem_hackery_for_setup () {
+  ssh_control_run_as_user_these_hosts root "dnf -y erase buildah podman" "$ALL_HOSTS"
+}
+
 
 
 SUDO_PASS_FILE=`get_sudo_password`
@@ -141,5 +145,6 @@ install_kolla_for_admin
 #install_kolla_for_dev
 config_ansible
 install_extra_packages
+other_sytem_hackery_for_setup
 
 rm $SUDO_PASS_FILE
