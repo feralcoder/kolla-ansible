@@ -1,6 +1,6 @@
 #!/bin/bash
 ADMIN_SETUP_SOURCE="${BASH_SOURCE[0]}"
-ADMIN_SETUP_DIR=$( dirname $KOLLA_SETUP_SOURCE )
+ADMIN_SETUP_DIR=$( dirname $ADMIN_SETUP_SOURCE )
 
 . ~/CODE/feralcoder/host_control/control_scripts.sh
 
