@@ -13,6 +13,10 @@ for x in 2 3 4 5 6; do
   sed -i 's/DEFROUT.*/DEFROUTE=no/g' ifcfg-bond$x
   sed -i 's/BOOTPROTO.*/BOOTPROTO=none/g' ifcfg-bond$x
   sed -i 's/ONBOOT.*/ONBOOT=yes/g' ifcfg-bond$x
-  ifdown bond$x; sleep 1 ; ifup bond$x; sleep 1
+  sed -i "s/^GATEWAY.*//g" ifcfg-bond$x
+  echo "DEFROUTE=no" >> ifcfg-bond$x
+
+  cat ifcfg-bond$x | sort | uniq | grep -v '^$' > bond_$$ && mv -f bond_$$ ifcfg-bond$x
+  echo "ifdown bond$x ; sleep 2; ifup bond$x; sleep 2; ifup bond$x" | at now
 done
 
