@@ -1,26 +1,26 @@
 [control]
-strange        ansible_user=stack ansible_password=st@ck ansible_become=true
-merlin         ansible_user=stack ansible_password=st@ck ansible_become=true
-gandalf        ansible_user=stack ansible_password=st@ck ansible_become=true
+strange_api        ansible_user=stack ansible_password=st@ck ansible_become=true
+merlin_api         ansible_user=stack ansible_password=st@ck ansible_become=true
+gandalf_api        ansible_user=stack ansible_password=st@ck ansible_become=true
 
 [network:children]
 control
 
 [compute]
-kerrigan        ansible_user=stack ansible_password=st@ck ansible_become=true
-neo             ansible_user=stack ansible_password=st@ck ansible_become=true
-bowman          ansible_user=stack ansible_password=st@ck ansible_become=true
-lawnmowerman    ansible_user=stack ansible_password=st@ck ansible_become=true
-manhattan       ansible_user=stack ansible_password=st@ck ansible_become=true
+kerrigan_api        ansible_user=stack ansible_password=st@ck ansible_become=true
+neo_api             ansible_user=stack ansible_password=st@ck ansible_become=true
+bowman_api          ansible_user=stack ansible_password=st@ck ansible_become=true
+lawnmowerman_api    ansible_user=stack ansible_password=st@ck ansible_become=true
+manhattan_api       ansible_user=stack ansible_password=st@ck ansible_become=true
 
 [monitoring]
-merlin          ansible_user=stack ansible_password=st@ck ansible_become=true
+merlin_api          ansible_user=stack ansible_password=st@ck ansible_become=true
 
 [storage:children]
 compute
 
 [deployment]
-localhost       ansible_connection=local become=true
+localhost           ansible_connection=local become=true
 
 
 
