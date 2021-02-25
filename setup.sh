@@ -30,6 +30,12 @@ add_stack_user () {
   sudo chmod 0440 /etc/sudoers.d/stack
 }
 
+setup_local_passwordless_sudo () {
+  cat $SUDO_PASS_FILE | sudo -S ls > /dev/null
+  ( sudo grep "cliff ALL" /etc/sudoers.d/cliff ) || { echo "cliff ALL=(root) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/cliff; }
+  sudo chmod 0440 /etc/sudoers.d/cliff
+}
+
 install_prereqs () {
   cat $SUDO_PASS_FILE | sudo -S ls > /dev/null
   sudo dnf install python3-devel libffi-devel gcc openssl-devel python3-libselinux -y
@@ -79,6 +85,7 @@ install_kolla_for_admin
 #install_kolla_for_dev
 config_ansible
 add_stack_user
+setup_local_passwordless_sudo
 install_extra_packages
 
 rm $SUDO_PASS_FILE
