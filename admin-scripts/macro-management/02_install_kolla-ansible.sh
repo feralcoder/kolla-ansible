@@ -4,9 +4,6 @@ ADMIN_SETUP_DIR=$( dirname $KOLLA_SETUP_SOURCE )
 
 . ~/CODE/feralcoder/host_control/control_scripts.sh
 
-
-. 01_reset_everything.sh
-
 NOW=`date +%Y%m%d-%H%M%S`
 KOLLA_ANSIBLE_CHECKOUT=~/CODE/feralcoder/kolla-ansible/
 LOG_DIR=~/kolla-ansible-logs/
