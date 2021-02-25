@@ -26,7 +26,7 @@ os_control_boot_to_target_installation_these_hosts default "$STACK_HOSTS"
 admin_control_fix_grub_these_hosts "$STACK_HOSTS"
 host_control_update
 
-ssh_control_run_as_user cliff "cd CODE/feralcoder; git clone https://feralcoder:`cat ~/.git_password`@github.com/feralcoder/repo-fetcher.git" dmb
+os_control_checkout_repofetcher dmb
 ssh_control_run_as_user root "/home/cliff/CODE/feralcoder/repo-fetcher/setup.sh" dmb
 
 os_control_checkout_repofetcher yda
