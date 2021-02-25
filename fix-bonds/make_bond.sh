@@ -15,6 +15,7 @@ echo "options $BOND_NAME mode=balance-rr" >> /etc/modprobe.d/bond.conf
 
 sed -i "s/^BOOTPROTO.*/BOOTPROTO=none/g" $FIRST_IF
 sed -i "s/^NAME.*/NAME=$IF_NAME/g" $FIRST_IF
+sed -i "s/^ONBOOT.*/ONBOOT=yes/g" $FIRST_IF
 sed -i "s/^IPV.*//g" $FIRST_IF
 sed -i "s/^IPADD.*//g" $FIRST_IF
 sed -i "s/^PREFIX.*//g" $FIRST_IF
@@ -33,6 +34,7 @@ sed -i "s/NAME=.*/NAME=$BOND_NAME/g" $FIRST_BOND
 sed -i "s/^BOOTPROTO.*/BOOTPROTO=none/g" $FIRST_IF
 sed -i "s/^IPV6.*//g" $FIRST_BOND
 sed -i "s/^DEVICE.*/DEVICE=$BOND_NAME/g" $FIRST_BOND
+sed -i "s/^ONBOOT.*/ONBOOT=yes/g" $FIRST_IF
 echo "BONDING_OPTS='mode=0 miimon=100'" >> $FIRST_BOND
 echo "BONDING_MASTER=yes" >> $FIRST_BOND
 cat $FIRST_BOND | sort | uniq | grep -v '^$' > IF_$$ && mv -f IF_$$ $FIRST_BOND
