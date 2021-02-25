@@ -1,20 +1,20 @@
 [control]
-strange_api        ansible_user=stack ansible_password=st@ck ansible_become=true
-merlin_api         ansible_user=stack ansible_password=st@ck ansible_become=true
-gandalf_api        ansible_user=stack ansible_password=st@ck ansible_become=true
+strange-api        ansible_user=stack ansible_password=st@ck ansible_become=true
+merlin-api         ansible_user=stack ansible_password=st@ck ansible_become=true
+gandalf-api        ansible_user=stack ansible_password=st@ck ansible_become=true
 
 [network:children]
 control
 
 [compute]
-kerrigan_api        ansible_user=stack ansible_password=st@ck ansible_become=true
-neo_api             ansible_user=stack ansible_password=st@ck ansible_become=true
-bowman_api          ansible_user=stack ansible_password=st@ck ansible_become=true
-lawnmowerman_api    ansible_user=stack ansible_password=st@ck ansible_become=true
-manhattan_api       ansible_user=stack ansible_password=st@ck ansible_become=true
+kerrigan-api        ansible_user=stack ansible_password=st@ck ansible_become=true
+neo-api             ansible_user=stack ansible_password=st@ck ansible_become=true
+bowman-api          ansible_user=stack ansible_password=st@ck ansible_become=true
+lawnmowerman-api    ansible_user=stack ansible_password=st@ck ansible_become=true
+manhattan-api       ansible_user=stack ansible_password=st@ck ansible_become=true
 
 [monitoring]
-merlin_api          ansible_user=stack ansible_password=st@ck ansible_become=true
+merlin-api          ansible_user=stack ansible_password=st@ck ansible_become=true
 
 [storage:children]
 compute
