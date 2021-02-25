@@ -31,3 +31,6 @@ host_control_update
 ssh_control_run_as_user cliff "cd CODE/feralcoder; git clone https://feralcoder:`cat ~/.git_password`@github.com/feralcoder/repo-fetcher.git" dmb
 ssh_control_run_as_user root "/home/cliff/CODE/feralcoder/repo-fetcher/setup.sh" dmb
 
+os_control_checkout_repofetcher yda
+os_control_repoint_repos_to_feralcoder_these_hosts "$ALL_HOSTS"
+
