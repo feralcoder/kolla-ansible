@@ -13,7 +13,6 @@ for x in 2 3 4 5 6; do
   sed -i 's/DEFROUT.*/DEFROUTE=no/g' ifcfg-bond$x
   sed -i 's/BOOTPROTO.*/BOOTPROTO=none/g' ifcfg-bond$x
   sed -i 's/ONBOOT.*/ONBOOT=yes/g' ifcfg-bond$x
-  sed -i 's/ONBOOT.*/ONBOOT=yes/g' ifcfg-bond$x
   ifdown bond$x; sleep 1 ; ifup bond$x; sleep 1
 done
 
