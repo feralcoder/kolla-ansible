@@ -130,9 +130,26 @@ install_extra_packages () {
 }
 
 other_sytem_hackery_for_setup () {
-  ssh_control_run_as_user_these_hosts root "dnf -y erase buildah podman" "$ALL_HOSTS"
+  ssh_control_run_as_user_these_hosts root "dnf -y erase buildah podman" "$STACK_HOSTS"
 }
 
+
+
+host_control_updates () {
+  git_control_pull_push_these_hosts "$ALL_HOSTS"
+
+  for host in $ALL_HOSTS; do
+     ssh_control_run_as_user cliff "ilo_control_refetch_ilo_hostkey_these_hosts \"$ALL_HOSTS\"" $HOST
+     ssh_control_run_as_user cliff "ssh_control_refetch_hostkey_these_hosts \"$ALL_HOSTS\"" $HOST
+     ssh_control_run_as_user cliff "ssh_control_refetch_hostkey_these_hosts \"$ALL_HOSTS_API_NET\"" $HOST
+     ssh_control_run_as_user cliff "./CODE/feralcoder/workstation/update.sh" $HOST                    # Set up /etc/hosts
+  done
+  for host in $STACK_HOSTS; do
+     ssh_control_run_as_user root "( hostname | grep -vE '^[^\.]+-api' ) && \
+                                   { hostname \`hostname | sed -E 's/^([^\.]+)/\1-api/g'\` > /dev/null; \
+                                   hostname ; } || echo hostname is already apid" $HOST
+  done
+}
 
 
 SUDO_PASS_FILE=`get_sudo_password`
@@ -146,5 +163,7 @@ install_kolla_for_admin
 config_ansible
 install_extra_packages
 other_sytem_hackery_for_setup
+
+host_control_updates
 
 rm $SUDO_PASS_FILE
