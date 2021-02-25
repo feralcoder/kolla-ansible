@@ -1,4 +1,6 @@
 #!/bin/bash
+KOLLA_SETUP_SOURCE="${BASH_SOURCE[0]}"
+KOLLA_SETUP_DIR=$( dirname $KOLLA_SETUP_SOURCE )
 
 . ~/CODE/feralcoder/host_control/control_scripts.sh
 
