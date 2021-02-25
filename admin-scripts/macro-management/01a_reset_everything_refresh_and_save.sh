@@ -30,6 +30,10 @@ admin_control_fix_grub_these_hosts "$STACK_HOSTS"
 host_control_update
 ssh_control_run_as_user root "dnf -y upgrade" "$STACK_HOSTS"
 
+ssh_control_run_as_user cliff "cd CODE/feralcoder; git clone https://feralcoder:`cat ~/.git_password`@github.com/feralcoder/repo-fetcher.git" dmb
+ssh_control_run_as_user root "/home/cliff/CODE/feralcoder/repo-fetcher/setup.sh" dmb
+
 os_control_boot_to_target_installation_these_hosts admin "$STACK_HOSTS"
 backup_control_backup_all 01_CentOS_8_3_Admin_Install
 os_control_boot_to_target_installation_these_hosts default "$STACK_HOSTS"
+
