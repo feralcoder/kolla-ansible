@@ -27,9 +27,6 @@ os_control_boot_to_target_installation_these_hosts default "$STACK_HOSTS"
 admin_control_fix_grub_these_hosts "$STACK_HOSTS"
 host_control_updates
 
-os_control_checkout_repofetcher dmb
-ssh_control_run_as_user root "/home/cliff/CODE/feralcoder/repo-fetcher/setup.sh" dmb
-
 os_control_checkout_repofetcher yda
 os_control_repoint_repos_to_feralcoder_these_hosts "$ALL_HOSTS"
 ssh_control_run_as_user root "dnf -y upgrade" "$STACK_HOSTS"
