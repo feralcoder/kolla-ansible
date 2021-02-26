@@ -167,18 +167,25 @@ host_control_updates () {
   echo; echo "UPDATING REPOS EVERYWHERE"
   git_control_pull_push_these_hosts "$ALL_HOSTS" 2>/dev/null
 
+  echo; echo "UPDATING cliff ADMIN ENV FROM workstation/update.sh EVERYWHERE (to update /etc/hosts mainly...)"
+  ssh_control_sync_as_user_these_hosts cliff ~/.password ~/.password "$ALL_HOSTS"
+  ssh_control_run_as_user_these_hosts cliff "./CODE/feralcoder/workstation/update.sh" "$ALL_HOSTS"                    # Set up /etc/hosts
+
   echo; echo "REFETCHING ILO KEYS EVERYWHERE"
   # Serialize to not hose ILO's
-  for host in $ALL_HOSTS; do
+  for HOST in $ALL_HOSTS; do
+     echo; echo "Getting ILO hostkeys on $HOST"
      ssh_control_run_as_user cliff "ilo_control_refetch_ilo_hostkey_these_hosts \"$ALL_HOSTS\"" $HOST 2>/dev/null
   done
+
   echo; echo "REFETCHING HOST KEYS EVERYWHERE"
-  ssh_control_run_as_user_these_hosts cliff "ssh_control_refetch_hostkey_these_hosts \"$ALL_HOSTS\"" $HOST 2>/dev/null
+  ssh_control_refetch_hostkey_these_hosts "$ALL_HOSTS"
+  ssh_control_run_as_user_these_hosts cliff "ssh_control_refetch_hostkey_these_hosts \"$ALL_HOSTS\"" "$ALL_HOSTS" 2>/dev/null
   echo; echo "REFETCHING HOST KEYS FOR API NETWORK EVERYWHERE"
-  ssh_control_run_as_user_these_hosts cliff "ssh_control_refetch_hostkey_these_hosts \"$ALL_HOSTS_API_NET\"" $HOST 2>/dev/null
-  echo; echo "UPDATING clriff ADMIN ENV FROM workstation/update.sh EVERYWHERE (to update /etc/hosts mainly...)"
-  ssh_control_run_as_user_these_hosts cliff "./CODE/feralcoder/workstation/update.sh" $HOST                    # Set up /etc/hosts
-  ssh_control_run_as_user_THESE_HOSTS root "( hostname | grep -vE '^[^\.]+-api' ) && \
+  ssh_control_run_as_user_these_hosts cliff "ssh_control_refetch_hostkey_these_hosts \"$ALL_HOSTS_API_NET\"" "$ALL_HOSTS" 2>/dev/null
+
+  echo; echo "RENAMING STACK HOSTS TO THEIR API-NET-RESOLVING NAMES"
+  ssh_control_run_as_user_these_hosts root "( hostname | grep -vE '^[^\.]+-api' ) && \
                                    { hostname \`hostname | sed -E 's/^([^\.]+)/\1-api/g'\` > /dev/null; \
                                    hostname ; } || echo hostname is already apid" "$STACK_HOSTS"
 }
