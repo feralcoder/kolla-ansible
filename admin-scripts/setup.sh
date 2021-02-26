@@ -9,6 +9,16 @@ KOLLA_SETUP_DIR=$( dirname $KOLLA_SETUP_SOURCE )
 get_sudo_password () {
   local PASSWORD
 
+  # if ~/.password exists and works, use it
+  [[ -f ~/.password ]] && {
+    cat ~/.password | sudo -k -S ls >/dev/null 2>&1
+    if [[ $? == 0 ]] ; then
+      echo ~/.password
+      return
+    fi
+  }
+
+  # either ~.password doesn't exiist, or it doesn't work
   read -s -p "Enter Sudo Password: " PASSWORD
   touch /tmp/password_$$
   chmod 600 /tmp/password_$$
@@ -17,8 +27,8 @@ get_sudo_password () {
 }
 
 setup_local_passwordless_sudo () {
-  cat $SUDO_PASS_FILE | sudo -S ls > /dev/null
-  ( sudo grep "cliff ALL" /etc/sudoers.d/cliff ) || { echo "cliff ALL=(root) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/cliff; }
+  cat $SUDO_PASS_FILE | sudo -S ls > /dev/null 
+  ( sudo grep "cliff ALL" /etc/sudoers.d/cliff >/dev/null 2>&1 ) || { echo "cliff ALL=(root) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/cliff; }
   sudo chmod 0440 /etc/sudoers.d/cliff
 }
 
@@ -35,23 +45,28 @@ use_venv () {
 
 
 add_stack_user_everywhere () {
-  # Add stack user everywhere
-  ssh_control_run_as_user_these_hosts root "adduser stack" "$ALL_HOSTS"
-  echo "Enter stack user password:"
-  PASSFILE=`ssh_control_get_password`
-  mv $PASSFILE ~/.stack_password
+  echo; echo "ADDIING STACK USER EVERYWHERE"
+  ssh_control_run_as_user_these_hosts root "adduser stack" "$ALL_HOSTS" 2>/dev/null 
+  [[ -f ~/.stack_password ]] && {
+    PASSFILE=~/.stack_password
+  } || {
+    echo "Enter stack user password:"
+    PASSFILE=`ssh_control_get_password`
+    mv $PASSFILE ~/.stack_password
+  }
   chmod 600 ~/.stack_password
-  ssh_control_sync_as_user_these_hosts root ~/.stack_password /tmp/.stack_password "$ALL_HOSTS"
-  ssh_control_run_as_user_these_hosts  root "cat /tmp/.stack_password /tmp/.stack_password | passwd stack" "$ALL_HOSTS"
+  ssh_control_sync_as_user_these_hosts root ~/.stack_password /tmp/.stack_password "$ALL_HOSTS" 2>/dev/null
+  ssh_control_run_as_user_these_hosts  root "cat /tmp/.stack_password /tmp/.stack_password | passwd stack 2>&1" "$ALL_HOSTS" 2>/dev/null
 
-  # Add stack to sudoers on localhost
+  echo; echo "ADDING STACK USER TO LOCAL SUDOERS"
   cat $SUDO_PASS_FILE | sudo -S ls > /dev/null
-  ( sudo grep "stack ALL" /etc/sudoers.d/stack ) || { echo "stack ALL=(root) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/stack; }
+  ( sudo grep "stack ALL" /etc/sudoers.d/stack >/dev/null 2>&1 ) || { echo "stack ALL=(root) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/stack >/dev/null; }
   sudo chmod 0440 /etc/sudoers.d/stack
-  # Add stack to sudoers everywhere
+
+  echo; echo "ADDING STACK USER TO SUDOERS EVERYWHERE"
   sudo cp /etc/sudoers.d/stack /tmp/stack && sudo chown cliff:cliff /tmp/stack
-  ssh_control_sync_as_user_these_hosts root /tmp/stack /etc/sudoers.d/stack "$ALL_HOSTS"
-  ssh_control_run_as_user_these_hosts root "chown root:root /etc/sudoers.d/stack" "$ALL_HOSTS"
+  ssh_control_sync_as_user_these_hosts root /tmp/stack /etc/sudoers.d/stack "$ALL_HOSTS" 2>/dev/null
+  ssh_control_run_as_user_these_hosts root "chown root:root /etc/sudoers.d/stack 2>&1" "$ALL_HOSTS" 2>/dev/null
   rm -f /tmp/stack
 }
 
@@ -63,19 +78,24 @@ setup_stack_keys_and_sync () {
     chmod 600 ~/.password
   }
   
-  # Set up ~stack/.ssh directory if needed
+  echo; echo "SETTING UP LOCAL STACK .ssh DIRECTORY"
   STACK_SSHDIR=~stack/.ssh/
   cat ~/.password | sudo -S ls >/dev/null
-  sudo su - stack -c '[[ -f $STACK_SSHDIR/id_rsa.pub ]] || ssh-keygen -f $STACK_SSHDIR/id_rsa -P ""'
-  # Put own stack's own pubkey into authorized_keys if needed
-  ADMIN_KEY=`cat $STACK_SSHDIR/pubkeys/id_rsa.pub`
-  KEYPRINT=`echo $ADMIN_KEY | awk '{print $2}'`
-  sudo su - stack -c 'cat $STACK_SSHDIR/id_rsa.pub >> $STACK_SSHDIR/authorized_keys && chmod 600 $STACK_SSHDIR/authorized_keys'
-  sudo su - stack -c "( grep "$KEYPRINT" $STACK_SSHDIR/authorized_keys ) || cat $STACK_SSHDIR/id_rsa.pub >> $STACK_SSHDIR/authorized_keys"
-  # Sync ~stack/.ssh/ to all hosts
+  sudo su - stack -c "[[ -f $STACK_SSHDIR/id_rsa.pub ]] || ssh-keygen -f $STACK_SSHDIR/id_rsa -P ''"
+  
+  echo; echo "PUT STACKS PUBKEY INTO STACKS authorized_keys FILE"
+  ADMIN_KEY=`cat ~/.ssh/pubkeys/id_rsa.pub`
+  STACK_KEY=`sudo cat $STACK_SSHDIR/id_rsa.pub`
+  ADMIN_KEYPRINT=`echo $ADMIN_KEY | awk '{print $2}'`
+  STACK_KEYPRINT=`echo $STACK_KEY | awk '{print $2}'`
+  sudo su - stack -c "touch $STACK_SSHDIR/authorized_keys && chmod 600 $STACK_SSHDIR/authorized_keys"
+  sudo su - stack -c "( grep "$ADMIN_KEYPRINT" $STACK_SSHDIR/authorized_keys >/dev/null ) || echo $STACK_KEY >> $STACK_SSHDIR/authorized_keys"
+  sudo su - stack -c "( grep "$STACK_KEYPRINT" $STACK_SSHDIR/authorized_keys >/dev/null ) || echo $ADMIN_KEY >> $STACK_SSHDIR/authorized_keys"
+  
+  echo; echo "SYNC ~stack/.ssh/ TO STACK EVERYWHERE"
   sudo chown cliff:cliff -R ~stack/
-  ssh_control_sync_as_user_these_hosts root $STACK_SSHDIR/ $STACK_SSHDIR/ "$ALL_HOSTS"
-  ssh_control_run_as_user_these_hosts root "chown stack:stack -R ~stack/" "$ALL_HOSTS"
+  ssh_control_sync_as_user_these_hosts root $STACK_SSHDIR/ $STACK_SSHDIR/ "$ALL_HOSTS" 2>/dev/null
+  ssh_control_run_as_user_these_hosts root "chown stack:stack -R ~stack/" "$ALL_HOSTS" 2>/dev/null
 }
 
 
@@ -88,8 +108,9 @@ setup_stack_keys_and_sync () {
 
 
 install_prereqs () {
+  echo; echo "INSTALLING PREREQ'S"
   cat $SUDO_PASS_FILE | sudo -S ls > /dev/null
-  sudo dnf install python3-devel libffi-devel gcc openssl-devel python3-libselinux -y
+  sudo dnf -y install python3-devel libffi-devel gcc openssl-devel python3-libselinux
   new_venv
   use_venv
   pip install -U pip
@@ -97,6 +118,7 @@ install_prereqs () {
 }
 
 install_kolla_for_admin () {
+  echo; echo "INSTALLING KOLLA FOR ADMINISTRATION"
   pip install kolla-ansible
   cat $SUDO_PASS_FILE | sudo -S ls > /dev/null
   sudo mkdir -p /etc/kolla
@@ -106,6 +128,7 @@ install_kolla_for_admin () {
 }
 
 install_kolla_for_dev () {
+  echo; echo "INSTALLING KOLLA FOR DEVELOPMENT"
   git clone https://github.com/openstack/kolla
   git clone https://github.com/openstack/kolla-ansible
   pip install ./kolla
@@ -118,11 +141,15 @@ install_kolla_for_dev () {
 }
 
 config_ansible () {
-  [[ -f /etc/ansible/ansible.cfg ]] || cp ~/CODE/feralcoder/kolla-ansible/files/first-ansible.cfg /etc/ansible/ansible.cfg
+  echo; echo "CONFIGURING ANSIBLE"
+  cat $SUDO_PASS_FILE | sudo -S ls > /dev/null
+  sudo mkdir -p /etc/ansible
+  [[ -f /etc/ansible/ansible.cfg ]] || sudo cp ~/CODE/feralcoder/kolla-ansible/files/first-ansible.cfg /etc/ansible/ansible.cfg
   [[ -f ~/ansible.cfg ]] || cp ~/CODE/feralcoder/kolla-ansible/files/first-ansible.cfg ~/ansible.cfg
 }
 
 install_extra_packages () {
+  echo; echo "INSTALLING EXTRA PACKAGES"
   cat $SUDO_PASS_FILE | sudo -S ls > /dev/null
   sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
   sudo dnf -y install sshpass
@@ -130,25 +157,30 @@ install_extra_packages () {
 }
 
 other_sytem_hackery_for_setup () {
-  ssh_control_run_as_user_these_hosts root "dnf -y erase buildah podman" "$STACK_HOSTS"
+  echo; echo "OTHER SYSTEM HACKERY"
+  ssh_control_run_as_user_these_hosts root "dnf -y erase buildah podman" "$STACK_HOSTS" 2>/dev/null
 }
 
 
 
 host_control_updates () {
-  git_control_pull_push_these_hosts "$ALL_HOSTS"
+  echo; echo "UPDATING REPOS EVERYWHERE"
+  git_control_pull_push_these_hosts "$ALL_HOSTS" 2>/dev/null
 
+  echo; echo "REFETCHING ILO KEYS EVERYWHERE"
+  # Serialize to not hose ILO's
   for host in $ALL_HOSTS; do
-     ssh_control_run_as_user cliff "ilo_control_refetch_ilo_hostkey_these_hosts \"$ALL_HOSTS\"" $HOST
-     ssh_control_run_as_user cliff "ssh_control_refetch_hostkey_these_hosts \"$ALL_HOSTS\"" $HOST
-     ssh_control_run_as_user cliff "ssh_control_refetch_hostkey_these_hosts \"$ALL_HOSTS_API_NET\"" $HOST
-     ssh_control_run_as_user cliff "./CODE/feralcoder/workstation/update.sh" $HOST                    # Set up /etc/hosts
+     ssh_control_run_as_user cliff "ilo_control_refetch_ilo_hostkey_these_hosts \"$ALL_HOSTS\"" $HOST 2>/dev/null
   done
-  for host in $STACK_HOSTS; do
-     ssh_control_run_as_user root "( hostname | grep -vE '^[^\.]+-api' ) && \
+  echo; echo "REFETCHING HOST KEYS EVERYWHERE"
+  ssh_control_run_as_user_these_hosts cliff "ssh_control_refetch_hostkey_these_hosts \"$ALL_HOSTS\"" $HOST 2>/dev/null
+  echo; echo "REFETCHING HOST KEYS FOR API NETWORK EVERYWHERE"
+  ssh_control_run_as_user_these_hosts cliff "ssh_control_refetch_hostkey_these_hosts \"$ALL_HOSTS_API_NET\"" $HOST 2>/dev/null
+  echo; echo "UPDATING clriff ADMIN ENV FROM workstation/update.sh EVERYWHERE (to update /etc/hosts mainly...)"
+  ssh_control_run_as_user_these_hosts cliff "./CODE/feralcoder/workstation/update.sh" $HOST                    # Set up /etc/hosts
+  ssh_control_run_as_user_THESE_HOSTS root "( hostname | grep -vE '^[^\.]+-api' ) && \
                                    { hostname \`hostname | sed -E 's/^([^\.]+)/\1-api/g'\` > /dev/null; \
-                                   hostname ; } || echo hostname is already apid" $HOST
-  done
+                                   hostname ; } || echo hostname is already apid" "$STACK_HOSTS"
 }
 
 
@@ -166,4 +198,5 @@ other_sytem_hackery_for_setup
 
 host_control_updates
 
-rm $SUDO_PASS_FILE
+
+[[ $SUDO_PASS_FILE != ~/.password ]] && rm $SUDO_PASS_FILE
