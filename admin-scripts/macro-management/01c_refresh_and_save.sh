@@ -8,8 +8,6 @@ ADMIN_SETUP_DIR=$( dirname $ADMIN_SETUP_SOURCE )
 # Run from admin box (yoda)
 
 
-
-
 host_control_updates () {
   git_control_pull_push_these_hosts "$ALL_HOSTS"
   ssh_control_run_as_user_these_hosts cliff "/home/cliff/CODE/feralcoder/workstation/update.sh" "$ALL_HOSTS"
@@ -19,7 +17,6 @@ host_control_updates () {
      ssh_control_run_as_user cliff "ilo_control_refetch_ilo_hostkey_these_hosts \"$ALL_HOSTS\"" $HOST
   done
   ssh_control_run_as_user_these_hosts cliff "ssh_control_refetch_hostkey_these_hosts \"$ALL_HOSTS\"" "$ALL_HOSTS"
-  ssh_control_run_as_user_these_hosts cliff "./CODE/feralcoder/workstation/update.sh" "$ALL_HOSTS"                    # Set up /etc/hosts
 }
 
 
