@@ -17,7 +17,8 @@ os_control_assert_hosts_booted_target default "$STACK_HOSTS" || {
   exit 1
 }
 
-ssh_control_run_as_user cliff "cd CODE/feralcoder; git clone https://feralcoder:`cat ~/.git_password`@github.com/feralcoder/kolla-ansible" $ANSIBLE_CONTROLLER
+ssh_control_run_as_user cliff "cd CODE/feralcoder; [[ -d kolla-ansible ]] || git clone https://feralcoder:`cat ~/.git_password`@github.com/feralcoder/kolla-ansible" $ANSIBLE_CONTROLLER
+ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSIBLE_CONTROLLER
 
 ssh_control_run_as_user cliff "mkdir $LOG_DIR" $ANSIBLE_CONTROLLER
 ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/setup.sh > $LOG_DIR/01-setup_$NOW.log 2>&1" $ANSIBLE_CONTROLLER
