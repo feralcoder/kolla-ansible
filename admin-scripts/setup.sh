@@ -172,11 +172,11 @@ host_control_updates () {
   ssh_control_run_as_user_these_hosts cliff "./CODE/feralcoder/workstation/update.sh" "$ALL_HOSTS"                    # Set up /etc/hosts
 
   echo; echo "REFETCHING ILO KEYS EVERYWHERE"
-  # Serialize to not hose ILO's
-  for HOST in $ALL_HOSTS; do
-     echo; echo "Getting ILO hostkeys on $HOST"
-     ssh_control_run_as_user cliff "ilo_control_refetch_ilo_hostkey_these_hosts \"$ALL_HOSTS\"" $HOST 2>/dev/null
-  done
+#  # Serialize to not hose ILO's
+#  for HOST in $ALL_HOSTS; do
+#     echo; echo "Getting ILO hostkeys on $HOST"
+#     ssh_control_run_as_user cliff "ilo_control_refetch_ilo_hostkey_these_hosts \"$ALL_HOSTS\"" $HOST 2>/dev/null
+#  done
 
   echo; echo "REFETCHING HOST KEYS EVERYWHERE"
   ssh_control_refetch_hostkey_these_hosts "$ALL_HOSTS"
