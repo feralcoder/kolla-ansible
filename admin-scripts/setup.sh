@@ -178,8 +178,6 @@ host_control_updates () {
   echo; echo "REFETCHING HOST KEYS EVERYWHERE"
   ssh_control_refetch_hostkey_these_hosts "$ALL_HOSTS"
   ssh_control_run_as_user_these_hosts cliff "ssh_control_refetch_hostkey_these_hosts \"$ALL_HOSTS\"" "$ALL_HOSTS" 2>/dev/null
-  echo; echo "REFETCHING HOST KEYS FOR API NETWORK EVERYWHERE"
-  ssh_control_run_as_user_these_hosts cliff "ssh_control_refetch_hostkey_these_hosts \"$ALL_HOSTS_API_NET\"" "$ALL_HOSTS" 2>/dev/null
 
   echo; echo "RENAMING STACK HOSTS TO THEIR API-NET-RESOLVING NAMES"
   ssh_control_run_as_user_these_hosts root "( hostname | grep -vE '^[^\.]+-api' ) && \
