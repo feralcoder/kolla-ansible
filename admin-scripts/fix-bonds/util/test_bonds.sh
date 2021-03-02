@@ -1,5 +1,6 @@
 #!/bin/bash
 
+. ~/CODE/feralcoder/host_control/control_scripts.sh
 
 last_octets () {
   for HOST in dmb kgn neo bmn lmn mtn str mrl gnd; do
