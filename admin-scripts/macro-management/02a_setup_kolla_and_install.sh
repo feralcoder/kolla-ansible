@@ -8,6 +8,7 @@ NOW=`date +%Y%m%d-%H%M%S`
 KOLLA_ANSIBLE_CHECKOUT=~/CODE/feralcoder/kolla-ansible/
 LOG_DIR=~/kolla-ansible-logs/
 ANSIBLE_CONTROLLER=dmb
+STACKPASS=st@ck
 
 
 os_control_boot_to_target_installation_these_hosts default "$STACK_HOSTS"
@@ -19,6 +20,10 @@ os_control_assert_hosts_booted_target default "$STACK_HOSTS" || {
 
 ssh_control_run_as_user cliff "cd CODE/feralcoder; [[ -d kolla-ansible ]] || git clone https://feralcoder:`cat ~/.git_password`@github.com/feralcoder/kolla-ansible" $ANSIBLE_CONTROLLER
 ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSIBLE_CONTROLLER
+
+echo $STACKPASS > ~/.stack_password && chmod 600 ~/.stack_password
+ssh_control_sync_as_user cliff /.stack_password /.stack_password $ANSIBLE_CONTROLLER
+ssh_control_run_as_user cliff "chmod 600 ~/.stack_password" $ANSIBLE_CONTROLLER
 
 ssh_control_run_as_user cliff "mkdir $LOG_DIR" $ANSIBLE_CONTROLLER
 ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/setup.sh > $LOG_DIR/01-setup_$NOW.log 2>&1" $ANSIBLE_CONTROLLER
