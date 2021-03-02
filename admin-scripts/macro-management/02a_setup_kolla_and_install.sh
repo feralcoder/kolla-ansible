@@ -22,7 +22,7 @@ ssh_control_run_as_user cliff "cd CODE/feralcoder; [[ -d kolla-ansible ]] || git
 ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSIBLE_CONTROLLER
 
 echo $STACKPASS > ~/.stack_password && chmod 600 ~/.stack_password
-ssh_control_sync_as_user cliff /.stack_password /.stack_password $ANSIBLE_CONTROLLER
+ssh_control_sync_as_user cliff ~/.stack_password ~/.stack_password $ANSIBLE_CONTROLLER
 ssh_control_run_as_user cliff "chmod 600 ~/.stack_password" $ANSIBLE_CONTROLLER
 
 ssh_control_run_as_user cliff "mkdir $LOG_DIR" $ANSIBLE_CONTROLLER
