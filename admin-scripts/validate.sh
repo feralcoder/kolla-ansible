@@ -9,6 +9,6 @@ KOLLA_SETUP_DIR=$( dirname $KOLLA_SETUP_SOURCE )
 
 
 kolla-genpwd
-ansible -i ../files/inventory-feralstack all -m ping
-kolla-ansible -i ../files/inventory-feralstack bootstrap-servers
-kolla-ansible -i ../files/inventory-feralstack prechecks
+ansible -i $KOLLA_SETUP_DIR/../files/inventory-feralstack all -m ping
+kolla-ansible -i $KOLLA_SETUP_DIR/../files/inventory-feralstack bootstrap-servers
+kolla-ansible -i $KOLLA_SETUP_DIR/../files/inventory-feralstack prechecks
