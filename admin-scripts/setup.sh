@@ -26,6 +26,12 @@ get_sudo_password () {
   echo /tmp/password_$$
 }
 
+decrypt_secure_files () {
+  # Private key encrypted via: openssl enc -aes-256-cfb8 -md sha256 -in $KOLLA_SETUP_DIR/../files/passwords.yml -out $KOLLA_SETUP_DIR/../files/passwords.yml.encrypted
+  openssl enc --pass file:/home/cliff/.password -d -aes-256-cfb8 -md sha256 -in $KOLLA_SETUP_DIR/../files/passwords.yml.encrypted -out $KOLLA_SETUP_DIR/../files/passwords.yml
+  cp $KOLLA_SETUP_DIR/../files/passwords.yml /etc/kolla/
+}
+
 setup_local_passwordless_sudo () {
   cat $SUDO_PASS_FILE | sudo -S ls > /dev/null 
   ( sudo grep "cliff ALL" /etc/sudoers.d/cliff >/dev/null 2>&1 ) || { echo "cliff ALL=(root) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/cliff; }
@@ -190,6 +196,7 @@ setup_stack_keys_and_sync
 
 install_prereqs
 install_kolla_for_admin
+decrypt_secure_files
 #install_kolla_for_dev
 config_ansible
 install_extra_packages
