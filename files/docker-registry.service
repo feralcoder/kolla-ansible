@@ -8,8 +8,8 @@ Requires=docker.service
 Type=oneshot
 User=root
 RemainAfterExit=yes
-ExecStartPre=-/root/docker-registry-stop.sh
-ExecStart=/root/docker-registry-start.sh
-ExecStop=/root/docker-registry-stop.sh
+ExecStartPre=-/usr/local/bin/docker-registry-stop.sh
+ExecStart=/usr/local/bin/docker-registry-start.sh
+ExecStop=/usr/local/bin/docker-registry-stop.sh
 [Install]
 WantedBy=multi-user.target
