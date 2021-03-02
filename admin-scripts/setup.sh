@@ -99,11 +99,6 @@ setup_stack_keys_and_sync () {
 
 
 
-
-
-
-
-
 install_prereqs () {
   echo; echo "INSTALLING PREREQ'S"
   cat $SUDO_PASS_FILE | sudo -S ls > /dev/null
@@ -121,6 +116,7 @@ install_kolla_for_admin () {
   sudo mkdir -p /etc/kolla
   sudo chown $USER:$USER /etc/kolla
   cp -r ~/CODE/venvs/kolla-ansible/share/kolla-ansible/etc_examples/kolla/* /etc/kolla
+  cp $KOLLA_SETUP_DIR/../files/globals.yml /etc/kolla/
   # cp ~/CODE/venvs/kolla-ansible/share/kolla-ansible/ansible/inventory/* .
 }
 
@@ -135,6 +131,7 @@ install_kolla_for_dev () {
   sudo chown $USER:$USER /etc/kolla
   cp -r ~/CODE/feralcoder/kolla-ansible/etc/kolla/* /etc/kolla
   cp ~/CODE/feralcoder/kolla-ansible/ansible/inventory/* .
+  cp $KOLLA_SETUP_DIR/../files/globals.yml /etc/kolla/
 }
 
 config_ansible () {
