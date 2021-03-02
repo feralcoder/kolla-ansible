@@ -10,10 +10,12 @@ last_octets () {
 }
 
 LAST_OCTETS=`last_octets $ALL_HOSTS | tr '\n' ' ' `
-echo "$LAST_OCTETS"
 
 test_nets () {
   for NET_24 in 192.168.127 192.168.40 172.16.0 172.17.0 172.18.0 172.19.0; do
     ssh_control_run_as_user_these_hosts root "for HOST_8 in $LAST_OCTETS; do ping -c3 -t1 ${NET_24}.\$HOST_8 ; done" "dmb kgn neo bmn lmn mtn str mrl gnd"
   done
 }
+
+echo "$LAST_OCTETS"
+test_nets
