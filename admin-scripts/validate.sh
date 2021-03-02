@@ -1,4 +1,9 @@
 #!/bin/bash
+
+# RUN ON ANSIBLE CONTROLLER
+
+. ~/CODE/venvs/kolla-ansible/bin/activate
+
 KOLLA_SETUP_SOURCE="${BASH_SOURCE[0]}"
 KOLLA_SETUP_DIR=$( dirname $KOLLA_SETUP_SOURCE )
 
