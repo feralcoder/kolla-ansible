@@ -51,8 +51,7 @@ add_stack_user_everywhere () {
     PASSFILE=~/.stack_password
   } || {
     echo "Enter stack user password:"
-    PASSFILE=`ssh_control_get_password`
-    mv $PASSFILE ~/.stack_password
+    PASSFILE=`ssh_control_get_password ~/.stack_password false`
   }
   chmod 600 ~/.stack_password
   ssh_control_sync_as_user_these_hosts root ~/.stack_password /tmp/.stack_password "$ALL_HOSTS" 2>/dev/null
@@ -73,9 +72,7 @@ add_stack_user_everywhere () {
 setup_stack_keys_and_sync () {
   [[ -f ~/.password ]] || { 
     echo "Enter sudo password:" 
-    PASSFILE=`ssh_control_get_password`
-    mv $PASSFILE ~/.password
-    chmod 600 ~/.password
+    PASSFILE=`ssh_control_get_password ~/.password`
   }
   
   echo; echo "SETTING UP LOCAL STACK .ssh DIRECTORY"
