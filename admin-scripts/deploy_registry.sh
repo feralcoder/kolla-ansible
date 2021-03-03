@@ -8,7 +8,7 @@ ANSIBLE_CONTROLLER=dmb
 
 echo; echo "INSTALLING YUM-UTILS and DOCKER.CE REPO"
 ssh_control_run_as_user root "yum install -y yum-utils" $ANSIBLE_CONTROLLER
-ssh_control_run_as_user root "yum-config-manager     --add-repo     https://download.docker.com/linux/centos/docker-ce.repo" $ANSIBLE_CONTROLLER
+ssh_control_run_as_user root "(dnf repolist | grep docker) || yum-config-manager     --add-repo     https://download.docker.com/linux/centos/docker-ce.repo" $ANSIBLE_CONTROLLER
 
 echo; echo "INSTALLING CONTAINERD AND DOCKER.CE (and disabling firewal)"
 ssh_control_run_as_user root "dnf -y install https://download.docker.com/linux/centos/7/x86_64/stable/Packages/containerd.io-1.2.6-3.3.el7.x86_64.rpm" $ANSIBLE_CONTROLLER
@@ -25,11 +25,12 @@ ssh_control_run_as_user root "chown root:root /etc/systemd/system/docker-registr
 ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/daemon.json /etc/docker/daemon.json $ANSIBLE_CONTROLLER
 ssh_control_run_as_user root "chown root:root /etc/docker/daemon.json; chmod 644 /etc/docker/daemon.json" $ANSIBLE_CONTROLLER
 
-echo; echo "CONFIGURING SELINUX TO TOLERATE docker-registry"
-ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/docker-registry.te /tmp/docker-registry.te $ANSIBLE_CONTROLLER
-ssh_control_run_as_user root "checkmodule -M  -m -o /tmp/docker-registry.mod /tmp/docker-registry.te" $ANSIBLE_CONTROLLER
-ssh_control_run_as_user root "semodule_package -o /tmp/docker-registry.pp  -m /tmp/docker-registry.mod" $ANSIBLE_CONTROLLER
-ssh_control_run_as_user root "semodule -i /tmp/docker-registry.pp" $ANSIBLE_CONTROLLER
+# NOW NOT NEEDED.  WHY???
+#echo; echo "CONFIGURING SELINUX TO TOLERATE docker-registry"
+#ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/docker-registry.te /tmp/docker-registry.te $ANSIBLE_CONTROLLER
+#ssh_control_run_as_user root "checkmodule -M  -m -o /tmp/docker-registry.mod /tmp/docker-registry.te" $ANSIBLE_CONTROLLER
+#ssh_control_run_as_user root "semodule_package -o /tmp/docker-registry.pp  -m /tmp/docker-registry.mod" $ANSIBLE_CONTROLLER
+#ssh_control_run_as_user root "semodule -i /tmp/docker-registry.pp" $ANSIBLE_CONTROLLER
 
 echo; echo "ENABLING AND STARTING docker-registry"
 ssh_control_run_as_user root "systemctl enable docker-registry" $ANSIBLE_CONTROLLER
