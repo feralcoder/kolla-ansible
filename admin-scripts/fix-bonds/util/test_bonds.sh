@@ -20,3 +20,5 @@ test_nets () {
 
 echo "$LAST_OCTETS"
 test_nets
+
+for i in $ALL_HOSTS; do ssh root@$i hostname; done

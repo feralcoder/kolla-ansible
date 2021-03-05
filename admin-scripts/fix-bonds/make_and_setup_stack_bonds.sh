@@ -18,3 +18,5 @@ for SERVER in $STACK_HOSTS; do
   ssh_control_sync_as_user root $BONDSCRIPT_DIR/scripts/setup_host_bonds.sh /root/setup_host_bonds.sh $SERVER
   ssh_control_run_as_user root "nohup /root/setup_host_bonds.sh &" $SERVER
 done
+
+for i in $ALL_HOSTS; do ssh root@$i hostname; done
