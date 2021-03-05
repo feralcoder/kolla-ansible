@@ -159,6 +159,8 @@ install_extra_packages () {
 other_sytem_hackery_for_setup () {
   echo; echo "OTHER SYSTEM HACKERY"
   ssh_control_run_as_user_these_hosts root "dnf -y erase buildah podman" "$STACK_HOSTS" 2>/dev/null
+  ssh_control_sync_as_user_these_hosts root $KOLLA_SETUP_DIR/../files/90-networkmanager-go-fuck-yourself.conf /etc/NetworkManager/conf.d/ "$STACK_HOSTS"
+  ssh_control_run_as_user_these_hosts root "systemctl reload NetworkManager" "$STACK_HOSTS"
 }
 
 
