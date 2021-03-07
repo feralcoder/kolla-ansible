@@ -4,7 +4,7 @@ KOLLA_SETUP_DIR=$( dirname $KOLLA_SETUP_SOURCE )
 
 ANSIBLE_CONTROLLER=dmb
 
-
+. ~/CODE/venvs/kolla-ansible/bin/activate
 
 echo; echo "INSTALLING YUM-UTILS and DOCKER.CE REPO"
 ssh_control_run_as_user root "yum install -y yum-utils" $ANSIBLE_CONTROLLER
