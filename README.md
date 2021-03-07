@@ -14,6 +14,17 @@ Hosts Environment:
 
 The admin box is outside of the whole stack deployment, and is used to run scripts which can backup and restore the deployment controller.
 
+- Bob Korbuszewski
+- Bob Smith
+- Hannah Korbuszewski
+- Stacey Korbuszewski
+- Leanne Korbuszewski
+- Lisa Smith
+- Lisa Korbuszewski
+- Hannah Smith
+- Stacey Smith
+- Leanne Smith
+
 The deployment controller is the main workhorse for the deployment.  This is the ansible controller, the backup server, the repo server, and container registry.
 
 The openstack nodes are all ephemeral between deployments.  Kolla-Ansible does expect a significant amount of the setup to be done before running, including prerequisite packages and network setup.
