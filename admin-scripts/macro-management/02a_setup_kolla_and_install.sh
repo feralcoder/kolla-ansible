@@ -36,14 +36,15 @@ ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/fix-bonds/m
 ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/fix-bonds/util/test_bonds.sh > $LOG_DIR/03-test-bonds_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 3: Test Bonds"
 ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/pre-deploy.sh > $LOG_DIR/04-pre-deploy_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 4: Pre Deployment"
 ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/deploy_registry.sh > $LOG_DIR/05-deploy_registry_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 5: Registry Deployment"
+
+os_control_boot_to_target_installation_these_hosts admin "$STACK_HOSTS"
+backup_control_backup_all 02_Kolla-Ansible_Setup
+os_control_boot_to_target_installation_these_hosts default "$STACK_HOSTS"
+
 ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/deploy.sh > $LOG_DIR/06-deploy_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 6: Stack Deployment"
 
-#os_control_boot_to_target_installation_these_hosts admin "$STACK_HOSTS"
-#backup_control_backup_all 02_Kolla-Ansible_Setup
-#os_control_boot_to_target_installation_these_hosts default "$STACK_HOSTS"
-#
-#ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/deploy.sh > $LOG_DIR/05-install_$NOW.log 2>&1" $ANSIBLE_CONTROLLER
-#
-#os_control_boot_to_target_installation_these_hosts admin "$STACK_HOSTS"
-#backup_control_backup_all 03_Kolla-Ansible_Installed
-#os_control_boot_to_target_installation_these_hosts default "$STACK_HOSTS"
+os_control_boot_to_target_installation_these_hosts admin "$STACK_HOSTS"
+backup_control_backup_all 03_Kolla-Ansible_Installed
+os_control_boot_to_target_installation_these_hosts default "$STACK_HOSTS"
+
+
