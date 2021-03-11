@@ -1,0 +1,45 @@
+[mons]
+strange-api        ansible_user=stack ansible_password=st@ck ansible_become=true
+merlin-api         ansible_user=stack ansible_password=st@ck ansible_become=true
+gandalf-api        ansible_user=stack ansible_password=st@ck ansible_become=true
+
+[osds]
+kerrigan-api        ansible_user=stack ansible_password=st@ck ansible_become=true
+neo-api             ansible_user=stack ansible_password=st@ck ansible_become=true
+bowman-api          ansible_user=stack ansible_password=st@ck ansible_become=true
+lawnmowerman-api    ansible_user=stack ansible_password=st@ck ansible_become=true
+manhattan-api       ansible_user=stack ansible_password=st@ck ansible_become=true
+
+[grafana-server]
+strange-api        ansible_user=stack ansible_password=st@ck ansible_become=true
+
+[mgrs]
+strange-api        ansible_user=stack ansible_password=st@ck ansible_become=true
+merlin-api         ansible_user=stack ansible_password=st@ck ansible_become=true
+gandalf-api        ansible_user=stack ansible_password=st@ck ansible_become=true
+
+[rgws]
+strange-api        ansible_user=stack ansible_password=st@ck ansible_become=true
+merlin-api         ansible_user=stack ansible_password=st@ck ansible_become=true
+gandalf-api        ansible_user=stack ansible_password=st@ck ansible_become=true
+
+[mdss]
+strange-api        ansible_user=stack ansible_password=st@ck ansible_become=true
+merlin-api         ansible_user=stack ansible_password=st@ck ansible_become=true
+gandalf-api        ansible_user=stack ansible_password=st@ck ansible_become=true
+
+[clients]
+kerrigan-api        ansible_user=stack ansible_password=st@ck ansible_become=true
+neo-api             ansible_user=stack ansible_password=st@ck ansible_become=true
+bowman-api          ansible_user=stack ansible_password=st@ck ansible_become=true
+lawnmowerman-api    ansible_user=stack ansible_password=st@ck ansible_become=true
+manhattan-api       ansible_user=stack ansible_password=st@ck ansible_become=true
+strange-api        ansible_user=stack ansible_password=st@ck ansible_become=true
+merlin-api         ansible_user=stack ansible_password=st@ck ansible_become=true
+gandalf-api        ansible_user=stack ansible_password=st@ck ansible_become=true
+dumbledore         ansible_user=stack ansible_password=st@ck ansible_become=true
+
+[rgws]
+strange-api        ansible_user=stack ansible_password=st@ck ansible_become=true
+merlin-api         ansible_user=stack ansible_password=st@ck ansible_become=true
+gandalf-api        ansible_user=stack ansible_password=st@ck ansible_become=true
