@@ -1,0 +1,5 @@
+osd_scenario: collocated
+osd_objectstore: bluestore
+dmcrypt: false
+devices:
+
