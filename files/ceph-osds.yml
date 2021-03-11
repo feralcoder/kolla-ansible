@@ -1,5 +1,4 @@
-osd_scenario: collocated
+osd_scenario: non-collocated
 osd_objectstore: bluestore
 dmcrypt: false
-devices:
-
+devices: []
