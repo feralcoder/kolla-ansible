@@ -1,6 +1,11 @@
 #!/bin/bash
 CEPH_SETUP_SOURCE="${BASH_SOURCE[0]}"
 CEPH_SETUP_DIR=$( dirname $CEPH_SETUP_SOURCE )
+# CEPH_SETUP_DIR=~/CODE/feralcoder/kolla-ansible/admin-scripts
+
+CODE_DIR=~/CODE
+CEPH_CODE_DIR=$CODE_DIR/ceph
+CEPH_CHECKOUT_DIR=$CEPH_CODE_DIR/ceph-ansible
 
 . ~/CODE/feralcoder/host_control/control_scripts.sh
 
@@ -20,10 +25,18 @@ use_venv () {
   source ~/CODE/venvs/ceph-ansible/bin/activate
 }
 
-install_ceph-ansible_for_dev () {
+install_prereqs () {
+  new_venv
+  use_venv
+  pip install -U pip
+  pip install -r $CEPH_CHECKOUT_DIR/requirements.txt
+}
+
+checkout_ceph-ansible_for_dev () {
   echo; echo "INSTALLING CEPH-ANSIBLE"
   mkdir -p ~/CODE/ceph/
   cd ~/CODE/ceph/
+  cd $CEPH_CODE_DIR
   git clone https://github.com/ceph/ceph-ansible.git
   cd ceph-ansible
   git checkout stable-$VERSION
@@ -31,9 +44,22 @@ install_ceph-ansible_for_dev () {
 
 
 
+place_ceph_files () {
+  cp $CEPH_SETUP_DIR/../files/ceph-osds.yml $CEPH_CHECKOUT_DIR/group_vars/osds.yml
+  cp $CEPH_SETUP_DIR/../files/ceph-all.yml $CEPH_CHECKOUT_DIR/group_vars/all.yml
+  cp $CEPH_SETUP_DIR/../files/ceph-site.yml $CEPH_CHECKOUT_DIR/site.yml
+  cp $CEPH_SETUP_DIR/../files/ceph-mons.yml $CEPH_CHECKOUT_DIR/group_vars/mons.yml
+  cp $CEPH_SETUP_DIR/../files/ceph-site-docker.yml $CEPH_CHECKOUT_DIR/site-docker.yml
+  cp $CEPH_SETUP_DIR/../files/ceph-docker-prerequisites.yml $CEPH_CHECKOUT_DIR/roles/ceph-container-engine/tasks/pre_requisites/prerequisites.yml
+  cp $CEPH_SETUP_DIR/../files/ceph-purge-docker-cluster.yml $CEPH_CHECKOUT_DIR/infrastructure-playbooks/purge-docker-cluster.yml
+  cp $CEPH_SETUP_DIR/../files/ceph-hosts $CEPH_CHECKOUT_DIR/hosts
+}
 
 
-new_venv
-use_venv
-install_ceph-ansible_for_dev
 
+
+install_prereqs
+checkout_ceph-ansible_for_dev
+place_ceph_files
+
+ansible-playbook site-docker.yml -i hosts -e container_package_name=docker-ce
