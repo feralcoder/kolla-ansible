@@ -50,6 +50,7 @@ place_ceph_files () {
   cp $CEPH_SETUP_DIR/../files/ceph-site.yml $CEPH_CHECKOUT_DIR/site.yml
   cp $CEPH_SETUP_DIR/../files/ceph-mons.yml $CEPH_CHECKOUT_DIR/group_vars/mons.yml
   cp $CEPH_SETUP_DIR/../files/ceph-site-docker.yml $CEPH_CHECKOUT_DIR/site-docker.yml
+  cp $CEPH_SETUP_DIR/../files/ceph-container_binary.yml $CEPH_CHECKOUT_DIR/roles/ceph-facts/tasks/container_binary.yml
   cp $CEPH_SETUP_DIR/../files/ceph-docker-prerequisites.yml $CEPH_CHECKOUT_DIR/roles/ceph-container-engine/tasks/pre_requisites/prerequisites.yml
   cp $CEPH_SETUP_DIR/../files/ceph-purge-docker-cluster.yml $CEPH_CHECKOUT_DIR/infrastructure-playbooks/purge-docker-cluster.yml
   cp $CEPH_SETUP_DIR/../files/ceph-hosts $CEPH_CHECKOUT_DIR/hosts
