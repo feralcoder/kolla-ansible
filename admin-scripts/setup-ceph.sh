@@ -22,7 +22,8 @@ use_venv () {
 
 install_ceph-ansible_for_dev () {
   echo; echo "INSTALLING CEPH-ANSIBLE"
-  cd ~/CODE/feralcoder/
+  mkdir -p ~/CODE/ceph/
+  cd ~/CODE/ceph/
   git clone https://github.com/ceph/ceph-ansible.git
   cd ceph-ansible
   git checkout stable-$VERSION
@@ -36,7 +37,3 @@ new_venv
 use_venv
 install_ceph-ansible_for_dev
 
-
-#my kolla storage_interface will be my monitor_interface
-#my kolla cluster_interface will be my cluster_network
-#my kolla kolla_external_vip_interface will be my radosgw_interface
