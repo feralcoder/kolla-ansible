@@ -27,7 +27,7 @@ get_sudo_password () {
 }
 
 decrypt_secure_files () {
-  # Private key encrypted via: openssl enc -aes-256-cfb8 -md sha256 -in $KOLLA_SETUP_DIR/../files/passwords.yml -out $KOLLA_SETUP_DIR/../files/passwords.yml.encrypted
+  # Password file encrypted via: openssl enc -aes-256-cfb8 -md sha256 -in $KOLLA_SETUP_DIR/../files/passwords.yml -out $KOLLA_SETUP_DIR/../files/passwords.yml.encrypted
   openssl enc --pass file:/home/cliff/.password -d -aes-256-cfb8 -md sha256 -in $KOLLA_SETUP_DIR/../files/passwords.yml.encrypted -out $KOLLA_SETUP_DIR/../files/passwords.yml
   cp $KOLLA_SETUP_DIR/../files/passwords.yml /etc/kolla/
 }
