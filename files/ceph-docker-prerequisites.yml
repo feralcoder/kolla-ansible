@@ -15,7 +15,7 @@
 
 # feralcoder: Commented out - not installing docker here, don't need extras for ceph?
 ## ensure extras enabled for docker
-- name: enable extras on centos
+#- name: enable extras on centos
 #  yum_repository:
 #    name: extras
 #    state: present
