@@ -1,4 +1,9 @@
 osd_scenario: non-collocated
 osd_objectstore: bluestore
 dmcrypt: false
-devices: []
+#devices: []
+lvm_volumes:
+  - data: OSD_1_data
+    data_vg: OSD_1_data
+    db: OSD_1_db
+    db_vg: OSD_1_db
