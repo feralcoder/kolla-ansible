@@ -45,16 +45,32 @@ checkout_ceph-ansible_for_dev () {
 
 
 place_ceph_files () {
+  # These are pure configuration, no need to back up targets
   cp $CEPH_SETUP_DIR/../files/ceph-osds.yml $CEPH_CHECKOUT_DIR/group_vars/osds.yml
   cp $CEPH_SETUP_DIR/../files/ceph-all.yml $CEPH_CHECKOUT_DIR/group_vars/all.yml
   cp $CEPH_SETUP_DIR/../files/ceph-site.yml $CEPH_CHECKOUT_DIR/site.yml
   cp $CEPH_SETUP_DIR/../files/ceph-mons.yml $CEPH_CHECKOUT_DIR/group_vars/mons.yml
   cp $CEPH_SETUP_DIR/../files/ceph-site-docker.yml $CEPH_CHECKOUT_DIR/site-docker.yml
+  cp $CEPH_SETUP_DIR/../files/ceph-hosts $CEPH_CHECKOUT_DIR/hosts
+
+  # These are code, corrected for bugs, need to back up.
+  # Compare in the future for code drift.  Improve: edit instead of replace.
+  XXX=$CEPH_CHECKOUT_DIR/roles/ceph-osd/tasks/main.yml
+  [[ -f $XXX.orig ]] || cp $XXX $XXX.orig
+  XXX=$CEPH_CHECKOUT_DIR/roles/ceph-facts/tasks/container_binary.yml
+  [[ -f $XXX.orig ]] || cp $XXX $XXX.orig
+  XXX=$CEPH_CHECKOUT_DIR/roles/ceph-container-engine/tasks/pre_requisites/prerequisites.yml
+  [[ -f $XXX.orig ]] || cp $XXX $XXX.orig
+  XXX=$CEPH_CHECKOUT_DIR/infrastructure-playbooks/purge-docker-cluster.yml
+  [[ -f $XXX.orig ]] || cp $XXX $XXX.orig
+  XXX=$CEPH_CHECKOUT_DIR/roles/ceph-dashboard/tasks/configure_dashboard.yml
+  [[ -f $XXX.orig ]] || cp $XXX $XXX.orig
+
   cp $CEPH_SETUP_DIR/../files/ceph-main.yml $CEPH_CHECKOUT_DIR/roles/ceph-osd/tasks/main.yml
   cp $CEPH_SETUP_DIR/../files/ceph-container_binary.yml $CEPH_CHECKOUT_DIR/roles/ceph-facts/tasks/container_binary.yml
   cp $CEPH_SETUP_DIR/../files/ceph-docker-prerequisites.yml $CEPH_CHECKOUT_DIR/roles/ceph-container-engine/tasks/pre_requisites/prerequisites.yml
   cp $CEPH_SETUP_DIR/../files/ceph-purge-docker-cluster.yml $CEPH_CHECKOUT_DIR/infrastructure-playbooks/purge-docker-cluster.yml
-  cp $CEPH_SETUP_DIR/../files/ceph-hosts $CEPH_CHECKOUT_DIR/hosts
+  cp $CEPH_SETUP_DIR/../files/ceph-configure_dashboard.yml $CEPH_CHECKOUT_DIR/roles/ceph-dashboard/tasks/configure_dashboard.yml
 }
 
 
