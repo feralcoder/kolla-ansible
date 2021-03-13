@@ -194,7 +194,7 @@ host_control_updates () {
 }
 
 
-SUDO_PASS_FILE=`get_sudo_password`
+SUDO_PASS_FILE=`admin_control_get_sudo_password`
 setup_local_passwordless_sudo
 add_stack_user_everywhere
 setup_stack_keys_and_sync

@@ -6,26 +6,6 @@ KOLLA_SETUP_DIR=$( dirname $KOLLA_SETUP_SOURCE )
 
 
 
-get_sudo_password () {
-  local PASSWORD
-
-  # if ~/.password exists and works, use it
-  [[ -f ~/.password ]] && {
-    cat ~/.password | sudo -k -S ls >/dev/null 2>&1
-    if [[ $? == 0 ]] ; then
-      echo ~/.password
-      return
-    fi
-  }
-
-  # either ~.password doesn't exiist, or it doesn't work
-  read -s -p "Enter Sudo Password: " PASSWORD
-  touch /tmp/password_$$
-  chmod 600 /tmp/password_$$
-  echo $PASSWORD > /tmp/password_$$
-  echo /tmp/password_$$
-}
-
 set_up_ceph_volumes_and_users () {
   CEPH_MON=`echo "$CEPH_MON_HOSTS" | tr ' ' '\n' | head -n 1`
   MON_CONTAINER=`ssh_control_run_as_user root "docker container list" $CEPH_MON | grep ' ceph-mon-' | awk '{print $1}'`
@@ -70,16 +50,16 @@ set_up_ceph_volumes_and_users () {
   sudo cp $KOLLA_SETUP_DIR/../files/ceph-glance-api.conf /etc/kolla/config/glance/glance-api.conf
   sudo cp $KOLLA_SETUP_DIR/../files/ceph-nova-compute.conf /etc/kolla/config/nova/nova-compute.conf
   sudo cp $KOLLA_SETUP_DIR/../files/ceph-gnocchi.conf /etc/kolla/config/gnocchi/gnocchi.conf
-  sudo cp /etc/ceph/ceph.conf //etc/kolla/config/cinder/
-  sudo cp /etc/ceph/ceph.conf //etc/kolla/config/glance/
-  sudo cp /etc/ceph/ceph.conf //etc/kolla/config/nova/
-  sudo cp /etc/ceph/ceph.conf //etc/kolla/config/gnocchi/
+  sudo cp /etc/ceph/ceph.conf /etc/kolla/config/cinder/
+  sudo cp /etc/ceph/ceph.conf /etc/kolla/config/glance/
+  sudo cp /etc/ceph/ceph.conf /etc/kolla/config/nova/
+  sudo cp /etc/ceph/ceph.conf /etc/kolla/config/gnocchi/
 }
 
 
 
 
-SUDO_PASS_FILE=`get_sudo_password`
+SUDO_PASS_FILE=`admin_control_get_sudo_password`
 set_up_ceph_volumes_and_users
 
 [[ $SUDO_PASS_FILE != ~/.password ]] && rm $SUDO_PASS_FILE
