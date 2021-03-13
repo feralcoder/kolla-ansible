@@ -1,4 +1,4 @@
-osd_scenario: non-collocated
+osd_scenario: lvm
 osd_objectstore: bluestore
 dmcrypt: false
 #devices: []
