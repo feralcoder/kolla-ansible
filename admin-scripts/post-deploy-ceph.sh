@@ -66,7 +66,7 @@ set_up_ceph_volumes_and_users () {
   sudo cp /etc/ceph/ceph.client.nova.keyring /etc/kolla/config/nova/
   sudo cp /etc/ceph/ceph.client.gnocchi.keyring /etc/kolla/config/gnocchi/
   sudo cp $KOLLA_SETUP_DIR/../files/ceph-cinder-backup.conf /etc/kolla/config/cinder/cinder-backup.conf
-  sudo cp $KOLLA_SETUP_DIR/../files/ceph-cinder-api.conf /etc/kolla/config/cinder/cinder-api.conf
+  sudo cp $KOLLA_SETUP_DIR/../files/ceph-cinder-volume.conf /etc/kolla/config/cinder/cinder-volume.conf
   sudo cp $KOLLA_SETUP_DIR/../files/ceph-glance-api.conf /etc/kolla/config/glance/glance-api.conf
   sudo cp $KOLLA_SETUP_DIR/../files/ceph-nova-compute.conf /etc/kolla/config/nova/nova-compute.conf
   sudo cp $KOLLA_SETUP_DIR/../files/ceph-gnocchi.conf /etc/kolla/config/gnocchi/gnocchi.conf
