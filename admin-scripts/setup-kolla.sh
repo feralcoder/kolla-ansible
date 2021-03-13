@@ -210,4 +210,4 @@ other_sytem_hackery_for_setup
 host_control_updates
 
 
-[[ $SUDO_PASS_FILE != ~/.password ]] && rm $SUDO_PASS_FILE
+[[ $SUDO_PASS_FILE == ~/.password ]] || rm $SUDO_PASS_FILE
