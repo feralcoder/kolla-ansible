@@ -33,7 +33,7 @@ decrypt_secure_files () {
 }
 
 setup_local_passwordless_sudo () {
-  cat $SUDO_PASS_FILE | sudo -S ls > /dev/null 
+  cat $SUDO_PASS_FILE | sudo -S ls > /dev/null
   ( sudo grep "cliff ALL" /etc/sudoers.d/cliff >/dev/null 2>&1 ) || { echo "cliff ALL=(root) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/cliff; }
   sudo chmod 0440 /etc/sudoers.d/cliff
 }
@@ -52,7 +52,7 @@ use_venv () {
 
 add_stack_user_everywhere () {
   echo; echo "ADDIING STACK USER EVERYWHERE"
-  ssh_control_run_as_user_these_hosts root "adduser stack" "$ALL_HOSTS" 2>/dev/null 
+  ssh_control_run_as_user_these_hosts root "adduser stack" "$ALL_HOSTS" 2>/dev/null
   [[ -f ~/.stack_password ]] && {
     PASSFILE=~/.stack_password
   } || {
@@ -76,16 +76,16 @@ add_stack_user_everywhere () {
 }
 
 setup_stack_keys_and_sync () {
-  [[ -f ~/.password ]] || { 
-    echo "Enter sudo password:" 
+  [[ -f ~/.password ]] || {
+    echo "Enter sudo password:"
     PASSFILE=`ssh_control_get_password ~/.password`
   }
-  
+
   echo; echo "SETTING UP LOCAL STACK .ssh DIRECTORY"
   STACK_SSHDIR=~stack/.ssh/
   cat ~/.password | sudo -S ls >/dev/null
   sudo su - stack -c "[[ -f $STACK_SSHDIR/id_rsa.pub ]] || ssh-keygen -f $STACK_SSHDIR/id_rsa -P ''"
-  
+
   echo; echo "PUT STACKS PUBKEY INTO STACKS authorized_keys FILE"
   ADMIN_KEY=`cat ~/.ssh/pubkeys/id_rsa.pub`
   STACK_KEY=`sudo cat $STACK_SSHDIR/id_rsa.pub`
@@ -94,7 +94,7 @@ setup_stack_keys_and_sync () {
   sudo su - stack -c "touch $STACK_SSHDIR/authorized_keys && chmod 600 $STACK_SSHDIR/authorized_keys"
   sudo su - stack -c "( grep "$ADMIN_KEYPRINT" $STACK_SSHDIR/authorized_keys >/dev/null ) || echo $STACK_KEY >> $STACK_SSHDIR/authorized_keys"
   sudo su - stack -c "( grep "$STACK_KEYPRINT" $STACK_SSHDIR/authorized_keys >/dev/null ) || echo $ADMIN_KEY >> $STACK_SSHDIR/authorized_keys"
-  
+
   echo; echo "SYNC ~stack/.ssh/ TO STACK EVERYWHERE"
   sudo chown cliff:cliff -R ~stack/
   ssh_control_sync_as_user_these_hosts root $STACK_SSHDIR/ $STACK_SSHDIR/ "$ALL_HOSTS" 2>/dev/null
@@ -123,6 +123,7 @@ install_kolla_for_admin () {
   sudo chown $USER:$USER /etc/kolla
   cp -r ~/CODE/venvs/kolla-ansible/share/kolla-ansible/etc_examples/kolla/* /etc/kolla
   cp $KOLLA_SETUP_DIR/../files/globals.yml /etc/kolla/
+
   # cp ~/CODE/venvs/kolla-ansible/share/kolla-ansible/ansible/inventory/* .
 }
 
