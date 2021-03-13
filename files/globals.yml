@@ -112,7 +112,7 @@ network_interface: "bond1"
 neutron_external_interface: "bond2"
 api_interface: "bond3"
 storage_interface: "bond4"
-swift_storage_interface: "bond5"
+swift_storage_interface: "bond4" # I BELIEVE there's no interface defined for ceph-internals, here
 tunnel_interface: "bond6"
 
 
