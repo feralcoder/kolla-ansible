@@ -62,4 +62,4 @@ set_up_ceph_volumes_and_users () {
 SUDO_PASS_FILE=`admin_control_get_sudo_password`
 set_up_ceph_volumes_and_users
 
-[[ $SUDO_PASS_FILE != ~/.password ]] && rm $SUDO_PASS_FILE
+[[ $SUDO_PASS_FILE == ~/.password ]] || rm $SUDO_PASS_FILE
