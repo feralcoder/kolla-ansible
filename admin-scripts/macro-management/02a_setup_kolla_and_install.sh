@@ -41,7 +41,7 @@ os_control_boot_to_target_installation_these_hosts admin "$STACK_HOSTS"
 backup_control_backup_all 02_Kolla-Ansible_Setup
 os_control_boot_to_target_installation_these_hosts default "$STACK_HOSTS"
 
-ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/deploy.sh > $LOG_DIR/06-deploy_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 6: Stack Deployment"
+ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/deploy-kolla.sh > $LOG_DIR/06-deploy-kolla_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 6: Stack Deployment"
 
 os_control_boot_to_target_installation_these_hosts admin "$STACK_HOSTS"
 backup_control_backup_all 03_Kolla-Ansible_Installed
