@@ -80,4 +80,6 @@ install_prereqs
 checkout_ceph-ansible_for_dev
 place_ceph_files
 
-ansible-playbook site-docker.yml -i hosts -e container_package_name=docker-ce
+# export ANSIBLE_DEBUG=true
+# export ANSIBLE_VERBOSITY=4
+ansible-playbook $CEPH_CHECKOUT_DIR/site-docker.yml -i $CEPH_CHECKOUT_DIR/hosts -e container_package_name=docker-ce

@@ -294,6 +294,19 @@
       failed_when: false # uniq
       changed_when: false # uniq
 
+#    - name: DEBUG print get radosgw user stdout
+#      debugger: always
+#      debug: 
+#        var: get_rgw_user.stdout
+#      when: get_rgw_user is defined
+
+
+#    - name: DEBUG print get radosgw user stderr
+#      debugger: always
+#      debug: 
+#        var: get_rgw_user.stderr
+#      when: get_rgw_user is defined
+
 
 
     - name: create radosgw system user
@@ -304,9 +317,46 @@
       delegate_to: "{{ groups[mon_group_name][0] }}"
       run_once: true
       when:
-#       - get_rgw_user.rc != 0 # FROM HACK, maybe 22 is enough?...
+        - get_rgw_user.rc != 0 # FROM HACK, maybe 22 is enough?...
         - not rgw_multisite | bool or rgw_zonemaster | bool # uniq
         - get_rgw_user.rc == 22 # uniq
+
+#    - name: DEBUG print create rgw user stdout
+#      debugger: always
+#      debug: 
+#        var: create_rgw_user.stdout
+#      when: create_rgw_user is defined
+
+
+#    - name: DEBUG print create rgw user stderr
+#      debugger: always
+#      debug: 
+#        var: create_rgw_user.stderr
+#      when: create_rgw_user is defined
+
+
+#    - name: DEBUG print dashboard_rgw_api_user_id
+#      debugger: always
+#      debug:
+#        var: dashboard_rgw_api_user_id
+#      when: dashboard_rgw_api_user_id is defined
+
+
+
+#    - name: DEBUG print cluster
+#      debugger: always
+#      debug:
+#        var: cluster
+#      when: cluster is defined
+
+
+
+
+#    - name: DEBUG print container_exec_cmd
+#      debugger: always
+#      debug:
+#        var: container_exec_cmd
+#      when: container_exec_cmd is defined
 
 
 
