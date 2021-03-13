@@ -271,7 +271,7 @@ tunnel_interface: "bond6"
 #enable_cells: "no"
 #enable_central_logging: "no"
 #enable_chrony: "yes"
-#enable_cinder: "no"
+enable_cinder: "yes"
 #enable_cinder_backup: "yes"
 #enable_cinder_backend_hnas_nfs: "no"
 #enable_cinder_backend_iscsi: "{{ enable_cinder_backend_lvm | bool or enable_cinder_backend_zfssa_iscsi | bool }}"
@@ -289,9 +289,9 @@ tunnel_interface: "bond6"
 #enable_etcd: "no"
 #enable_fluentd: "yes"
 #enable_freezer: "no"
-#enable_gnocchi: "no"
+enable_gnocchi: "yes"
 #enable_gnocchi_statsd: "no"
-#enable_grafana: "no"
+enable_grafana: "yes"
 #enable_heat: "{{ enable_openstack_core | bool }}"
 #enable_horizon: "{{ enable_openstack_core | bool }}"
 #enable_horizon_blazar: "{{ enable_blazar | bool }}"
@@ -330,10 +330,10 @@ tunnel_interface: "bond6"
 #enable_kibana: "{{ 'yes' if enable_central_logging | bool or enable_monasca | bool else 'no' }}"
 #enable_kuryr: "no"
 #enable_magnum: "no"
-#enable_manila: "no"
+enable_manila: "no"
 #enable_manila_backend_generic: "no"
 #enable_manila_backend_hnas: "no"
-#enable_manila_backend_cephfs_native: "no"
+enable_manila_backend_cephfs_native: "no"
 #enable_manila_backend_cephfs_nfs: "no"
 #enable_mariabackup: "no"
 #enable_masakari: "no"
@@ -459,8 +459,8 @@ tunnel_interface: "bond6"
 # Glance - Image Options
 ########################
 # Configure image backend.
-#glance_backend_ceph: "no"
-#glance_backend_file: "yes"
+glance_backend_ceph: "yes"
+#glance_backend_file: "no"
 #glance_backend_swift: "no"
 #glance_backend_vmware: "no"
 #enable_glance_image_cache: "no"
@@ -488,7 +488,7 @@ tunnel_interface: "bond6"
 # Gnocchi options
 #################
 # Valid options are [ file, ceph, swift ]
-#gnocchi_backend_storage: "{% if enable_swift | bool %}swift{% else %}file{% endif %}"
+gnocchi_backend_storage: "rbd"
 
 # Valid options are [redis, '']
 #gnocchi_incoming_storage: "{{ 'redis' if enable_redis | bool else '' }}"
@@ -497,7 +497,7 @@ tunnel_interface: "bond6"
 # Cinder - Block Storage Options
 ################################
 # Enable / disable Cinder backends
-#cinder_backend_ceph: "no"
+cinder_backend_ceph: "yes"
 #cinder_backend_vmwarevc_vmdk: "no"
 #cinder_volume_group: "cinder-volumes"
 # Valid options are [ '', redis, etcd ]
@@ -532,7 +532,7 @@ tunnel_interface: "bond6"
 ########################
 # Nova - Compute Options
 ########################
-#nova_backend_ceph: "no"
+nova_backend_ceph: "yes"
 
 # Valid options are [ qemu, kvm, vmware ]
 #nova_compute_virt_type: "kvm"
