@@ -82,8 +82,8 @@ place_ceph_files () {
 
 
 checkout_ceph-ansible_for_dev || fail_exit "checkout_ceph-ansible_for_dev"
-install_prereqs || fail_exit "install_prereqs"
-place_ceph_files || fail_exit "place_ceph_files"
+install_prereqs               || fail_exit "install_prereqs"
+place_ceph_files              || fail_exit "place_ceph_files"
 
 # export ANSIBLE_DEBUG=true
 # export ANSIBLE_VERBOSITY=4
