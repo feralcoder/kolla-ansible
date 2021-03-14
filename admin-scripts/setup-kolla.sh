@@ -13,26 +13,6 @@ fail_exit () {
 
 
 
-get_sudo_password () {
-  local PASSWORD
-
-  # if ~/.password exists and works, use it
-  [[ -f ~/.password ]] && {
-    cat ~/.password | sudo -k -S ls >/dev/null 2>&1
-    if [[ $? == 0 ]] ; then
-      echo ~/.password
-      return
-    fi
-  }
-
-  # either ~.password doesn't exiist, or it doesn't work
-  read -s -p "Enter Sudo Password: " PASSWORD
-  touch /tmp/password_$$
-  chmod 600 /tmp/password_$$
-  echo $PASSWORD > /tmp/password_$$
-  echo /tmp/password_$$
-}
-
 decrypt_secure_files () {
   # Password file encrypted via: openssl enc -aes-256-cfb8 -md sha256 -in $KOLLA_SETUP_DIR/../files/passwords.yml -out $KOLLA_SETUP_DIR/../files/passwords.yml.encrypted
   openssl enc --pass file:/home/cliff/.password -d -aes-256-cfb8 -md sha256 -in $KOLLA_SETUP_DIR/../files/passwords.yml.encrypted -out $KOLLA_SETUP_DIR/../files/passwords.yml
