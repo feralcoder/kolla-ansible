@@ -2,9 +2,17 @@
 KOLLA_SETUP_SOURCE="${BASH_SOURCE[0]}"
 KOLLA_SETUP_DIR=$( dirname $KOLLA_SETUP_SOURCE )
 
+
+. ~/CODE/feralcoder/host_control/control_scripts.sh
+. ~/CODE/venvs/kolla-ansible/bin/activate
+
 ANSIBLE_CONTROLLER=dmb
 
-. ~/CODE/venvs/kolla-ansible/bin/activate
+fail_exit () {
+  echo; echo "INSTALLATION FAILED AT STEP: $1"
+  echo "Check the logs and try again.  Or just give up.  I don't care."
+  exit 1
+}
 
 echo; echo "INSTALLING YUM-UTILS and DOCKER.CE REPO"
 ssh_control_run_as_user root "yum install -y yum-utils" $ANSIBLE_CONTROLLER
