@@ -19,7 +19,8 @@ ssh_control_run_as_user root "yum install -y yum-utils" $ANSIBLE_CONTROLLER
 ssh_control_run_as_user root "(dnf repolist | grep docker) || yum-config-manager     --add-repo     https://download.docker.com/linux/centos/docker-ce.repo" $ANSIBLE_CONTROLLER
 
 echo; echo "INSTALLING CONTAINERD AND DOCKER.CE (and disabling firewal)"
-ssh_control_run_as_user root "dnf -y install https://download.docker.com/linux/centos/7/x86_64/stable/Packages/containerd.io-1.2.6-3.3.el7.x86_64.rpm" $ANSIBLE_CONTROLLER
+#ssh_control_run_as_user root "dnf -y install https://download.docker.com/linux/centos/7/x86_64/stable/Packages/containerd.io-1.2.6-3.3.el7.x86_64.rpm" $ANSIBLE_CONTROLLER
+# Above may no longer be necessary
 ssh_control_run_as_user root "dnf -y install docker-ce" $ANSIBLE_CONTROLLER
 ssh_control_run_as_user root "systemctl disable firewalld; systemctl enable --now docker" $ANSIBLE_CONTROLLER
 
