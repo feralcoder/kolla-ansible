@@ -6,6 +6,13 @@ KOLLA_SETUP_DIR=$( realpath `dirname $KOLLA_SETUP_SOURCE` )
 
 
 
+fail_exit () {
+  echo; echo "INSTALLATION FAILED AT STEP: $1"
+  echo "Check the logs and try again.  Or just give up.  I don't care."
+  exit 1
+}
+
+
 set_up_ceph_volumes_and_users () {
   CEPH_MON=`echo "$CEPH_MON_HOSTS" | tr ' ' '\n' | head -n 1`
   MON_CONTAINER=`ssh_control_run_as_user root "docker container list" $CEPH_MON | grep ' ceph-mon-' | awk '{print $1}'`
