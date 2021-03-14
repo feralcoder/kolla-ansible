@@ -189,7 +189,7 @@ host_control_updates () {
   ssh_control_run_as_user_these_hosts root "( hostname | grep -vE '^[^\.]+-api' ) && \
                                    { hostname \`hostname | sed -E 's/^([^\.]+)/\1-api/g'\` > /dev/null; \
                                    hostname ; } || echo hostname is already apid" "$STACK_HOSTS"
-  ssh_control_run_as_user_these_hosts root "hostnamectl set-hostname `hostname`" "$STACK_HOSTS"
+  ssh_control_run_as_user_these_hosts root "hostnamectl set-hostname \`hostname\`" "$STACK_HOSTS"
   for i in $ALL_HOSTS; do ssh root@$i hostname; done
 }
 
