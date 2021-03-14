@@ -1,6 +1,6 @@
 #!/bin/bash
 MACRO_SOURCE="${BASH_SOURCE[0]}"
-MACRO_DIR=$( dirname $MACRO_SOURCE )
+MACRO_DIR=$( realpath `dirname $MACRO_SOURCE` )
 
 . ~/CODE/feralcoder/host_control/control_scripts.sh
 

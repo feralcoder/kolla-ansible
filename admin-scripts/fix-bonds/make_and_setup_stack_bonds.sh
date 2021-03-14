@@ -1,6 +1,6 @@
 #!/bin/bash
 BONDSCRIPT_SOURCE="${BASH_SOURCE[0]}"
-BONDSCRIPT_DIR=$( dirname $BONDSCRIPT_SOURCE )
+BONDSCRIPT_DIR=$( realpath `dirname $BONDSCRIPT_SOURCE` )
 
 . $BONDSCRIPT_DIR/bond_config.sh
 . ~/CODE/feralcoder/host_control/control_scripts.sh

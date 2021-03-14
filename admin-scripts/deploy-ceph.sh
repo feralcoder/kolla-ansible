@@ -1,6 +1,6 @@
 #!/bin/bash
 CEPH_SETUP_SOURCE="${BASH_SOURCE[0]}"
-CEPH_SETUP_DIR=$( dirname $CEPH_SETUP_SOURCE )
+CEPH_SETUP_DIR=$( realpath `dirname $CEPH_SETUP_SOURCE` )
 # CEPH_SETUP_DIR=~/CODE/feralcoder/kolla-ansible/admin-scripts
 
 CODE_DIR=~/CODE
