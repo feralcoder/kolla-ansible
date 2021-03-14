@@ -55,18 +55,18 @@ add_stack_user_everywhere () {
     PASSFILE=`ssh_control_get_password ~/.stack_password false`                                                    || return 1
   }
   chmod 600 ~/.stack_password
-  ssh_control_sync_as_user_these_hosts root ~/.stack_password /tmp/.stack_password "$ALL_HOSTS" 2>/dev/null                                                      || { echo "Failed to sync stack password."; return 1 }
-  ssh_control_run_as_user_these_hosts  root "cat /tmp/.stack_password /tmp/.stack_password | passwd stack 2>&1" "$ALL_HOSTS" 2>/dev/null                         || { echo "Failed to set stack password."; return 1 }
+  ssh_control_sync_as_user_these_hosts root ~/.stack_password /tmp/.stack_password "$ALL_HOSTS" 2>/dev/null                                                      || { echo "Failed to sync stack password."; return 1; }
+  ssh_control_run_as_user_these_hosts  root "cat /tmp/.stack_password /tmp/.stack_password | passwd stack 2>&1" "$ALL_HOSTS" 2>/dev/null                         || { echo "Failed to set stack password."; return 1; }
 
   echo; echo "ADDING STACK USER TO LOCAL SUDOERS"
   cat $SUDO_PASS_FILE | sudo -S ls > /dev/null
-  (( sudo grep "stack ALL" /etc/sudoers.d/stack >/dev/null 2>&1 ) || { echo "stack ALL=(root) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/stack >/dev/null; })    || { echo "Failed to add stack to local sudoers."; return 1 }
+  (( sudo grep "stack ALL" /etc/sudoers.d/stack >/dev/null 2>&1 ) || { echo "stack ALL=(root) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/stack >/dev/null; })    || { echo "Failed to add stack to local sudoers."; return 1; }
   sudo chmod 0440 /etc/sudoers.d/stack || return 1
 
   echo; echo "ADDING STACK USER TO SUDOERS EVERYWHERE"
   sudo cp /etc/sudoers.d/stack /tmp/stack && sudo chown cliff:cliff /tmp/stack
-  ssh_control_sync_as_user_these_hosts root /tmp/stack /etc/sudoers.d/stack "$ALL_HOSTS" 2>/dev/null               || { echo "Failed to add stack to all sudoers."; return 1 }
-  ssh_control_run_as_user_these_hosts root "chown root:root /etc/sudoers.d/stack 2>&1" "$ALL_HOSTS" 2>/dev/null    || { echo "Failed to fix sudoers ownership and perms."; return 1 }
+  ssh_control_sync_as_user_these_hosts root /tmp/stack /etc/sudoers.d/stack "$ALL_HOSTS" 2>/dev/null               || { echo "Failed to add stack to all sudoers."; return 1; }
+  ssh_control_run_as_user_these_hosts root "chown root:root /etc/sudoers.d/stack 2>&1" "$ALL_HOSTS" 2>/dev/null    || { echo "Failed to fix sudoers ownership and perms."; return 1; }
   rm -f /tmp/stack
 }
 
@@ -77,21 +77,21 @@ setup_stack_keys_and_sync () {
   STACK_SSHDIR=~stack/.ssh/
 
   test_sudo || return 1
-  sudo su - stack -c "[[ -f $STACK_SSHDIR/id_rsa.pub ]] || ssh-keygen -f $STACK_SSHDIR/id_rsa -P ''"    || { echo "Could not find or setup stack's public key."; return 1 }
+  sudo su - stack -c "[[ -f $STACK_SSHDIR/id_rsa.pub ]] || ssh-keygen -f $STACK_SSHDIR/id_rsa -P ''"    || { echo "Could not find or setup stack's public key."; return 1; }
 
   echo; echo "PUT STACKS PUBKEY INTO STACKS authorized_keys FILE"
   ADMIN_KEY=`cat ~/.ssh/pubkeys/id_rsa.pub`           &&
   STACK_KEY=`sudo cat $STACK_SSHDIR/id_rsa.pub`       &&
   ADMIN_KEYPRINT=`echo $ADMIN_KEY | awk '{print $2}'` &&
   STACK_KEYPRINT=`echo $STACK_KEY | awk '{print $2}'` ||  return 1
-  sudo su - stack -c "touch $STACK_SSHDIR/authorized_keys && chmod 600 $STACK_SSHDIR/authorized_keys"    ||  { echo "Could not fix mod or perms on stack authorized_keys"; return 1 }
-  sudo su - stack -c "( grep "$ADMIN_KEYPRINT" $STACK_SSHDIR/authorized_keys >/dev/null ) || echo $STACK_KEY >> $STACK_SSHDIR/authorized_keys"    ||  { echo "Could not add admin key to stack's authorized_keys"; return 1 }
-  sudo su - stack -c "( grep "$STACK_KEYPRINT" $STACK_SSHDIR/authorized_keys >/dev/null ) || echo $ADMIN_KEY >> $STACK_SSHDIR/authorized_keys"    ||  { echo "Could not add stack key to stack's authorized_keys"; return 1 }
+  sudo su - stack -c "touch $STACK_SSHDIR/authorized_keys && chmod 600 $STACK_SSHDIR/authorized_keys"    ||  { echo "Could not fix mod or perms on stack authorized_keys"; return 1; }
+  sudo su - stack -c "( grep "$ADMIN_KEYPRINT" $STACK_SSHDIR/authorized_keys >/dev/null ) || echo $STACK_KEY >> $STACK_SSHDIR/authorized_keys"    ||  { echo "Could not add admin key to stack's authorized_keys"; return 1; }
+  sudo su - stack -c "( grep "$STACK_KEYPRINT" $STACK_SSHDIR/authorized_keys >/dev/null ) || echo $ADMIN_KEY >> $STACK_SSHDIR/authorized_keys"    ||  { echo "Could not add stack key to stack's authorized_keys"; return 1; }
 
   echo; echo "SYNC ~stack/.ssh/ TO STACK EVERYWHERE"
   sudo chown cliff:cliff -R ~stack/
-  ssh_control_sync_as_user_these_hosts root $STACK_SSHDIR/ $STACK_SSHDIR/ "$ALL_HOSTS" 2>/dev/null    ||  { echo "Could not sync stack's ssh dir."; return 1 }
-  ssh_control_run_as_user_these_hosts root "chown stack:stack -R ~stack/" "$ALL_HOSTS" 2>/dev/null    ||  { echo "could not fix mod or perms on stack's ssh dirs"; return 1 }
+  ssh_control_sync_as_user_these_hosts root $STACK_SSHDIR/ $STACK_SSHDIR/ "$ALL_HOSTS" 2>/dev/null    ||  { echo "Could not sync stack's ssh dir."; return 1; }
+  ssh_control_run_as_user_these_hosts root "chown stack:stack -R ~stack/" "$ALL_HOSTS" 2>/dev/null    ||  { echo "could not fix mod or perms on stack's ssh dirs"; return 1; }
 }
 
 
@@ -172,17 +172,17 @@ host_control_updates () {
 #  for HOST in $ALL_HOSTS; do
 #     echo; echo "Getting ILO hostkeys on $HOST"
 #     ssh_control_run_as_user cliff "ilo_control_refetch_ilo_hostkey_these_hosts \"$ALL_HOSTS\"" $HOST 2>/dev/null
-#  done   ||  { echo "Could not refetch ILO keys everywhere"; return 1 }
+#  done   ||  { echo "Could not refetch ILO keys everywhere"; return 1; }
 
   echo; echo "REFETCHING HOST KEYS EVERYWHERE"
-  ssh_control_refetch_hostkey_these_hosts "$ALL_HOSTS"     ||  { echo "Could not refetch host keys."; return 1 }
-  ssh_control_run_as_user_these_hosts cliff "ssh_control_refetch_hostkey_these_hosts \"$ALL_HOSTS\"" "$ALL_HOSTS" 2>/dev/null    ||  { echo "Could not refetch host keys everywhere."; return 1 }
+  ssh_control_refetch_hostkey_these_hosts "$ALL_HOSTS"     ||  { echo "Could not refetch host keys."; return 1; }
+  ssh_control_run_as_user_these_hosts cliff "ssh_control_refetch_hostkey_these_hosts \"$ALL_HOSTS\"" "$ALL_HOSTS" 2>/dev/null    ||  { echo "Could not refetch host keys everywhere."; return 1; }
 
   echo; echo "RENAMING STACK HOSTS TO THEIR API-NET-RESOLVING NAMES"
   ssh_control_run_as_user_these_hosts root "( hostname | grep -vE '^[^\.]+-api' ) && \
                                    { hostname \`hostname | sed -E 's/^([^\.]+)/\1-api/g'\` > /dev/null; \
-                                   hostname ; } || echo hostname is already apid" "$STACK_HOSTS"    ||  { echo "Could not set hostnames to hostnames-api"; return 1 }
-  ssh_control_run_as_user_these_hosts root "hostnamectl set-hostname \`hostname\`" "$STACK_HOSTS"   ||  { echo "Could not cement hostnames"; return 1 }
+                                   hostname ; } || echo hostname is already apid" "$STACK_HOSTS"    ||  { echo "Could not set hostnames to hostnames-api"; return 1; }
+  ssh_control_run_as_user_these_hosts root "hostnamectl set-hostname \`hostname\`" "$STACK_HOSTS"   ||  { echo "Could not cement hostnames"; return 1; }
   for i in $ALL_HOSTS; do ssh root@$i hostname; done
 }
 
