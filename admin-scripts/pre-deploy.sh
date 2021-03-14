@@ -16,7 +16,10 @@ fail_exit () {
 
 
 echo; echo "REFETCHING HOST KEYS FOR API NETWORK EVERYWHERE"
-ssh_control_run_as_user_these_hosts cliff "ssh_control_refetch_hostkey_these_hosts \"$ALL_HOSTS_API_NET\"" "$ALL_HOSTS" 2>/dev/null
+for HOST in $ALL_HOSTS; do
+  ssh_control_run_as_user cliff "ssh_control_refetch_hostkey_these_hosts \"$ALL_HOSTS_API_NET\"" $HOST 2>/dev/null
+done
+
 
 kolla-genpwd
 ansible -i $KOLLA_SETUP_DIR/../files/inventory-feralstack all -m ping
