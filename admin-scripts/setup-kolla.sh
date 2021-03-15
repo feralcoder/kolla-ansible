@@ -22,9 +22,9 @@ test_sudo () {
 
 
 decrypt_secure_files () {
-  # Password file encrypted via: openssl enc -aes-256-cfb8 -md sha256 -in $KOLLA_SETUP_DIR/../files/passwords.yml -out $KOLLA_SETUP_DIR/../files/passwords.yml.encrypted
-  openssl enc --pass file:/home/cliff/.password -d -aes-256-cfb8 -md sha256 -in $KOLLA_SETUP_DIR/../files/passwords.yml.encrypted -out $KOLLA_SETUP_DIR/../files/passwords.yml &&
-  cp $KOLLA_SETUP_DIR/../files/passwords.yml /etc/kolla/
+  # Password file encrypted via: openssl enc -aes-256-cfb8 -md sha256 -in $KOLLA_SETUP_DIR/../files/kolla-passwords.yml -out $KOLLA_SETUP_DIR/../files/kolla-passwords.yml.encrypted
+  openssl enc --pass file:/home/cliff/.password -d -aes-256-cfb8 -md sha256 -in $KOLLA_SETUP_DIR/../files/kolla-passwords.yml.encrypted -out $KOLLA_SETUP_DIR/../files/kolla-passwords.yml &&
+  cp $KOLLA_SETUP_DIR/../files/kolla-passwords.yml /etc/kolla/passwords.yml
 }
 
 setup_local_passwordless_sudo () {
@@ -115,7 +115,7 @@ install_kolla_for_admin () {
   sudo mkdir -p /etc/kolla
   sudo chown $USER:$USER /etc/kolla
   cp -r ~/CODE/venvs/kolla-ansible/share/kolla-ansible/etc_examples/kolla/* /etc/kolla    ||  return 1
-  cp $KOLLA_SETUP_DIR/../files/globals.yml /etc/kolla/                                    ||  return 1
+  cp $KOLLA_SETUP_DIR/../files/kolla-globals.yml /etc/kolla/                                    ||  return 1
 
   # cp ~/CODE/venvs/kolla-ansible/share/kolla-ansible/ansible/inventory/* .
 }
@@ -131,7 +131,7 @@ install_kolla_for_dev () {
   sudo chown $USER:$USER /etc/kolla
   cp -r ~/CODE/feralcoder/kolla-ansible/etc/kolla/* /etc/kolla &&
   cp ~/CODE/feralcoder/kolla-ansible/ansible/inventory/* .     &&
-  cp $KOLLA_SETUP_DIR/../files/globals.yml /etc/kolla/         || return 1
+  cp $KOLLA_SETUP_DIR/../files/kolla-globals.yml /etc/kolla/         || return 1
 }
 
 config_ansible () {

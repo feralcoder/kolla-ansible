@@ -22,8 +22,8 @@ done
 
 
 kolla-genpwd
-ansible -i $KOLLA_SETUP_DIR/../files/inventory-feralstack all -m ping
-kolla-ansible -i $KOLLA_SETUP_DIR/../files/inventory-feralstack bootstrap-servers
-kolla-ansible -i $KOLLA_SETUP_DIR/../files/inventory-feralstack prechecks
+ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack all -m ping
+kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack bootstrap-servers
+kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack prechecks
 
 
