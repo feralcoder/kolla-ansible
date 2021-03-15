@@ -18,11 +18,13 @@ echo; echo "INSTALLING YUM-UTILS and DOCKER.CE REPO"
 ssh_control_run_as_user root "yum install -y yum-utils" $ANSIBLE_CONTROLLER
 ssh_control_run_as_user root "(dnf repolist | grep docker) || yum-config-manager     --add-repo     https://download.docker.com/linux/centos/docker-ce.repo" $ANSIBLE_CONTROLLER
 
-echo; echo "INSTALLING CONTAINERD AND DOCKER.CE (and disabling firewal)"
+echo; echo "INSTALLING CONTAINERD AND DOCKER.CE, AND POKING HOLE IN FIREWALL"
 #ssh_control_run_as_user root "dnf -y install https://download.docker.com/linux/centos/7/x86_64/stable/Packages/containerd.io-1.2.6-3.3.el7.x86_64.rpm" $ANSIBLE_CONTROLLER
 # Above may no longer be necessary
+ssh_control_run_as_user root "firewall-cmd --zone=public --add-port=4000/tcp" $ANSIBLE_CONTROLLER
+ssh_control_run_as_user root "firewall-cmd --permanent --zone=public --add-port=4000/tcp" $ANSIBLE_CONTROLLER
 ssh_control_run_as_user root "dnf -y install docker-ce" $ANSIBLE_CONTROLLER
-ssh_control_run_as_user root "systemctl disable firewalld; systemctl enable --now docker" $ANSIBLE_CONTROLLER
+ssh_control_run_as_user root "systemctl enable --now docker" $ANSIBLE_CONTROLLER
 
 echo; echo "PLACING docker-registry SERVICE FILES"
 ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/docker-registry-start.sh /usr/local/bin/docker-registry-start.sh $ANSIBLE_CONTROLLER
