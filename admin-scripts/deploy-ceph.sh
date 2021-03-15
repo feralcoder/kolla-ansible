@@ -35,7 +35,13 @@ checkout_ceph-ansible_for_dev () {
   echo; echo "INSTALLING CEPH-ANSIBLE"
   mkdir -p $CEPH_CODE_DIR >/dev/null 2>&1
   cd $CEPH_CODE_DIR || return 1
-  git clone https://github.com/ceph/ceph-ansible.git
+  if [[ -d $CEPH_CHECKOUT_DIR ]]; then
+#    cd $CEPH_CHECKOUT_DIR && git stash && git pull && git stash apply
+    echo; echo "$CEPH_CHECKOUT_DIR already exists, not cloning."
+    echo "Manual update recommended!"
+  else
+    git clone https://github.com/ceph/ceph-ansible.git
+  fi
   cd $CEPH_CHECKOUT_DIR || return 1
   git checkout stable-$VERSION
 }
@@ -47,7 +53,7 @@ install_prereqs () {
 
 
 
-place_ceph_files () {
+place_ceph_configs () {
   # These are pure configuration, no need to back up targets
   cp $CEPH_SETUP_DIR/../files/ceph-osds.yml $CEPH_CHECKOUT_DIR/group_vars/osds.yml &&
   cp $CEPH_SETUP_DIR/../files/ceph-all.yml $CEPH_CHECKOUT_DIR/group_vars/all.yml &&
@@ -55,7 +61,10 @@ place_ceph_files () {
   cp $CEPH_SETUP_DIR/../files/ceph-mons.yml $CEPH_CHECKOUT_DIR/group_vars/mons.yml &&
   cp $CEPH_SETUP_DIR/../files/ceph-site-docker.yml $CEPH_CHECKOUT_DIR/site-docker.yml &&
   cp $CEPH_SETUP_DIR/../files/ceph-hosts $CEPH_CHECKOUT_DIR/hosts || return 1
+}
 
+
+place_ceph_hacks () {
   # These are code, corrected for bugs, need to back up.
   # Compare in the future for code drift.  Improve: edit instead of replace.
   XXX=$CEPH_CHECKOUT_DIR/roles/ceph-osd/tasks/main.yml
@@ -80,10 +89,11 @@ place_ceph_files () {
 
 
 checkout_ceph-ansible_for_dev || fail_exit "checkout_ceph-ansible_for_dev"
-venv                          || fail_exit "venv"
-install_prereqs               || fail_exit "install_prereqs"
-place_ceph_files              || fail_exit "place_ceph_files"
+venv                         || fail_exit "venv"
+install_prereqs              || fail_exit "install_prereqs"
+place_ceph_configs           || fail_exit "place_ceph_files"
+#place_ceph_hacks             || fail_exit "place_ceph_files"
 
 # export ANSIBLE_DEBUG=true
 # export ANSIBLE_VERBOSITY=4
-cd $CEPH_CHECKOUT_DIR && ansible-playbook $CEPH_CHECKOUT_DIR/site-docker.yml -i $CEPH_CHECKOUT_DIR/hosts -e container_package_name=docker-ce || fail_exit "ansible-playbook"
+#cd $CEPH_CHECKOUT_DIR && ansible-playbook $CEPH_CHECKOUT_DIR/site-docker.yml -i $CEPH_CHECKOUT_DIR/hosts -e container_package_name=docker-ce || fail_exit "ansible-playbook"
