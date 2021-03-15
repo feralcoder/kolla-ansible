@@ -46,6 +46,7 @@ set_up_ceph_volumes_and_users () {
   sudo mkdir -p /etc/kolla/config/glance/ > /dev/null 2>&1
   sudo mkdir -p /etc/kolla/config/nova/ > /dev/null 2>&1
   sudo mkdir -p /etc/kolla/config/gnocchi/ > /dev/null 2>&1
+  sudo cp /etc/ceph/ceph.client.glance.keyring /etc/kolla/config/glance/
   sudo cp /etc/ceph/ceph.client.cinder-backup.keyring /etc/kolla/config/cinder/cinder-backup/
   sudo cp /etc/ceph/ceph.client.cinder.keyring /etc/kolla/config/cinder/cinder-backup/
   sudo cp /etc/ceph/ceph.client.cinder.keyring /etc/kolla/config/cinder/cinder-volume/
