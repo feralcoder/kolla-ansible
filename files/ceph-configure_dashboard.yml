@@ -295,14 +295,12 @@
       changed_when: false # uniq
 
 #    - name: DEBUG print get radosgw user stdout
-#      debugger: always
 #      debug: 
 #        var: get_rgw_user.stdout
 #      when: get_rgw_user is defined
 
 
 #    - name: DEBUG print get radosgw user stderr
-#      debugger: always
 #      debug: 
 #        var: get_rgw_user.stderr
 #      when: get_rgw_user is defined
@@ -322,21 +320,18 @@
         - get_rgw_user.rc == 22 # uniq
 
 #    - name: DEBUG print create rgw user stdout
-#      debugger: always
 #      debug: 
 #        var: create_rgw_user.stdout
 #      when: create_rgw_user is defined
 
 
 #    - name: DEBUG print create rgw user stderr
-#      debugger: always
 #      debug: 
 #        var: create_rgw_user.stderr
 #      when: create_rgw_user is defined
 
 
 #    - name: DEBUG print dashboard_rgw_api_user_id
-#      debugger: always
 #      debug:
 #        var: dashboard_rgw_api_user_id
 #      when: dashboard_rgw_api_user_id is defined
@@ -344,7 +339,6 @@
 
 
 #    - name: DEBUG print cluster
-#      debugger: always
 #      debug:
 #        var: cluster
 #      when: cluster is defined
@@ -353,7 +347,6 @@
 
 
 #    - name: DEBUG print container_exec_cmd
-#      debugger: always
 #      debug:
 #        var: container_exec_cmd
 #      when: container_exec_cmd is defined
