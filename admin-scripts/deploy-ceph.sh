@@ -22,12 +22,12 @@ fail_exit () {
 }
 
 
-new_venv () {
-  mkdir -p ~/CODE/venvs/ceph-ansible
-  python3 -m venv ~/CODE/venvs/ceph-ansible || return 1
-}
+venv () {
+  ( [[ -f ~/CODE/venvs/ceph-ansible/bin/activate ]] || {
+    mkdir -p ~/CODE/venvs/ceph-ansible &&
+    python3 -m venv ~/CODE/venvs/ceph-ansible
+  } ) || return 1
 
-use_venv () {
   source ~/CODE/venvs/ceph-ansible/bin/activate || return 1
 }
 
@@ -41,8 +41,6 @@ checkout_ceph-ansible_for_dev () {
 }
 
 install_prereqs () {
-  new_venv || return 1
-  use_venv || return 1
   pip install -U pip || return 1
   pip install -r $CEPH_CHECKOUT_DIR/requirements.txt || return 1
 }
@@ -82,9 +80,10 @@ place_ceph_files () {
 
 
 checkout_ceph-ansible_for_dev || fail_exit "checkout_ceph-ansible_for_dev"
+venv                          || fail_exit "venv"
 install_prereqs               || fail_exit "install_prereqs"
 place_ceph_files              || fail_exit "place_ceph_files"
 
 # export ANSIBLE_DEBUG=true
 # export ANSIBLE_VERBOSITY=4
-ansible-playbook $CEPH_CHECKOUT_DIR/site-docker.yml -i $CEPH_CHECKOUT_DIR/hosts -e container_package_name=docker-ce || fail_exit "ansible-playbook"
+cd $CEPH_CHECKOUT_DIR && ansible-playbook $CEPH_CHECKOUT_DIR/site-docker.yml -i $CEPH_CHECKOUT_DIR/hosts -e container_package_name=docker-ce || fail_exit "ansible-playbook"
