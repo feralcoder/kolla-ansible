@@ -74,13 +74,17 @@ place_ceph_hacks () {
 #  ( [[ -f $XXX.orig ]] || cp $XXX $XXX.orig ) &&
 #  cp $CEPH_FILE_DIR/ceph-main.yml $XXX || return 1
 
+  XXX=$CEPH_CHECKOUT_DIR/roles/ceph-container-common/tasks/fetch_image.yml
+  ( [[ -f $XXX.orig ]] || cp $XXX $XXX.orig ) &&
+  cp $CEPH_FILE_DIR/ceph-fetch_image.yml $XXX || return 1
+
   XXX=$CEPH_CHECKOUT_DIR/roles/ceph-facts/tasks/container_binary.yml
   ( [[ -f $XXX.orig ]] || cp $XXX $XXX.orig ) &&
   cp $CEPH_FILE_DIR/ceph-container_binary.yml $XXX || return 1
 
-#  XXX=$CEPH_CHECKOUT_DIR/roles/ceph-container-engine/tasks/pre_requisites/prerequisites.yml
-#  ( [[ -f $XXX.orig ]] || cp $XXX $XXX.orig ) &&
-#  cp $CEPH_FILE_DIR/ceph-docker-prerequisites.yml $XXX || return 1
+  XXX=$CEPH_CHECKOUT_DIR/roles/ceph-container-engine/tasks/pre_requisites/prerequisites.yml
+  ( [[ -f $XXX.orig ]] || cp $XXX $XXX.orig ) &&
+  cp $CEPH_FILE_DIR/ceph-docker-prerequisites.yml $XXX || return 1
 
 #  XXX=$CEPH_CHECKOUT_DIR/infrastructure-playbooks/purge-docker-cluster.yml
 #  ( [[ -f $XXX.orig ]] || cp $XXX $XXX.orig ) &&
