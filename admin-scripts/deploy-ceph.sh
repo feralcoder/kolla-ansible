@@ -99,9 +99,9 @@ place_ceph_hacks () {
 
 
 
-#checkout_ceph-ansible_for_dev || fail_exit "checkout_ceph-ansible_for_dev"
+checkout_ceph-ansible_for_dev || fail_exit "checkout_ceph-ansible_for_dev"
 venv                         || fail_exit "venv"
-#install_prereqs              || fail_exit "install_prereqs"
+install_prereqs              || fail_exit "install_prereqs"
 place_ceph_configs           || fail_exit "place_ceph_files"
 place_ceph_hacks             || fail_exit "place_ceph_files"
 
