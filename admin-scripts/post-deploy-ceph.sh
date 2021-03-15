@@ -4,7 +4,7 @@ KOLLA_SETUP_DIR=$( realpath `dirname $KOLLA_SETUP_SOURCE` )
 
 . ~/CODE/feralcoder/host_control/control_scripts.sh
 
-
+ANSIBLE_CONTROLLER=dmb
 
 fail_exit () {
   echo; echo "INSTALLATION FAILED AT STEP: $1"
@@ -21,23 +21,23 @@ set_up_ceph_volumes_and_users () {
 
   ssh_control_run_as_user root "docker exec $MON_CONTAINER ceph osd pool create images 32" $CEPH_MON
   ssh_control_run_as_user root "docker exec $MON_CONTAINER ceph auth get-or-create client.glance mon 'allow r' osd 'allow class-read object_prefix rdb_children, allow rwx pool=images' -o /etc/ceph/ceph.client.glance.keyring" $CEPH_MON
-  ssh_control_run_as_user cliff "ssh_control_sync_as_user root /etc/ceph/ceph.client.glance.keyring /etc/ceph/ `hostname`" $CEPH_MON
+  ssh_control_run_as_user cliff "ssh_control_sync_as_user root /etc/ceph/ceph.client.glance.keyring /etc/ceph/ $ANSIBLE_CONTROLLER" $CEPH_MON
 
   ssh_control_run_as_user root "docker exec $MON_CONTAINER ceph osd pool create volumes 32" $CEPH_MON
   ssh_control_run_as_user root "docker exec $MON_CONTAINER ceph auth get-or-create client.cinder mon 'allow r' osd 'allow class-read object_prefix rdb_children, allow rwx pool=volumes' -o /etc/ceph/ceph.client.cinder.keyring" $CEPH_MON
-  ssh_control_run_as_user cliff "ssh_control_sync_as_user root /etc/ceph/ceph.client.cinder.keyring /etc/ceph/ `hostname`" $CEPH_MON
+  ssh_control_run_as_user cliff "ssh_control_sync_as_user root /etc/ceph/ceph.client.cinder.keyring /etc/ceph/ $ANSIBLE_CONTROLLER" $CEPH_MON
 
   ssh_control_run_as_user root "docker exec $MON_CONTAINER ceph osd pool create backups 32" $CEPH_MON
   ssh_control_run_as_user root "docker exec $MON_CONTAINER ceph auth get-or-create client.cinder-backup mon 'allow r' osd 'allow class-read object_prefix rdb_children, allow rwx pool=backups' -o /etc/ceph/ceph.client.cinder-backup.keyring" $CEPH_MON
-  ssh_control_run_as_user cliff "ssh_control_sync_as_user root /etc/ceph/ceph.client.cinder-backup.keyring /etc/ceph/ `hostname`" $CEPH_MON
+  ssh_control_run_as_user cliff "ssh_control_sync_as_user root /etc/ceph/ceph.client.cinder-backup.keyring /etc/ceph/ $ANSIBLE_CONTROLLER" $CEPH_MON
 
   ssh_control_run_as_user root "docker exec $MON_CONTAINER ceph osd pool create vms 32" $CEPH_MON
   ssh_control_run_as_user root "docker exec $MON_CONTAINER ceph auth get-or-create client.nova mon 'allow r' osd 'allow class-read object_prefix rdb_children, allow rwx pool=vms' -o /etc/ceph/ceph.client.nova.keyring" $CEPH_MON
-  ssh_control_run_as_user cliff "ssh_control_sync_as_user root /etc/ceph/ceph.client.nova.keyring /etc/ceph/ `hostname`" $CEPH_MON
+  ssh_control_run_as_user cliff "ssh_control_sync_as_user root /etc/ceph/ceph.client.nova.keyring /etc/ceph/ $ANSIBLE_CONTROLLER" $CEPH_MON
 
   ssh_control_run_as_user root "docker exec $MON_CONTAINER ceph osd pool create metrics 32" $CEPH_MON
   ssh_control_run_as_user root "docker exec $MON_CONTAINER ceph auth get-or-create client.gnocchi mon 'allow r' osd 'allow class-read object_prefix rdb_children, allow rwx pool=metrics' -o /etc/ceph/ceph.client.gnocchi.keyring" $CEPH_MON
-  ssh_control_run_as_user cliff "ssh_control_sync_as_user root /etc/ceph/ceph.client.gnocchi.keyring /etc/ceph/ `hostname`" $CEPH_MON
+  ssh_control_run_as_user cliff "ssh_control_sync_as_user root /etc/ceph/ceph.client.gnocchi.keyring /etc/ceph/ $ANSIBLE_CONTROLLER" $CEPH_MON
 
   cat $SUDO_PASS_FILE | sudo -S ls > /dev/null
   sudo mkdir -p /etc/kolla/config/cinder/cinder-backup/ > /dev/null 2>&1
