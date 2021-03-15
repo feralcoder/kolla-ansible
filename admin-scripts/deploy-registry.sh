@@ -33,7 +33,7 @@ ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/docker-registry.service 
 ssh_control_run_as_user root "chown root:root /usr/local/bin/docker-registry-start.sh; chmod 755 /usr/local/bin/docker-registry-start.sh" $ANSIBLE_CONTROLLER
 ssh_control_run_as_user root "chown root:root /usr/local/bin/docker-registry-stop.sh; chmod 755 /usr/local/bin/docker-registry-stop.sh" $ANSIBLE_CONTROLLER
 ssh_control_run_as_user root "chown root:root /etc/systemd/system/docker-registry.service; chmod 644 /etc/systemd/system/docker-registry.service" $ANSIBLE_CONTROLLER
-ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/daemon.json /etc/docker/daemon.json $ANSIBLE_CONTROLLER
+ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/docker-daemon.json /etc/docker/daemon.json $ANSIBLE_CONTROLLER
 ssh_control_run_as_user root "chown root:root /etc/docker/daemon.json; chmod 644 /etc/docker/daemon.json" $ANSIBLE_CONTROLLER
 
 # NOW NOT NEEDED.  WHY???
@@ -49,8 +49,8 @@ ssh_control_run_as_user root "systemctl start docker-registry" $ANSIBLE_CONTROLL
 
 
 #echo; echo "CONFIGURING DOCKER TO USE OUR LOCAL (INSECURE) MIRROR"
-#ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/daemon.json /etc/docker/daemon.json $ANSIBLE_CONTROLLER
-#ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/feralcoder-registry.conf /usr/lib/systemd/system/docker.service.d/feralcoder-registry.conf $ANSIBLE_CONTROLLER
+#ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/docker-daemon.json /etc/docker/daemon.json $ANSIBLE_CONTROLLER
+#ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/docker-feralcoder-registry.conf /usr/lib/systemd/system/docker.service.d/feralcoder-registry.conf $ANSIBLE_CONTROLLER
 #ssh_control_run_as_user root "chown root:root /etc/docker/daemon.json; chmod 644 /etc/docker/daemon.json" $ANSIBLE_CONTROLLER
 #ssh_control_run_as_user root "chown root:root /usr/lib/systemd/system/docker.service.d/feralcoder-registry.conf; chmod 644 /usr/lib/systemd/system/docker.service.d/feralcoder-registry.conf" $ANSIBLE_CONTROLLER
 #ssh_control_run_as_user root "systemctl daemon-reload" $ANSIBLE_CONTROLLER

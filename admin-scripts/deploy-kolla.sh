@@ -11,4 +11,4 @@ fail_exit () {
 }
 
 
-kolla-ansible -i ../files/inventory-feralstack deploy
+kolla-ansible -i ../files/kolla-inventory-feralstack deploy
