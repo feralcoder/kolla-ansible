@@ -112,6 +112,7 @@ ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSI
 
 deploy_ceph || fail_exit "deploy_ceph"
 take_backups 02b_Ceph_Setup || fail_exit "take_backups 02b_Ceph_Setup"
+# NEED CEPH EXPORT FUNCTION
 
 # ASSUME WE COULD BE STARTING FROM A FREEZE-THAW...
 ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSIBLE_CONTROLLER || fail_exit "git pull kolla-ansible"
