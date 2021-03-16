@@ -8,6 +8,13 @@ CODE_DIR=~/CODE
 CEPH_CODE_DIR=$CODE_DIR/ceph
 CEPH_CHECKOUT_DIR=$CEPH_CODE_DIR/ceph-ansible
 
+# BAIL OUT IF USER SOURCES SCRIPT, INSTEAD OF RUNNING IT
+if [ ! "${BASH_SOURCE[0]}" -ef "$0" ]; then
+  echo "Do not source this script (exits will bail you...)."
+  echo "Run it instead"
+  return 1
+fi
+
 . ~/CODE/feralcoder/host_control/control_scripts.sh
 
 

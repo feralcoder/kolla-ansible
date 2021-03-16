@@ -2,6 +2,13 @@
 
 # RUN ON ANSIBLE CONTROLLER
 
+# BAIL OUT IF USER SOURCES SCRIPT, INSTEAD OF RUNNING IT
+if [ ! "${BASH_SOURCE[0]}" -ef "$0" ]; then
+  echo "Do not source this script (exits will bail you...)."
+  echo "Run it instead"
+  return 1
+fi
+
 . ~/CODE/venvs/kolla-ansible/bin/activate
 
 KOLLA_SETUP_SOURCE="${BASH_SOURCE[0]}"
