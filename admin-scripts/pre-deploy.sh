@@ -15,10 +15,11 @@ fail_exit () {
 }
 
 
+
 echo; echo "REFETCHING HOST KEYS FOR API NETWORK EVERYWHERE"
 for HOST in $ALL_HOSTS; do
   ssh_control_run_as_user cliff "ssh_control_refetch_hostkey_these_hosts \"$ALL_HOSTS_API_NET\"" $HOST 2>/dev/null
-done
+done  || { echo "Could not refetch hostkeys on all hosts"; return 1; }
 
 
 kolla-genpwd
