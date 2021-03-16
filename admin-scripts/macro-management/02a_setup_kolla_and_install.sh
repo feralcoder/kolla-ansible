@@ -50,7 +50,7 @@ take_backups () {
 
 # Separate function because I'd like to get this stuff into the base image...
 remediate_hosts () {
-  ssh_control_run_as_user_these_hosts root "yum -y install telnet"
+  ssh_control_run_as_user_these_hosts root "yum -y install telnet" "$STACK_HOSTS"
 }
 
 
