@@ -176,9 +176,6 @@ host_control_updates () {
 
   echo; echo "REFETCHING HOST KEYS EVERYWHERE"
   ssh_control_refetch_hostkey_these_hosts "$ALL_HOSTS"     ||  { echo "Could not refetch host keys."; return 1; }
-  for HOST in $ALL_HOSTS; do
-    ssh_control_run_as_user cliff "ssh_control_refetch_hostkey_these_hosts \"$ALL_HOSTS_API_NET\"" $HOST 2>/dev/null
-  done  || { echo "Could not refetch hostkeys on all hosts"; return 1; }
 
   echo; echo "RENAMING STACK HOSTS TO THEIR API-NET-RESOLVING NAMES"
   ssh_control_run_as_user_these_hosts root "( hostname | grep -vE '^[^\.]+-api' ) && \
