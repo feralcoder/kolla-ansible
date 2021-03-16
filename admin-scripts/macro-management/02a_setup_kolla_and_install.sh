@@ -50,7 +50,7 @@ take_backups () {
 
 # Separate function because I'd like to get this stuff into the base image...
 remediate_hosts () {
-  ssh_control_run_as_user_these_hosts root "yum -y install telnet"
+  ssh_control_run_as_user_these_hosts root "yum -y install telnet" "$STACK_HOSTS"
 }
 
 
@@ -112,6 +112,7 @@ ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSI
 
 deploy_ceph || fail_exit "deploy_ceph"
 take_backups 02b_Ceph_Setup || fail_exit "take_backups 02b_Ceph_Setup"
+# NEED CEPH EXPORT FUNCTION
 
 # ASSUME WE COULD BE STARTING FROM A FREEZE-THAW...
 ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSIBLE_CONTROLLER || fail_exit "git pull kolla-ansible"
