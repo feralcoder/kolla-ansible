@@ -11,4 +11,8 @@ fail_exit () {
 }
 
 
+# PULL CONTAINER IMAGES AHEAD OF DEPLOY.  Pull twice if needed...
+kolla-ansible -i ../files/inventory-feralstack pull || kolla-ansible -i ../files/inventory-feralstack pull
+
+# DEPLOY THE STACK!!!
 kolla-ansible -i ../files/kolla-inventory-feralstack deploy
