@@ -36,7 +36,7 @@ boot_to_target () {
 }
 
 
-take_backups ()) {
+take_backups () {
   local BACKUP_NAME=$1
 
   echo; echo "BOOTING ALL STACK HOSTS TO ADMIN OS FOR BACKUP OPERATION: $STACK_HOSTS"
