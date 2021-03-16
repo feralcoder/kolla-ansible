@@ -115,7 +115,7 @@ install_kolla_for_admin () {
   sudo mkdir -p /etc/kolla
   sudo chown $USER:$USER /etc/kolla
   cp -r ~/CODE/venvs/kolla-ansible/share/kolla-ansible/etc_examples/kolla/* /etc/kolla    ||  return 1
-  cp $KOLLA_SETUP_DIR/../files/kolla-globals.yml /etc/kolla/                                    ||  return 1
+  cp $KOLLA_SETUP_DIR/../files/kolla-globals.yml /etc/kolla/globals.yml                   ||  return 1
 
   # cp ~/CODE/venvs/kolla-ansible/share/kolla-ansible/ansible/inventory/* .
 }
@@ -131,7 +131,7 @@ install_kolla_for_dev () {
   sudo chown $USER:$USER /etc/kolla
   cp -r ~/CODE/feralcoder/kolla-ansible/etc/kolla/* /etc/kolla &&
   cp ~/CODE/feralcoder/kolla-ansible/ansible/inventory/* .     &&
-  cp $KOLLA_SETUP_DIR/../files/kolla-globals.yml /etc/kolla/         || return 1
+  cp $KOLLA_SETUP_DIR/../files/kolla-globals.yml /etc/kolla/globals.yml                   || return 1
 }
 
 config_ansible () {
