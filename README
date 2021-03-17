@@ -1,6 +1,16 @@
 # kolla-ansible
 Installing OpenStack via Kolla-Ansible
 
+TLDR:
+
+$KOLLA_CHECKOUT_DIR/admin-scripts/macro-management/ contains high-level scripts to collect sequences of deployment steps.
+See these for the collected view of administrative scripts.
+
+EG, this would reset the whole stack to base OS, and then run through the whole installation:
+~/CODE/feralcoder/host_control/macros/07_reset_stack_to_01b_CentOS_8_3_Admin_Install.sh && 
+~/CODE/feralcoder/kolla-ansible/admin-scripts/macro-management/02a_setup_kolla_and_install.sh
+
+
 
 OVERVIEW:
 These scripts are built on this environment setup:
@@ -13,21 +23,6 @@ Hosts Environment:
 - openstack compute:     kerrigan, neo, bowman, lawnmowerman, manhattan
 
 The admin box is outside of the whole stack deployment, and is used to run scripts which can backup and restore the deployment controller.
-
-- Bob Rasmussenski
-- tom Rasmussenski
-- dick Rasmussenski
-- harry Rasmussenski
-- Bob Korbuszewski
-- Bob Smith
-- Hannah Korbuszewski
-- Stacey Korbuszewski
-- Leanne Korbuszewski
-- Lisa Smith
-- Lisa Korbuszewski
-- Hannah Smith
-- Stacey Smith
-- Leanne Smith
 
 The deployment controller is the main workhorse for the deployment.  This is the ansible controller, the backup server, the repo server, and container registry.
 
@@ -68,7 +63,7 @@ Environment is fully set up with host_control administration:
 
   From admin server:
   - git_control_pull_push_these_hosts "$ALL_HOSTS"
-  
+
   On every server:
   for host in $ALL_SERVERS; do
      ssh_control_run_as_user cliff "ilo_control_refetch_ilo_hostkey_these_hosts \"$ALL_HOSTS\"" $HOST
@@ -86,7 +81,7 @@ Environment is fully set up with host_control administration:
 SETUP:
 Again, these steps are handled by the admin scripts mentioned above.
 
-Run: 
+Run:
   . setup.sh
   . fix-bonds/bondify_stack.sh
   . deploy.sh
