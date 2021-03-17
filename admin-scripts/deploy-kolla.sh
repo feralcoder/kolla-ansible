@@ -17,6 +17,14 @@ fail_exit () {
   exit 1
 }
 
+adjust_firewall () {
+  echo; echo ", AND POKING HOLE IN FIREWALL"
+  ssh_control_run_as_user_these_hosts root "firewall-cmd --zone=public --add-port=4567/tcp" "$CONTROL_HOSTS"                    || return 1
+  ssh_control_run_as_user_these_hosts root "firewall-cmd --permanent --zone=public --add-port=4567/tcp" "$CONTROL_HOSTS"        || return 1
+}
+
+# I FEEL LIKE THE kolla-ansible DEPLOYER'S BROKEN...
+adjust_firewall
 
 # PULL CONTAINER IMAGES AHEAD OF DEPLOY.  Pull twice if needed...
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/inventory-feralstack pull || kolla-ansible -i $KOLLA_SETUP_DIR../files/inventory-feralstack pull || fail_exit "kolla-ansible pull"
