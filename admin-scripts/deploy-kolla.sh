@@ -10,6 +10,7 @@ if [ ! "${BASH_SOURCE[0]}" -ef "$0" ]; then
 fi
 
 . ~/CODE/venvs/kolla-ansible/bin/activate
+. ~/CODE/feralcoder/host_control/control_scripts.sh
 
 fail_exit () {
   echo; echo "INSTALLATION FAILED AT STEP: $1"
