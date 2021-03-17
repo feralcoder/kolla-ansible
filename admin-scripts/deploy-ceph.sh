@@ -103,15 +103,46 @@ place_ceph_hacks () {
 
 }
 
+start_docker_pull () {
+  local OUTPUT
+  
+  PULLFILE=/tmp/docker_pull.out
+  OUTPUT="$( ssh_control_run_as_user_these_hosts root \"docker pull ceph/daemon:latest-nautilus >$PULLFILE 2>/&1 \" \"$CLOUD_HOSTS\" &&
+             sleep 1 )" &     # Sleep is basically noop - placeholder for when we want to pull sequence of images.
+  echo $!
+}
 
+wait_for_docker_pull () {
+  local PID=$1
 
+  echo "WAITING FOR DOCKER PULL TO FINISH... PID: $PID"
+  wait $PID 2>/dev/null
+  local RC=$?
+  if [[ $RC != 0 ]]; then
+    echo "Return code for PID $PID: $RC"
+    echo "Start_docker_pull returned failure.   Trying once more."
+    PID=`start_docker_pull`
+    wait $PID 2>/dev/null
+    RC=$?
+    if [[ $RC != 0 ]]; then
+      echo "Failed to pull docker images!"
+      echo "Figure it out, human."
+      return 1
+    fi
+  fi
+  echo "DOCKER PULL FINISHED"
+}
 
-checkout_ceph-ansible_for_dev || fail_exit "checkout_ceph-ansible_for_dev"
-venv                         || fail_exit "venv"
-install_prereqs              || fail_exit "install_prereqs"
-place_ceph_configs           || fail_exit "place_ceph_files"
-place_ceph_hacks             || fail_exit "place_ceph_files"
+DOCKER_PULL_PID=`start_docker_pull`   || exit_fail "start_docker_pull"
+
+#checkout_ceph-ansible_for_dev         || fail_exit "checkout_ceph-ansible_for_dev"
+#venv                                  || fail_exit "venv"
+#install_prereqs                       || fail_exit "install_prereqs"
+#place_ceph_configs                    || fail_exit "place_ceph_files"
+#place_ceph_hacks                      || fail_exit "place_ceph_files"
 
 # export ANSIBLE_DEBUG=true
 # export ANSIBLE_VERBOSITY=4
+
+wait_for_docker_pull $DOCKER_PULL_PID || exit_fail "wait_for_docker_pull"
 cd $CEPH_CHECKOUT_DIR && ansible-playbook $CEPH_CHECKOUT_DIR/site-docker.yml -i $CEPH_CHECKOUT_DIR/hosts -e container_package_name=docker-ce || fail_exit "ansible-playbook"
