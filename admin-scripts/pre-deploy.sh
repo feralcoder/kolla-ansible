@@ -10,6 +10,7 @@ if [ ! "${BASH_SOURCE[0]}" -ef "$0" ]; then
 fi
 
 . ~/CODE/venvs/kolla-ansible/bin/activate                                               || fail_exit "venv activate"
+. ~/CODE/feralcoder/host_control/control_scripts.sh
 
 KOLLA_SETUP_SOURCE="${BASH_SOURCE[0]}"
 KOLLA_SETUP_DIR=$( realpath `dirname $KOLLA_SETUP_SOURCE` )
