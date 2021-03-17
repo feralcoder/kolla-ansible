@@ -23,13 +23,15 @@ fail_exit () {
 }
 
 
+refetch_api_keys () {
+  echo; echo "REFETCHING HOST KEYS FOR API NETWORK EVERYWHERE"
+  for HOST in $ALL_HOSTS; do
+    ssh_control_run_as_user cliff "ssh_control_refetch_hostkey_these_hosts \"$STACK_HOSTS_API_NET\"" $HOST 2>/dev/null  || fail_exit "ssh_control_refetch_hostkey_these_hosts"
+  done
+}
 
-echo; echo "REFETCHING HOST KEYS FOR API NETWORK EVERYWHERE"
-for HOST in $ALL_HOSTS; do
-  ssh_control_run_as_user cliff "ssh_control_refetch_hostkey_these_hosts \"$ALL_HOSTS_API_NET\"" $HOST 2>/dev/null  || fail_exit "ssh_control_refetch_hostkey_these_hosts"
-done
 
-
+refetch_api_keys                                                                         || fail_exit "refetch_api_keys"
 kolla-genpwd                                                                             || fail_exit "kolla-genpwd"
 ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack all -m ping              || fail_exit "ansible ping"
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack bootstrap-servers  || fail_exit "kolla-ansible bootstrap-servers"
