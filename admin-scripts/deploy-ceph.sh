@@ -8,6 +8,8 @@ CODE_DIR=~/CODE
 CEPH_CODE_DIR=$CODE_DIR/ceph
 CEPH_CHECKOUT_DIR=$CEPH_CODE_DIR/ceph-ansible
 
+CEPH_VERSION=latest-nautilus
+
 # BAIL OUT IF USER SOURCES SCRIPT, INSTEAD OF RUNNING IT
 if [ ! "${BASH_SOURCE[0]}" -ef "$0" ]; then
   echo "Do not source this script (exits will bail you...)."
@@ -107,7 +109,7 @@ start_docker_pull () {
   local OUTPUT
   
   PULLFILE=/tmp/docker_pull.out
-  OUTPUT="$( ssh_control_run_as_user_these_hosts root \"docker pull ceph/daemon:latest-nautilus >$PULLFILE 2>/&1 \" \"$CLOUD_HOSTS\" &&
+  OUTPUT="$( ssh_control_run_as_user_these_hosts root \"docker pull ceph/daemon:$CEPH_VERSION >$PULLFILE 2>/&1 \" \"$CLOUD_HOSTS\" &&
              sleep 1 )" &     # Sleep is basically noop - placeholder for when we want to pull sequence of images.
   echo $!
 }
