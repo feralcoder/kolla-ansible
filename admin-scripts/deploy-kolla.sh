@@ -20,8 +20,8 @@ fail_exit () {
 
 adjust_firewall () {
   echo; echo ", AND POKING HOLE IN FIREWALL"
-  ssh_control_run_as_user_these_hosts root "systemd disable firewalld" "$STACK_HOSTS"                    || return 1
-  ssh_control_run_as_user_these_hosts root "systemd stop firewalld" "$STACK_HOSTS"                       || return 1
+  ssh_control_run_as_user_these_hosts root "systemctl disable firewalld" "$STACK_HOSTS"                    || return 1
+  ssh_control_run_as_user_these_hosts root "systemctl stop firewalld" "$STACK_HOSTS"                       || return 1
 #  ssh_control_run_as_user_these_hosts root "firewall-cmd --zone=public --add-port=4567/tcp" "$CONTROL_HOSTS"                    || return 1
 #  ssh_control_run_as_user_these_hosts root "firewall-cmd --permanent --zone=public --add-port=4567/tcp" "$CONTROL_HOSTS"        || return 1
 }
