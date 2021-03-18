@@ -9,8 +9,8 @@ CEPH_CODE_DIR=$CODE_DIR/ceph
 CEPH_CHECKOUT_DIR=$CEPH_CODE_DIR/ceph-ansible
 
 # SYNC THIS VERSION WITH ../files/ceph-all.yml: ceph_docker_image_tag
-#CEPH_DOCKER_VERSION=master-86da1a4-nautilus-centos-7
-CEPH_DOCKER_VERSION=latest-nautilus
+CEPH_DOCKER_VERSION=master-86da1a4-nautilus-centos-7
+#CEPH_DOCKER_VERSION=latest-nautilus
 
 # BAIL OUT IF USER SOURCES SCRIPT, INSTEAD OF RUNNING IT
 if [ ! "${BASH_SOURCE[0]}" -ef "$0" ]; then
