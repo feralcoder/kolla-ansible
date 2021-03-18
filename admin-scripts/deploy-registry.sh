@@ -31,9 +31,10 @@ install_packages () {
 }
 
 adjust_firewall () {
-  echo; echo ", AND POKING HOLE IN FIREWALL"
-  ssh_control_run_as_user root "firewall-cmd --zone=public --add-port=4000/tcp" $ANSIBLE_CONTROLLER                || return 1
-  ssh_control_run_as_user root "firewall-cmd --permanent --zone=public --add-port=4000/tcp" $ANSIBLE_CONTROLLER    || return 1
+  echo; echo "POKING HOLE IN FIREWALL"
+  # Firewall is off, for now...
+  #ssh_control_run_as_user root "firewall-cmd --zone=public --add-port=4000/tcp" $ANSIBLE_CONTROLLER                || return 1
+  #ssh_control_run_as_user root "firewall-cmd --permanent --zone=public --add-port=4000/tcp" $ANSIBLE_CONTROLLER    || return 1
 }
 
 set_up_docker_registry_service () {
