@@ -760,7 +760,7 @@ dashboard_enabled: True
 # If you define the dashboard_crt and dashboard_key variables, but leave them as '',
 # then we will autogenerate a cert and keyfile
 dashboard_protocol: http
-dashboard_port: 8080
+dashboard_port: 8480
 #dashboard_admin_user: admin
 #dashboard_admin_user_ro: false
 # This variable must be set with a strong custom password when dashboard_enabled is True
