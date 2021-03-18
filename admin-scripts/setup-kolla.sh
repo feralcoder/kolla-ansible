@@ -162,6 +162,10 @@ other_sytem_hackery_for_setup () {
   ssh_control_run_as_user_these_hosts root "dnf -y erase buildah podman" "$STACK_HOSTS" 2>/dev/null || return 1
   ssh_control_sync_as_user_these_hosts root $KOLLA_SETUP_DIR/../files/90-networkmanager-go-fuck-yourself.conf /etc/NetworkManager/conf.d/ "$STACK_HOSTS" || return 1
   ssh_control_run_as_user_these_hosts root "systemctl reload NetworkManager" "$STACK_HOSTS" || return 1
+
+  # Disable Reverse Path Filtering: Switches send routed traffic directly to any network, but default route back is via 192.168.127.X.
+  ssh_control_run_as_user_these_hosts root "echo 0 > /proc/sys/net/ipv4/conf/all/rp_filter" "$STACK_HOSTS" || return 1
+  ssh_control_run_as_user_these_hosts root "( grep 'net.ipv4.conf.all.rp_filter' /etc/sysctl.conf ) && sed -i 's/net.ipv4.conf.all.rp_filter.*/net.ipv4.conf.all.rp_filter=0/g' /etc/sysctl.conf || echo net.ipv4.conf.all.rp_filter=0 >> /etc/sysctl.conf" "$STACK_HOSTS" || return 1
 }
 
 
