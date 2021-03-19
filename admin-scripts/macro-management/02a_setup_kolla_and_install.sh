@@ -100,13 +100,20 @@ deploy_kolla () {
 }
 
 
+post_deploy_kolla () {
+  # Run: post-deploy-kolla.sh
+  echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/post-deploy-kolla.sh ON $ANSIBLE_CONTROLLER"
+  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/post-deploy-kolla.sh > $LOG_DIR/09-post-deploy-kolla_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 9: Post-Deploy Kolla"
+}
+
+
 
 # Boot all hosts to default
 echo; echo "BOOTING ALL STACK HOSTS TO default OS FOR SETUP: $STACK_HOSTS"
 boot_to_target default                          || fail_exit "boot_to_target default"
 
 remediate_hosts                                 || fail_exit "remediate_hosts"
-take_backups 01b_CentOS_8_3_Admin_Install.sh    || fail_exit "take_backups 01b_CentOS_8_3_Admin_Install.sh"
+take_backups 01b_CentOS_8_3_Admin_Install       || fail_exit "take_backups 01b_CentOS_8_3_Admin_Install.sh"
 
 setup_for_installers                            || fail_exit "setup_for_installers"
 take_backups 02a_Kolla-Ansible_Setup            || fail_exit "take_backups 02a_Kolla-Ansible_Setup"
@@ -122,6 +129,7 @@ take_backups 02b_Ceph_Setup                     || fail_exit "take_backups 02b_C
 ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSIBLE_CONTROLLER || fail_exit "git pull kolla-ansible"
 
 deploy_kolla                                    || fail_exit "deploy_kolla"
+post_deploy_kolla                               || fail_exit "post_deploy_kolla"
 take_backups 03_Kolla-Ansible_Installed         || fail_exit "take_backups 03_Kolla-Ansible_Installed"
 
 
