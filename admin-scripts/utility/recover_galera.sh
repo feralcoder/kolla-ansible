@@ -6,7 +6,9 @@ NOW=`date +%Y%m%d-%H%M%S`
 LOG_DIR=~/kolla-ansible-logs/
 
 
-. $KOLLA_VENV/bin/activate && kolla-ansible -i $KOLLA_CHECKOUT/files/kolla-inventory-feralstack mariadb_recovery >$LOG_DIR/recover_galera_$NOW.log 2>&1
+. $KOLLA_VENV/bin/activate
+ansible -i ~/CODE/feralcoder/kolla-ansible/files/kolla-inventory-feralstack   control   -m command -a "docker stop mariadb"
+kolla-ansible -i $KOLLA_CHECKOUT/files/kolla-inventory-feralstack mariadb_recovery >$LOG_DIR/recover_galera_$NOW.log 2>&1
 
 
 
