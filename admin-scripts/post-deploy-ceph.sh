@@ -26,6 +26,11 @@ set_up_ceph_volumes_and_users () {
 
   ( grep auth_cluster_required /etc/ceph/ceph.conf ) || ( echo "mon initial members = strange-api,merlin-api,gandalf-api" && echo "auth_cluster_required = cephx" && echo "auth_service_required = cephx" && echo "auth_client_required = cephx" ) | sudo tee -a /etc/ceph/ceph.conf    || return 1
 
+  # Default Pools Have Too Few Page Groups
+  ssh_control_run_as_user root "docker exec $MON_CONTAINER ceph osd pool set cephfs_data pg_num 16" $CEPH_MON                                     || return 1
+  ssh_control_run_as_user root "docker exec $MON_CONTAINER ceph osd pool set cephfs_metadata pg_num 16" $CEPH_MON                                 || return 1
+
+
   # CLIENT AUTH DETAILS HERE:
   # https://docs.ceph.com/en/latest/rbd/rbd-openstack/
 
