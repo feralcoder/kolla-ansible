@@ -130,6 +130,6 @@ ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSI
 
 deploy_kolla                                    || fail_exit "deploy_kolla"
 post_deploy_kolla                               || fail_exit "post_deploy_kolla"
-take_backups 03_Kolla-Ansible_Installed         || fail_exit "take_backups 03_Kolla-Ansible_Installed"
+#take_backups 03_Kolla-Ansible_Installed         || fail_exit "take_backups 03_Kolla-Ansible_Installed"
 
 
