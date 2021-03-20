@@ -22,16 +22,20 @@ fail_exit () {
 
 
 
-pip install python-openstackclient
 
-kolla-ansible post-deploy
-. /etc/kolla/admin-openrc.sh
+post_install_install () {
+  pip install python-openstackclient
+  kolla-ansible post-deploy
+  . /etc/kolla/admin-openrc.sh
+}
 
-XXX=~/CODE/venvs/kolla-ansible/share/kolla-ansible/init-runonce
-[[ -f $XXX.orig ]] || cp $XXX $XXX.orig
-cp $KOLLA_SETUP_DIR/../files/kolla-init-runonce $XXX
-chmod 755 $XXX
-$XXX
+place_and_run_init () {
+  XXX=~/CODE/venvs/kolla-ansible/share/kolla-ansible/init-runonce
+  [[ -f $XXX.orig ]] || cp $XXX $XXX.orig
+  cp $KOLLA_SETUP_DIR/../files/kolla-init-runonce $XXX
+  chmod 755 $XXX
+  $XXX
+}
 
 correct_compute_perms () {
   ssh_control_run_as_user_these_hosts root "docker exec -u root nova_compute mkdir -p /var/run/ceph/guests/ /var/log/qemu/; docker exec -u root nova_compute chown qemu:libvirt /var/run/ceph/guests /var/log/qemu/" "$COMPUTE_HOSTS"
@@ -42,6 +46,9 @@ correct_compute_perms () {
   ssh_control_run_as_user_these_hosts root "docker stop nova_compute; docker start nova_compute" "$COMPUTE_HOSTS"
 }
 
+post_install_install
+place_and_run_init
+correct_compute_perms
 
 # ADD THESE PROPERTIES TO IMAGES IN STACK:
 #hw_scsi_model=virtio-scsi: add the virtio-scsi controller and get better performance and support for discard operation
