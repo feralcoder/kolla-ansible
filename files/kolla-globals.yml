@@ -411,7 +411,7 @@ enable_manila_backend_cephfs_native: "no"
 # External Ceph options
 #######################
 # External Ceph - cephx auth enabled (this is the standard nowadays, defaults to yes)
-#external_ceph_cephx_enabled: "yes"
+external_ceph_cephx_enabled: "no"
 
 # Glance
 #ceph_glance_keyring: "ceph.client.glance.keyring"
@@ -425,7 +425,9 @@ enable_manila_backend_cephfs_native: "no"
 #ceph_cinder_backup_user: "cinder-backup"
 #ceph_cinder_backup_pool_name: "backups"
 # Nova
+# IS THIS WHY I'M FUCKED?
 #ceph_nova_keyring: "{{ ceph_cinder_keyring }}"
+ceph_nova_keyring: "ceph.client.nova.keyring"
 #ceph_nova_user: "nova"
 #ceph_nova_pool_name: "vms"
 # Gnocchi
