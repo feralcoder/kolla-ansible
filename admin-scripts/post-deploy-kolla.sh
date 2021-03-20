@@ -61,6 +61,13 @@ correct_compute_perms () {
   ssh_control_run_as_user_these_hosts root "docker exec -u root nova_compute chmod 775 /var/run/ceph/guests /var/log/qemu/" "$COMPUTE_HOSTS"
   ssh_control_run_as_user_these_hosts root "docker exec -u root nova_compute usermod -a -G ceph qemu; docker exec -u root nova_compute usermod -a -G ceph libvirt" "$COMPUTE_HOSTS"
 
+  # WTF.  Nova user has incorrect key set up in libvirt.
+  UUID_FILE=`get_libvirt_user_uuid nova`.base64
+  echo `get_user_secret nova` > /tmp/$UUID_FILE
+  ssh_control_sync_as_user_these_hosts root /tmp/$UUID_FILE /tmp/$UUID_FILE "$COMPUTE_HOSTS"
+  ssh_control_run_as_user_these_hosts root "docker cp /tmp/$UUID_FILE nova_libvirt:/etc/libvirt/secrets/$UUID_FILE" "$COMPUTE_HOSTS"
+  ssh_control_run_as_user_these_hosts root "rm /tmp/$UUID_FILE" "$COMPUTE_HOSTS"
+
   # Nova client key wasn't placed for nova-compute and nova-libvirt
   ssh_control_sync_as_user_these_hosts root /etc/kolla/config/nova/ceph.client.nova.keyring /etc/kolla/nova-compute/ "$COMPUTE_HOSTS"
   ssh_control_sync_as_user_these_hosts root /etc/kolla/config/nova/ceph.client.nova.keyring /etc/kolla/nova-libvirt/ "$COMPUTE_HOSTS"
@@ -69,13 +76,6 @@ correct_compute_perms () {
   ssh_control_run_as_user_these_hosts root "docker cp /etc/kolla/nova-libvirt/ceph.client.nova.keyring nova_libvirt:/etc/ceph/ceph.client.nova.keyring" "$COMPUTE_HOSTS"
   ssh_control_run_as_user_these_hosts root "docker cp /etc/kolla/nova-libvirt/ceph.client.cinder.keyring nova_libvirt:/etc/ceph/ceph.client.cinder.keyring" "$COMPUTE_HOSTS"
   ssh_control_run_as_user_these_hosts root "docker stop nova_compute nova_libvirt; docker start nova_compute nova_libvirt" "$COMPUTE_HOSTS"
-
-  # WTF.  Nova user has incorrect key set up in libvirt.
-  UUID_FILE=`get_libvirt_user_uuid nova`.base64
-  echo `get_user_secret nova` > /tmp/$UUID_FILE
-  ssh_control_sync_as_user_these_hosts root /tmp/$UUID_FILE /tmp/$UUID_FILE "$COMPUTE_HOSTS"
-  ssh_control_run_as_user_these_hosts root "docker cp /tmp/$UUID_FILE nova_libvirt:/etc/libvirt/secrets/$UUID_FILE" "$COMPUTE_HOSTS"
-  ssh_control_run_as_user_these_hosts root "rm /tmp/$UUID_FILE" "$COMPUTE_HOSTS"
 }
 
 post_install_install
