@@ -275,7 +275,7 @@ configure_firewall: false
 # Permissions for keyring files in /etc/ceph
 #ceph_keyring_permissions: '0600'
 
-#cephx: true
+cephx: false
 
 ## Client options
 #
