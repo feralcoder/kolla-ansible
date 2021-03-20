@@ -65,8 +65,8 @@ deploy_kolla () {
 
 reset_OSDs () {
   MAP=`ceph_control_show_map`
-  ceph_control_wipe_OSDs "$MAP" || exit 1
-  ceph_control_create_OSDs_from_map "$MAP" || exit 1
+  ceph_control_wipe_LVM_OSDs_from_map_these_hosts "$MAP" "$COMPUTE_HOSTS" || exit 1
+  ceph_control_create_LVM_OSDs_from_map_these_hosts "$MAP" "$COMPUTE_HOSTS" || exit 1
 }
 
 
