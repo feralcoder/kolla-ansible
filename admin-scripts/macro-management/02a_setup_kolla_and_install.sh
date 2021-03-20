@@ -50,11 +50,17 @@ take_backups () {
 
 # Separate function because I'd like to get this stuff into the base image...
 remediate_hosts () {
-  ssh_control_run_as_user_these_hosts root "yum -y install telnet" "$STACK_HOSTS"
-  ssh_control_run_as_user root "hostname strange.feralcoder.org" str
-  ssh_control_run_as_user root "hostnamectl set-hostname strange.feralcoder.org" str
+#  ssh_control_run_as_user_these_hosts root "yum -y install telnet" "$STACK_HOSTS"
+#  ssh_control_run_as_user root "hostname strange.feralcoder.org" str
+#  ssh_control_run_as_user root "hostnamectl set-hostname strange.feralcoder.org" str
+  ssh_control_run_as_user_these_hosts cliff "~/CODE/feralcoder/workstation/update.sh" "$ALL_HOSTS"
 }
 
+postmediate_hosts () {
+  # not exactly prerequisites for the stack, but I also don't want this stuff in the base image.  Yet.
+  ssh_control_run_as_user_these_hosts root "dnf -y install bcc perf systemtap" "$STACK_HOSTS"
+  ssh_control_run_as_user_these_hosts cliff "( [[ -d ~/CODE/brendangregg ]] || mkdir ~/CODE/brendangregg ) && cd ~/CODE/brendangregg && git clone https://github.com/brendangregg/perf-tools.git || ( cd ~/CODE/brendangregg/perf-tools && git pull )" "$STACK_HOSTS"
+}
 
 setup_for_installers () {
   # Checkout / update kolla-ansible on ansible controller
@@ -115,6 +121,7 @@ boot_to_target default                          || fail_exit "boot_to_target def
 remediate_hosts                                 || fail_exit "remediate_hosts"
 take_backups 01b_CentOS_8_3_Admin_Install       || fail_exit "take_backups 01b_CentOS_8_3_Admin_Install.sh"
 
+postmediate_hosts                               || fail_exit "postmediate_hosts"
 setup_for_installers                            || fail_exit "setup_for_installers"
 take_backups 02a_Kolla-Ansible_Setup            || fail_exit "take_backups 02a_Kolla-Ansible_Setup"
 
