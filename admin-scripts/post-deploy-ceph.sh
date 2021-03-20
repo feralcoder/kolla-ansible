@@ -96,7 +96,7 @@ set_up_ceph_volumes_and_users () {
   sudo cp /etc/ceph/ceph.conf /etc/kolla/config/glance/    || return 1
   sudo cp /etc/ceph/ceph.conf /etc/kolla/config/nova/      || return 1
   sudo cp /etc/ceph/ceph.conf /etc/kolla/config/gnocchi/   || return 1
-  cat $KOLLA_SETUP_DIR/../files/ceph-nova-ceph-conf-addl.conf >> /etc/kolla/config/nova/ceph.conf  || return 1
+  cat $KOLLA_SETUP_DIR/../files/ceph-nova-ceph-conf-addl.conf | sudo tee -a /etc/kolla/config/nova/ceph.conf  || return 1
 }
 
 
