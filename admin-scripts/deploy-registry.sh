@@ -38,19 +38,33 @@ adjust_firewall () {
 }
 
 set_up_docker_registry_service () {
-  echo; echo "PLACING docker-registry SERVICE FILES"
-  ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/docker-registry-start.sh /usr/local/bin/docker-registry-start.sh $ANSIBLE_CONTROLLER                             || return 1
-  ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/docker-registry-stop.sh /usr/local/bin/docker-registry-stop.sh $ANSIBLE_CONTROLLER                               || return 1
-  ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/docker-registry.service /etc/systemd/system/docker-registry.service $ANSIBLE_CONTROLLER                          || return 1
-  ssh_control_run_as_user root "chown root:root /usr/local/bin/docker-registry-start.sh; chmod 755 /usr/local/bin/docker-registry-start.sh" $ANSIBLE_CONTROLLER            || return 1
-  ssh_control_run_as_user root "chown root:root /usr/local/bin/docker-registry-stop.sh; chmod 755 /usr/local/bin/docker-registry-stop.sh" $ANSIBLE_CONTROLLER              || return 1
-  ssh_control_run_as_user root "chown root:root /etc/systemd/system/docker-registry.service; chmod 644 /etc/systemd/system/docker-registry.service" $ANSIBLE_CONTROLLER    || return 1
-  ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/docker-daemon.json /etc/docker/daemon.json $ANSIBLE_CONTROLLER                                                   || return 1
-  ssh_control_run_as_user root "chown root:root /etc/docker/daemon.json; chmod 644 /etc/docker/daemon.json" $ANSIBLE_CONTROLLER                                            || return 1
+  echo; echo "PLACING docker-local-registry SERVICE FILES"
+  ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/docker-local-registry-start.sh /usr/local/bin/docker-local-registry-start.sh $ANSIBLE_CONTROLLER                             || return 1
+  ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/docker-local-registry-stop.sh /usr/local/bin/docker-local-registry-stop.sh $ANSIBLE_CONTROLLER                               || return 1
+  ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/docker-local-registry.service /etc/systemd/system/docker-local-registry.service $ANSIBLE_CONTROLLER                          || return 1
+  ssh_control_run_as_user root "chown root:root /usr/local/bin/docker-local-registry-start.sh; chmod 755 /usr/local/bin/docker-local-registry-start.sh" $ANSIBLE_CONTROLLER            || return 1
+  ssh_control_run_as_user root "chown root:root /usr/local/bin/docker-local-registry-stop.sh; chmod 755 /usr/local/bin/docker-local-registry-stop.sh" $ANSIBLE_CONTROLLER              || return 1
+  ssh_control_run_as_user root "chown root:root /etc/systemd/system/docker-local-registry.service; chmod 644 /etc/systemd/system/docker-local-registry.service" $ANSIBLE_CONTROLLER    || return 1
+  ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/docker-local-daemon.json /etc/docker/local-daemon.json $ANSIBLE_CONTROLLER                                                   || return 1
+  ssh_control_run_as_user root "chown root:root /etc/docker/local-daemon.json; chmod 644 /etc/docker/local-daemon.json" $ANSIBLE_CONTROLLER                                            || return 1
 
-  echo; echo "ENABLING AND STARTING docker-registry"
-  ssh_control_run_as_user root "systemctl enable docker-registry" $ANSIBLE_CONTROLLER   || fail_exit "start docker-registry"
-  ssh_control_run_as_user root "systemctl start docker-registry" $ANSIBLE_CONTROLLER    || fail_exit "start docker-registry"
+  echo; echo "ENABLING AND STARTING docker-local-registry"
+  ssh_control_run_as_user root "systemctl enable docker-local-registry" $ANSIBLE_CONTROLLER   || fail_exit "start docker-local-registry"
+  ssh_control_run_as_user root "systemctl start docker-local-registry" $ANSIBLE_CONTROLLER    || fail_exit "start docker-local-registry"
+
+  echo; echo "PLACING docker-pullthru-registry SERVICE FILES"
+  ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/docker-pullthru-registry-start.sh /usr/local/bin/docker-pullthru-registry-start.sh $ANSIBLE_CONTROLLER                             || return 1
+  ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/docker-pullthru-registry-stop.sh /usr/local/bin/docker-pullthru-registry-stop.sh $ANSIBLE_CONTROLLER                               || return 1
+  ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/docker-pullthru-registry.service /etc/systemd/system/docker-pullthru-registry.service $ANSIBLE_CONTROLLER                          || return 1
+  ssh_control_run_as_user root "chown root:root /usr/local/bin/docker-pullthru-registry-start.sh; chmod 755 /usr/local/bin/docker-pullthru-registry-start.sh" $ANSIBLE_CONTROLLER            || return 1
+  ssh_control_run_as_user root "chown root:root /usr/local/bin/docker-pullthru-registry-stop.sh; chmod 755 /usr/local/bin/docker-pullthru-registry-stop.sh" $ANSIBLE_CONTROLLER              || return 1
+  ssh_control_run_as_user root "chown root:root /etc/systemd/system/docker-pullthru-registry.service; chmod 644 /etc/systemd/system/docker-pullthru-registry.service" $ANSIBLE_CONTROLLER    || return 1
+  ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/docker-pullthru-daemon.json /etc/docker/pullthru-daemon.json $ANSIBLE_CONTROLLER                                                   || return 1
+  ssh_control_run_as_user root "chown root:root /etc/docker/pullthru-daemon.json; chmod 644 /etc/docker/pullthru-daemon.json" $ANSIBLE_CONTROLLER                                            || return 1
+
+  echo; echo "ENABLING AND STARTING docker-pullthru-registry"
+  ssh_control_run_as_user root "systemctl enable docker-pullthru-registry" $ANSIBLE_CONTROLLER   || fail_exit "start docker-pullthru-registry"
+  ssh_control_run_as_user root "systemctl start docker-pullthru-registry" $ANSIBLE_CONTROLLER    || fail_exit "start docker-pullthru-registry"
 }
 
 
