@@ -54,7 +54,7 @@ use_venv () {
 
 add_stack_user_everywhere () {
   echo; echo "ADDIING STACK USER EVERYWHERE"
-  ssh_control_run_as_user_these_hosts root "adduser stack" "$ALL_HOSTS" 2>/dev/null                                || return 1
+  ssh_control_run_as_user_these_hosts root "adduser stack || id -u stack" "$ALL_HOSTS" 2>/dev/null                                || return 1
   [[ -f ~/.stack_password ]] && {
     PASSFILE=~/.stack_password
   } || {
