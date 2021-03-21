@@ -59,7 +59,7 @@ remediate_hosts () {
 postmediate_hosts () {
   # not exactly prerequisites for the stack, but I also don't want this stuff in the base image.  Yet.
   ssh_control_run_as_user_these_hosts root "dnf -y install bcc perf systemtap" "$STACK_HOSTS"
-  ssh_control_run_as_user_these_hosts cliff "( [[ -d ~/CODE/brendangregg ]] || mkdir ~/CODE/brendangregg ) && cd ~/CODE/brendangregg && git clone https://github.com/brendangregg/perf-tools.git || ( cd ~/CODE/brendangregg/perf-tools && git pull )" "$STACK_HOSTS"
+  ssh_control_run_as_user_these_hosts cliff "mkdir -p ~/CODE/brendangregg && cd ~/CODE/brendangregg && git clone https://github.com/brendangregg/perf-tools.git || ( cd ~/CODE/brendangregg/perf-tools && git pull )" "$STACK_HOSTS"
 }
 
 setup_for_installers () {
@@ -76,7 +76,7 @@ setup_for_installers () {
   
   # Run: setup-kolla.sh,   make_and_setup_stack_bonds.sh,   test_bonds.sh,   pre-deploy.sh,   deploy-registry.sh
   echo; echo "SETTING UP LOG DIRECTORY $LOG_DIR ON $ANSIBLE_CONTROLLER.  GO THERE FOR PROGRESS OUTPUT."
-  ssh_control_run_as_user cliff "mkdir $LOG_DIR" $ANSIBLE_CONTROLLER || exit 1
+  ssh_control_run_as_user cliff "mkdir -p $LOG_DIR" $ANSIBLE_CONTROLLER || exit 1
   echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/setup-kolla.sh ON $ANSIBLE_CONTROLLER"
   ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/setup-kolla.sh > $LOG_DIR/01-setup-kolla_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 1: Kolla Host Setup"
   echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/fix-bonds/make_and_setup_stack_bonds.sh ON $ANSIBLE_CONTROLLER"
@@ -114,14 +114,14 @@ post_deploy_kolla () {
 
 
 
-# Boot all hosts to default
-echo; echo "BOOTING ALL STACK HOSTS TO default OS FOR SETUP: $STACK_HOSTS"
-boot_to_target default                          || fail_exit "boot_to_target default"
-
-remediate_hosts                                 || fail_exit "remediate_hosts"
-take_backups 01b_CentOS_8_3_Admin_Install       || fail_exit "take_backups 01b_CentOS_8_3_Admin_Install.sh"
-
-postmediate_hosts                               || fail_exit "postmediate_hosts"
+## Boot all hosts to default
+#echo; echo "BOOTING ALL STACK HOSTS TO default OS FOR SETUP: $STACK_HOSTS"
+#boot_to_target default                          || fail_exit "boot_to_target default"
+#
+#remediate_hosts                                 || fail_exit "remediate_hosts"
+#take_backups 01b_CentOS_8_3_Admin_Install       || fail_exit "take_backups 01b_CentOS_8_3_Admin_Install.sh"
+#
+#postmediate_hosts                               || fail_exit "postmediate_hosts"
 setup_for_installers                            || fail_exit "setup_for_installers"
 take_backups 02a_Kolla-Ansible_Setup            || fail_exit "take_backups 02a_Kolla-Ansible_Setup"
 
