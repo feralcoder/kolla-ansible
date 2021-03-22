@@ -1,0 +1,12 @@
+---
+
+# PINNED CONTAINER VERSIONS
+docker_registry: 192.168.127.220:4001
+docker_namespace: "feralcoder"
+openstack_release: "feralcoder-20210321"
+
+## LATEST CONTAINER VERSIONS
+#docker_registry:
+#docker_registry_username: feralcoder
+#docker_namespace: "kolla"
+#openstack_release: "victoria"

@@ -14,6 +14,10 @@ fi
 
 KOLLA_SETUP_SOURCE="${BASH_SOURCE[0]}"
 KOLLA_SETUP_DIR=$( realpath `dirname $KOLLA_SETUP_SOURCE` )
+KOLLA_PULL_THRU_CACHE=/registry/docker/pullthru-registry/docker/registry/v2/repositories/kolla/
+LOCAL_REGISTRY=192.168.127.220:4001
+PULL_HOST=kgn
+TAG=feralcoder-`date  +%Y%m%d`
 
 
 fail_exit () {
@@ -30,11 +34,32 @@ refetch_api_keys () {
   done
 }
 
+prefetch_latest_containers () {
+  # We switch to dockerhub container fetches, to get the latest "victoria" containers
+  cp $KOLLA_SETUP_DIR/../files/kolla-globals-dockerpull.yml /etc/kolla/globals.yml         ||  return 1
+  cat $KOLLA_SETUP_DIR/../files/kolla-globals-remainder.yml >> /etc/kolla/globals.yml      ||  return 1
+  kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack pull               ||  return 1
+}
+
+localize_latest_containers () {
+  for CONTAINER in `ls $KOLLA_PULL_THRU_CACHE`; do
+    ssh_control_run_as_user root "docker image pull kolla/$CONTAINER:victoria" $PULL_HOST
+    ssh_control_run_as_user root "docker image tag kolla/$CONTAINER:victoria $LOCAL_REGISTRY/feralcoder/$CONTAINER:$TAG" $PULL_HOST
+    ssh_control_run_as_user root "docker image push $LOCAL_REGISTRY/feralcoder/$CONTAINER:$TAG" $PULL_HOST
+  done
+}
+
+use_localized_containers () {
+  # Switch back to local (pinned) fetches for deployment
+  cp $KOLLA_SETUP_DIR/../files/kolla-globals-localpull.yml /etc/kolla/globals.yml         ||  return 1
+  cat $KOLLA_SETUP_DIR/../files/kolla-globals-remainder.yml >> /etc/kolla/globals.yml     ||  return 1
+}
 
 refetch_api_keys                                                                         || fail_exit "refetch_api_keys"
 kolla-genpwd                                                                             || fail_exit "kolla-genpwd"
 ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack all -m ping              || fail_exit "ansible ping"
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack bootstrap-servers  || fail_exit "kolla-ansible bootstrap-servers"
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack prechecks          || fail_exit "kolla-ansible prechecks"
-
-
+prefetch_latest_containers                                                               || fail_exit "prefetch_latest_containers"
+localize_latest_containers                                                               || fail_exit "localize_latest_containers"
+use_localized_containers                                                                 || fail_exit "use_localized_containers"
