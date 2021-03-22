@@ -63,8 +63,8 @@ ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack all -m ping     
 use_localized_containers                                                                 || fail_exit "use_localized_containers"
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack bootstrap-servers  || fail_exit "kolla-ansible bootstrap-servers"
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack prechecks          || fail_exit "kolla-ansible prechecks"
-# This will point globals.yml at dockerhub, until pull completes
-prefetch_latest_containers                                                               || fail_exit "prefetch_latest_containers"
-localize_latest_containers                                                               || fail_exit "localize_latest_containers"
-# Use local registry so we use pinned versions for deployments
-use_localized_containers                                                                 || fail_exit "use_localized_containers"
+## This will point globals.yml at dockerhub, until pull completes
+#prefetch_latest_containers                                                               || fail_exit "prefetch_latest_containers"
+#localize_latest_containers                                                               || fail_exit "localize_latest_containers"
+## Use local registry so we use pinned versions for deployments
+#use_localized_containers                                                                 || fail_exit "use_localized_containers"
