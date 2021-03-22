@@ -19,6 +19,7 @@ ANSIBLE_CONTROLLER=dmb
 fail_exit () {
   echo; echo "INSTALLATION FAILED AT STEP: $1"
   echo "Check the logs and try again.  Or just give up.  I don't care."
+  ~/CODE/feralcoder/
   exit 1
 }
 
@@ -50,10 +51,16 @@ take_backups () {
 
 # Separate function because I'd like to get this stuff into the base image...
 remediate_hosts () {
-#  ssh_control_run_as_user_these_hosts root "yum -y install telnet" "$STACK_HOSTS"
-#  ssh_control_run_as_user root "hostname strange.feralcoder.org" str
-#  ssh_control_run_as_user root "hostnamectl set-hostname strange.feralcoder.org" str
+  ssh_control_run_as_user_these_hosts root "yum -y install telnet" "$STACK_HOSTS"
+  ssh_control_run_as_user root "hostname strange.feralcoder.org" str
+  ssh_control_run_as_user root "hostnamectl set-hostname strange.feralcoder.org" str
+  ssh_control_run_as_user_these_hosts root "$ALL_HOSTS"
   ssh_control_run_as_user_these_hosts cliff "~/CODE/feralcoder/workstation/update.sh" "$ALL_HOSTS"
+
+  ssh_control_run_as_user_these_hosts cliff "cd ~/CODE/feralcoder/ && git clone https://feralcoder:\`cat ~/.git_password\`@github.com/feralcoder/twilio-pager.git" "$ALL_HOSTS"
+  ssh_control_run_as_user_these_hosts cliff "cat ~/.password | sudo -S ls; cd $TWILIO_DIR/twilio-twilio-python-*/ && sudo -S python3 setup.py install" "$ALL_HOSTS"
+  ssh_control_run_as_user_these_hosts cliff "python3 ~/CODE/feralcoder/twilio-pager/pager.py \"hello from \`hostname\`\"" "$ALL_HOSTS"
+  echo
 }
 
 postmediate_hosts () {
@@ -114,14 +121,14 @@ post_deploy_kolla () {
 
 
 
-## Boot all hosts to default
-#echo; echo "BOOTING ALL STACK HOSTS TO default OS FOR SETUP: $STACK_HOSTS"
-#boot_to_target default                          || fail_exit "boot_to_target default"
-#
-#remediate_hosts                                 || fail_exit "remediate_hosts"
-#take_backups 01b_CentOS_8_3_Admin_Install       || fail_exit "take_backups 01b_CentOS_8_3_Admin_Install.sh"
-#
-#postmediate_hosts                               || fail_exit "postmediate_hosts"
+# Boot all hosts to default
+echo; echo "BOOTING ALL STACK HOSTS TO default OS FOR SETUP: $STACK_HOSTS"
+boot_to_target default                          || fail_exit "boot_to_target default"
+
+remediate_hosts                                 || fail_exit "remediate_hosts"
+take_backups 01b_CentOS_8_3_Admin_Install       || fail_exit "take_backups 01b_CentOS_8_3_Admin_Install.sh"
+
+postmediate_hosts                               || fail_exit "postmediate_hosts"
 setup_for_installers                            || fail_exit "setup_for_installers"
 take_backups 02a_Kolla-Ansible_Setup            || fail_exit "take_backups 02a_Kolla-Ansible_Setup"
 
@@ -129,7 +136,7 @@ take_backups 02a_Kolla-Ansible_Setup            || fail_exit "take_backups 02a_K
 ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSIBLE_CONTROLLER || fail_exit "git pull kolla-ansible"
 
 deploy_ceph                                     || fail_exit "deploy_ceph"
-take_backups 02b_Ceph_Setup                     || fail_exit "take_backups 02b_Ceph_Setup"
+#take_backups 02b_Ceph_Setup                     || fail_exit "take_backups 02b_Ceph_Setup"
 # NEED CEPH EXPORT FUNCTION
 
 # ASSUME WE COULD BE STARTING FROM A FREEZE-THAW...
