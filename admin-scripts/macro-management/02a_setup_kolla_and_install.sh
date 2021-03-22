@@ -56,17 +56,17 @@ remediate_hosts () {
   ssh_control_run_as_user root "hostnamectl set-hostname strange.feralcoder.org" str
   ssh_control_run_as_user_these_hosts root "$ALL_HOSTS"
   ssh_control_run_as_user_these_hosts cliff "~/CODE/feralcoder/workstation/update.sh" "$ALL_HOSTS"
-
-  ssh_control_run_as_user_these_hosts cliff "cd ~/CODE/feralcoder/ && git clone https://feralcoder:\`cat ~/.git_password\`@github.com/feralcoder/twilio-pager.git" "$ALL_HOSTS"
-  ssh_control_run_as_user_these_hosts cliff "cat ~/.password | sudo -S ls; cd $TWILIO_DIR/twilio-twilio-python-*/ && sudo -S python3 setup.py install" "$ALL_HOSTS"
-  ssh_control_run_as_user_these_hosts cliff "python3 ~/CODE/feralcoder/twilio-pager/pager.py \"hello from \`hostname\`\"" "$ALL_HOSTS"
-  echo
 }
 
 postmediate_hosts () {
   # not exactly prerequisites for the stack, but I also don't want this stuff in the base image.  Yet.
   ssh_control_run_as_user_these_hosts root "dnf -y install bcc perf systemtap" "$STACK_HOSTS"
   ssh_control_run_as_user_these_hosts cliff "mkdir -p ~/CODE/brendangregg && cd ~/CODE/brendangregg && git clone https://github.com/brendangregg/perf-tools.git || ( cd ~/CODE/brendangregg/perf-tools && git pull )" "$STACK_HOSTS"
+
+  ssh_control_run_as_user_these_hosts cliff "cd ~/CODE/feralcoder/ && git clone https://feralcoder:\`cat ~/.git_password\`@github.com/feralcoder/twilio-pager.git" "$ALL_HOSTS"
+  ssh_control_run_as_user_these_hosts cliff "cat ~/.password | sudo -S ls; cd $TWILIO_DIR/twilio-twilio-python-*/ && sudo -S python3 setup.py install" "$ALL_HOSTS"
+  ssh_control_run_as_user_these_hosts cliff "python3 ~/CODE/feralcoder/twilio-pager/pager.py \"hello from \`hostname\`\"" "$ALL_HOSTS"
+  echo
 }
 
 setup_for_installers () {
