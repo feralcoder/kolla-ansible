@@ -34,6 +34,12 @@ refetch_api_keys () {
   done
 }
 
+use_localized_containers () {
+  # Switch back to local (pinned) fetches for deployment
+  cp $KOLLA_SETUP_DIR/../files/kolla-globals-localpull.yml /etc/kolla/globals.yml         ||  return 1
+  cat $KOLLA_SETUP_DIR/../files/kolla-globals-remainder.yml >> /etc/kolla/globals.yml     ||  return 1
+}
+
 prefetch_latest_containers () {
   # We switch to dockerhub container fetches, to get the latest "victoria" containers
   cp $KOLLA_SETUP_DIR/../files/kolla-globals-dockerpull.yml /etc/kolla/globals.yml         ||  return 1
@@ -49,17 +55,16 @@ localize_latest_containers () {
   done
 }
 
-use_localized_containers () {
-  # Switch back to local (pinned) fetches for deployment
-  cp $KOLLA_SETUP_DIR/../files/kolla-globals-localpull.yml /etc/kolla/globals.yml         ||  return 1
-  cat $KOLLA_SETUP_DIR/../files/kolla-globals-remainder.yml >> /etc/kolla/globals.yml     ||  return 1
-}
 
 refetch_api_keys                                                                         || fail_exit "refetch_api_keys"
 kolla-genpwd                                                                             || fail_exit "kolla-genpwd"
 ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack all -m ping              || fail_exit "ansible ping"
+# Use local registry so insecure-registries is set up correctly by bootstrap-servers
+use_localized_containers                                                                 || fail_exit "use_localized_containers"
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack bootstrap-servers  || fail_exit "kolla-ansible bootstrap-servers"
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack prechecks          || fail_exit "kolla-ansible prechecks"
+# This will point globals.yml at dockerhub, until pull completes
 prefetch_latest_containers                                                               || fail_exit "prefetch_latest_containers"
 localize_latest_containers                                                               || fail_exit "localize_latest_containers"
+# Use local registry so we use pinned versions for deployments
 use_localized_containers                                                                 || fail_exit "use_localized_containers"
