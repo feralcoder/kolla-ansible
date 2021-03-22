@@ -29,5 +29,8 @@ adjust_firewall () {
 # I FEEL LIKE THE kolla-ansible DEPLOYER'S BROKEN...
 adjust_firewall
 
+# PULL CONTAINER IMAGES AHEAD OF DEPLOY.  Pull twice if needed...
+kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack pull || kolla-ansible -i $KOLLA_SETUP_DIR../files/kolla-inventory-feralstack pull || fail_exit "kolla-ansible pull"
+
 # DEPLOY THE STACK!!!
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack deploy || fail_exit "kolla-ansible deploy"
