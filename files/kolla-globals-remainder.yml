@@ -1,6 +1,3 @@
----
-# Additional options can be found in the
-# 'kolla-ansible/ansible/group_vars/all.yml' file. Default value of all the
 
 ###############
 # Kolla options
@@ -15,7 +12,6 @@
 #kolla_install_type: "binary"
 
 # Do not override this unless you know what you are doing.
-#openstack_release: "victoria"
 
 # Docker image tag used by default.
 #openstack_tag: "{{ openstack_release ~ openstack_tag_suffix }}"
@@ -63,14 +59,11 @@ docker_custom_config:
   registry-mirrors:
     - http://192.168.127.220:4000
 
-# Custom docker registry settings:
-docker_registry:
+
 docker_registry_insecure: "{{ 'yes' if docker_registry else 'no' }}"
-docker_registry_username: feralcoder
 # docker_registry_password is set in the passwords.yml file.
 
 # Namespace of images:
-#docker_namespace: "kolla"
 
 # Docker client timeout in seconds.
 #docker_client_timeout: 120

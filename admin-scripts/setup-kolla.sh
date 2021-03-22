@@ -122,7 +122,9 @@ install_kolla_for_admin () {
   sudo mkdir -p /etc/kolla
   sudo chown $USER:$USER /etc/kolla
   cp -r ~/CODE/venvs/kolla-ansible/share/kolla-ansible/etc_examples/kolla/* /etc/kolla    ||  return 1
-  cp $KOLLA_SETUP_DIR/../files/kolla-globals.yml /etc/kolla/globals.yml                   ||  return 1
+  # We start with local docker registry, so hosts bootstrap with appropriate insecure-registries defined...
+  cp $KOLLA_SETUP_DIR/../files/kolla-globals-localpull.yml /etc/kolla/globals.yml         ||  return 1
+  cat $KOLLA_SETUP_DIR/../files/kolla-globals-remainder.yml >> /etc/kolla/globals.yml     ||  return 1
 
   # cp ~/CODE/venvs/kolla-ansible/share/kolla-ansible/ansible/inventory/* .
 }
