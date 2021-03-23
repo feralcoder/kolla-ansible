@@ -64,7 +64,7 @@ postmediate_hosts () {
   ssh_control_run_as_user_these_hosts cliff "mkdir -p ~/CODE/brendangregg && cd ~/CODE/brendangregg && git clone https://github.com/brendangregg/perf-tools.git || ( cd ~/CODE/brendangregg/perf-tools && git pull )" "$STACK_HOSTS"
 
   ssh_control_run_as_user_these_hosts cliff "cd ~/CODE/feralcoder/ && git clone https://feralcoder:\`cat ~/.git_password\`@github.com/feralcoder/twilio-pager.git" "$ALL_HOSTS"
-  ssh_control_run_as_user_these_hosts cliff "cat ~/.password | sudo -S ls; cd $TWILIO_DIR/twilio-twilio-python-*/ && sudo -S python3 setup.py install" "$ALL_HOSTS"
+  ssh_control_run_as_user_these_hosts cliff "cd $TWILIO_DIR/ && ./setup.sh" "$ALL_HOSTS"
   ssh_control_run_as_user_these_hosts cliff "python3 ~/CODE/feralcoder/twilio-pager/pager.py \"hello from \`hostname\`\"" "$ALL_HOSTS"
   echo
 }
