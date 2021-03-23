@@ -16,6 +16,8 @@ KOLLA_ANSIBLE_CHECKOUT=~/CODE/feralcoder/kolla-ansible/
 LOG_DIR=~/kolla-ansible-logs/
 ANSIBLE_CONTROLLER=dmb
 
+TWILIO_PAGER_DIR=~/CODE/feralcoder/twilio-pager/
+
 fail_exit () {
   echo; echo "INSTALLATION FAILED AT STEP: $1"
   echo "Check the logs and try again.  Or just give up.  I don't care."
@@ -64,8 +66,8 @@ postmediate_hosts () {
   ssh_control_run_as_user_these_hosts cliff "mkdir -p ~/CODE/brendangregg && cd ~/CODE/brendangregg && git clone https://github.com/brendangregg/perf-tools.git || ( cd ~/CODE/brendangregg/perf-tools && git pull )" "$STACK_HOSTS"
 
   ssh_control_run_as_user_these_hosts cliff "cd ~/CODE/feralcoder/ && git clone https://feralcoder:\`cat ~/.git_password\`@github.com/feralcoder/twilio-pager.git" "$ALL_HOSTS"
-  ssh_control_run_as_user_these_hosts cliff "cd $TWILIO_DIR/ && ./setup.sh" "$ALL_HOSTS"
-  ssh_control_run_as_user_these_hosts cliff "python3 ~/CODE/feralcoder/twilio-pager/pager.py \"hello from \`hostname\`\"" "$ALL_HOSTS"
+  ssh_control_run_as_user_these_hosts cliff "cd $TWILIO_PAGER_DIR && ./setup.sh" "$ALL_HOSTS"
+  ssh_control_run_as_user_these_hosts cliff "python3 $TWILIO_PAGER_DIR/pager.py \"hello from \`hostname\`\"" "$ALL_HOSTS"
   echo
 }
 
