@@ -62,12 +62,16 @@ remediate_hosts () {
 
 postmediate_hosts () {
   # not exactly prerequisites for the stack, but I also don't want this stuff in the base image.  Yet.
+  TWILIO_PAGER_DIR=~/CODE/feralcoder/twilio-pager/
   ssh_control_run_as_user_these_hosts root "dnf -y install bcc perf systemtap" "$STACK_HOSTS"
   ssh_control_run_as_user_these_hosts cliff "mkdir -p ~/CODE/brendangregg && cd ~/CODE/brendangregg && git clone https://github.com/brendangregg/perf-tools.git || ( cd ~/CODE/brendangregg/perf-tools && git pull )" "$STACK_HOSTS"
 
-  ssh_control_run_as_user_these_hosts cliff "cd ~/CODE/feralcoder/ && git clone https://feralcoder:\`cat ~/.git_password\`@github.com/feralcoder/twilio-pager.git" "$ALL_HOSTS"
-  ssh_control_run_as_user_these_hosts cliff "cd $TWILIO_PAGER_DIR && ./setup.sh" "$ALL_HOSTS"
-  ssh_control_run_as_user_these_hosts cliff "python3 $TWILIO_PAGER_DIR/pager.py \"hello from \`hostname\`\"" "$ALL_HOSTS"
+  ssh_control_run_as_user_these_hosts cliff "cd ~/CODE/feralcoder/ && git clone https://feralcoder:\`cat ~/.git_password\`@github.com/feralcoder/twilio-pager.git" "$STACK_HOSTS"
+  ssh_control_run_as_user_these_hosts cliff "cd $TWILIO_PAGER_DIR && git git pull" "$STACK_HOSTS"
+  for HOST in $STACK_HOSTS; do
+    ssh_control_run_as_user cliff "cd $TWILIO_PAGER_DIR && ./setup.sh" $HOST
+  done
+  ssh_control_run_as_user_these_hosts cliff "python3 $TWILIO_PAGER_DIR/pager.py \"hello from \`hostname\`\"" "$STACK_HOSTS"
   echo
 }
 
@@ -131,6 +135,7 @@ remediate_hosts                                 || fail_exit "remediate_hosts"
 take_backups 01b_CentOS_8_3_Admin_Install       || fail_exit "take_backups 01b_CentOS_8_3_Admin_Install.sh"
 
 postmediate_hosts                               || fail_exit "postmediate_hosts"
+take_backups 01c_CentOS_8_3_Admin_Install       || fail_exit "take_backups 01c_CentOS_8_3_Admin_Install.sh"
 setup_for_installers                            || fail_exit "setup_for_installers"
 take_backups 02a_Kolla-Ansible_Setup            || fail_exit "take_backups 02a_Kolla-Ansible_Setup"
 
