@@ -43,7 +43,7 @@ use_localized_containers () {
   cat $KOLLA_SETUP_DIR/../files/kolla-globals-remainder.yml >> /etc/kolla/globals.yml     ||  return 1
 }
 
-use_dockerhub () {
+use_dockerhub_containers () {
   # We switch to dockerhub container fetches, to get the latest "victoria" containers
   cp $KOLLA_SETUP_DIR/../files/kolla-globals-dockerpull.yml /etc/kolla/globals.yml         ||  return 1
   cat $KOLLA_SETUP_DIR/../files/kolla-globals-remainder.yml >> /etc/kolla/globals.yml      ||  return 1
@@ -58,10 +58,11 @@ localize_latest_containers () {
 }
 
 
-#use_dockerhub                                                                            || fail_exit "use_dockerhub"
 use_localized_containers                                                                 || fail_exit "use_localized_containers"
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack bootstrap-servers  || fail_exit "kolla-ansible bootstrap-servers"
+# Set globals.yml to dockerhub to inform package fetch names (kolla/*:victoria)
+# But do not re-bootstrap!
+use_dockerhub_containers                                                                 || fail_exit "use_dockerhub_containers"
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack pull               || fail_exit "kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack pull"
-localize_latest_containers                                                               || fail_exit "localize_latest_containers"
 use_localized_containers                                                                 || fail_exit "use_localized_containers"
-kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack bootstrap-servers  || fail_exit "kolla-ansible bootstrap-servers"
+localize_latest_containers                                                               || fail_exit "localize_latest_containers"
