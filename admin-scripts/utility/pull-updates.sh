@@ -18,7 +18,7 @@ KOLLA_SETUP_DIR=$KOLLA_UTIL_DIR/..
 KOLLA_PULL_THRU_CACHE=/registry/docker/pullthru-registry/docker/registry/v2/repositories/kolla/
 LOCAL_REGISTRY=192.168.127.220:4001
 PULL_HOST=kgn
-TAG=feralcoder-20210323
+TAG=feralcoder-20210324
 #TAG=feralcoder-`date  +%Y%m%d`
 
 
@@ -58,7 +58,8 @@ localize_latest_containers () {
 }
 
 
-use_dockerhub                                                                            || fail_exit "use_dockerhub"
+#use_dockerhub                                                                            || fail_exit "use_dockerhub"
+use_localized_containers                                                                 || fail_exit "use_localized_containers"
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack bootstrap-servers  || fail_exit "kolla-ansible bootstrap-servers"
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack pull               || fail_exit "kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack pull"
 localize_latest_containers                                                               || fail_exit "localize_latest_containers"
