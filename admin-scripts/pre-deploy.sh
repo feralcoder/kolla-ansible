@@ -42,7 +42,7 @@ use_localized_containers () {
   cat $KOLLA_SETUP_DIR/../files/kolla-globals-remainder.yml >> /etc/kolla/globals.yml     ||  return 1
 }
 
-use_dockerhub () {
+use_dockerhub_containers () {
   # We switch to dockerhub container fetches, to get the latest "victoria" containers
   cp $KOLLA_SETUP_DIR/../files/kolla-globals-dockerpull.yml /etc/kolla/globals.yml         ||  return 1
   cat $KOLLA_SETUP_DIR/../files/kolla-globals-remainder.yml >> /etc/kolla/globals.yml      ||  return 1
@@ -65,7 +65,11 @@ use_localized_containers                                                        
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack bootstrap-servers  || fail_exit "kolla-ansible bootstrap-servers"
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack prechecks          || fail_exit "kolla-ansible prechecks"
 ## This will point globals.yml at dockerhub, until pull completes
+#    Set globals.yml to inform package names (kolla/*:victoria)
+#    BUT DO NOT re-bootstrap
+use_dockerhub_containers                                                                 || fail_exit "use_dockerhub_containers"
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack pull               || fail_exit "kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack pull"
+use_localized_containers                                                                 || fail_exit "use_localized_containers"
 localize_latest_containers                                                               || fail_exit "localize_latest_containers"
 ## Use local registry so we use pinned versions for deployments
 use_localized_containers                                                                 || fail_exit "use_localized_containers"
