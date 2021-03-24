@@ -58,6 +58,7 @@ remediate_hosts () {
   ssh_control_run_as_user root "hostnamectl set-hostname strange.feralcoder.org" str
   ssh_control_run_as_user_these_hosts root "$ALL_HOSTS"
   ssh_control_run_as_user_these_hosts cliff "~/CODE/feralcoder/workstation/update.sh" "$ALL_HOSTS"
+  ssh_control_run_as_user_these_hosts root "rm /etc/yum.repos.d/docker.repo" "$ALL_HOSTS"
 }
 
 postmediate_hosts () {
