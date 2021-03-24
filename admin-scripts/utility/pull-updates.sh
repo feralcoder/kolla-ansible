@@ -12,8 +12,9 @@ fi
 . ~/CODE/venvs/kolla-ansible/bin/activate                                               || fail_exit "venv activate"
 . ~/CODE/feralcoder/host_control/control_scripts.sh
 
-KOLLA_SETUP_SOURCE="${BASH_SOURCE[0]}"
-KOLLA_SETUP_DIR=$( realpath `dirname $KOLLA_SETUP_SOURCE` )
+KOLLA_UTIL_SOURCE="${BASH_SOURCE[0]}"
+KOLLA_UTIL_DIR=$( realpath `dirname $KOLLA_SETUP_SOURCE` )
+KOLLA_SETUP_DIR=$KOLLA_UTIL_DIR/..
 KOLLA_PULL_THRU_CACHE=/registry/docker/pullthru-registry/docker/registry/v2/repositories/kolla/
 LOCAL_REGISTRY=192.168.127.220:4001
 PULL_HOST=kgn
