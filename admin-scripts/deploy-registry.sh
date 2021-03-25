@@ -31,11 +31,10 @@ install_packages () {
   ssh_control_run_as_user root "systemctl enable --now docker" $ANSIBLE_CONTROLLER        || return 1
 }
 
-adjust_firewall () {
-  echo; echo "POKING HOLE IN FIREWALL"
-  # Firewall is off, for now...
-  #ssh_control_run_as_user root "firewall-cmd --zone=public --add-port=4000/tcp" $ANSIBLE_CONTROLLER                || return 1
-  #ssh_control_run_as_user root "firewall-cmd --permanent --zone=public --add-port=4000/tcp" $ANSIBLE_CONTROLLER    || return 1
+disable_firewall () {
+  echo; echo "DISABLE FIREWALLD"
+  ssh_control_run_as_user_these_hosts root "systemctl disable firewalld" "$STACK_HOSTS"                    || return 1
+  ssh_control_run_as_user_these_hosts root "systemctl stop firewalld" "$STACK_HOSTS"                       || return 1
 }
 
 set_up_docker_registry_service () {
@@ -102,6 +101,6 @@ set_up_docker_registry_service () {
 
 
 install_packages               || fail_exit "install_packages"
-adjust_firewall                || fail_exit "adjust_firewall"
+disable_firewall               || fail_exit "disable_firewall"
 set_up_docker_registry_service || fail_exit "set_up_docker_registry_service"
 
