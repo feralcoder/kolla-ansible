@@ -19,6 +19,12 @@ fail_exit () {
   exit 1
 }
 
+use_localized_containers () {
+  # Switch back to local (pinned) fetches for deployment
+  cp $KOLLA_SETUP_DIR/../files/kolla-globals-localpull.yml /etc/kolla/globals.yml         ||  return 1
+  cat $KOLLA_SETUP_DIR/../files/kolla-globals-remainder.yml >> /etc/kolla/globals.yml     ||  return 1
+}
+
 adjust_firewall () {
   echo; echo ", AND POKING HOLE IN FIREWALL"
   ssh_control_run_as_user_these_hosts root "systemctl disable firewalld" "$STACK_HOSTS"                    || return 1
@@ -30,6 +36,8 @@ adjust_firewall () {
 # I FEEL LIKE THE kolla-ansible DEPLOYER'S BROKEN...
 adjust_firewall
 
+# Reset globals.yml in case it's been updated
+use_localized_containers
 # PULL CONTAINER IMAGES AHEAD OF DEPLOY.  Pull twice if needed...
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack pull || kolla-ansible -i $KOLLA_SETUP_DIR../files/kolla-inventory-feralstack pull || fail_exit "kolla-ansible pull"
 
