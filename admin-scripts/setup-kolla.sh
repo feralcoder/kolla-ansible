@@ -144,6 +144,12 @@ install_kolla_for_dev () {
   cp $KOLLA_SETUP_DIR/../files/kolla-globals.yml /etc/kolla/globals.yml                   || return 1
 }
 
+disable_firewall () {
+  echo; echo "DISABLE FIREWALLD"
+  ssh_control_run_as_user_these_hosts root "systemctl disable firewalld" "$STACK_HOSTS"                    || return 1
+  ssh_control_run_as_user_these_hosts root "systemctl stop firewalld" "$STACK_HOSTS"                       || return 1
+}
+
 config_ansible () {
   echo; echo "CONFIGURING ANSIBLE"
   test_sudo || return 1
@@ -212,6 +218,7 @@ decrypt_secure_files           || fail_exit "decrypt_secure_files"
 config_ansible                 || fail_exit "config_ansible"
 install_extra_packages         || fail_exit "install_extra_packages"
 other_sytem_hackery_for_setup  || fail_exit "other_sytem_hackery_for_setup"
+disable_firewall               || fail_exit "disable_firewall"
 
 host_control_updates           || fail_exit "host_control_updates"
 
