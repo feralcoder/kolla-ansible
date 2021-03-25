@@ -28,6 +28,7 @@ install_packages () {
   echo; echo "INSTALLING CONTAINERD AND DOCKER.CE"
   ssh_control_run_as_user root "(dnf repolist | grep docker) || yum-config-manager     --add-repo     https://download.docker.com/linux/centos/docker-ce.repo" $ANSIBLE_CONTROLLER   || return 1
   ssh_control_run_as_user root "dnf -y install docker-ce" $ANSIBLE_CONTROLLER             || return 1
+  ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/docker-daemon.json /etc/docker/daemon.json $ANSIBLE_CONTROLLER                                                   || return 1
   ssh_control_run_as_user root "systemctl enable --now docker" $ANSIBLE_CONTROLLER        || return 1
 }
 
@@ -45,12 +46,6 @@ set_up_docker_registry_service () {
   ssh_control_run_as_user root "chown root:root /usr/local/bin/docker-local-registry-start.sh; chmod 755 /usr/local/bin/docker-local-registry-start.sh" $ANSIBLE_CONTROLLER            || return 1
   ssh_control_run_as_user root "chown root:root /usr/local/bin/docker-local-registry-stop.sh; chmod 755 /usr/local/bin/docker-local-registry-stop.sh" $ANSIBLE_CONTROLLER              || return 1
   ssh_control_run_as_user root "chown root:root /etc/systemd/system/docker-local-registry.service; chmod 644 /etc/systemd/system/docker-local-registry.service" $ANSIBLE_CONTROLLER    || return 1
-  # Don't know how to make docker run use other daemon file, next 2 lines are inneffectual
-  ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/docker-local-daemon.json /etc/docker/local-daemon.json $ANSIBLE_CONTROLLER                                                   || return 1
-  ssh_control_run_as_user root "chown root:root /etc/docker/local-daemon.json; chmod 644 /etc/docker/local-daemon.json" $ANSIBLE_CONTROLLER                                            || return 1
-
-  # Don't know how to make docker run use other daemon file, for now both use same...
-  ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/docker-local-daemon.json /etc/docker/daemon.json $ANSIBLE_CONTROLLER                                                   || return 1
 
   echo; echo "ENABLING AND STARTING docker-local-registry"
   ssh_control_run_as_user root "systemctl enable docker-local-registry" $ANSIBLE_CONTROLLER   || fail_exit "start docker-local-registry"
@@ -63,9 +58,6 @@ set_up_docker_registry_service () {
   ssh_control_run_as_user root "chown root:root /usr/local/bin/docker-pullthru-registry-start.sh; chmod 755 /usr/local/bin/docker-pullthru-registry-start.sh" $ANSIBLE_CONTROLLER            || return 1
   ssh_control_run_as_user root "chown root:root /usr/local/bin/docker-pullthru-registry-stop.sh; chmod 755 /usr/local/bin/docker-pullthru-registry-stop.sh" $ANSIBLE_CONTROLLER              || return 1
   ssh_control_run_as_user root "chown root:root /etc/systemd/system/docker-pullthru-registry.service; chmod 644 /etc/systemd/system/docker-pullthru-registry.service" $ANSIBLE_CONTROLLER    || return 1
-  # Don't know how to make docker run use other daemon file, next 2 lines are inneffectual
-  ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/docker-pullthru-daemon.json /etc/docker/pullthru-daemon.json $ANSIBLE_CONTROLLER                                                   || return 1
-  ssh_control_run_as_user root "chown root:root /etc/docker/pullthru-daemon.json; chmod 644 /etc/docker/pullthru-daemon.json" $ANSIBLE_CONTROLLER                                            || return 1
 
   echo; echo "ENABLING AND STARTING docker-pullthru-registry"
   ssh_control_run_as_user root "systemctl enable docker-pullthru-registry" $ANSIBLE_CONTROLLER   || fail_exit "start docker-pullthru-registry"
