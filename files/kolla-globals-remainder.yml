@@ -6,10 +6,10 @@
 #config_strategy: "COPY_ALWAYS"
 
 # Valid options are ['centos', 'debian', 'rhel', 'ubuntu']
-#kolla_base_distro: "centos"
+kolla_base_distro: "centos"
 
 # Valid options are [ binary, source ]
-#kolla_install_type: "binary"
+kolla_install_type: "source"
 
 # Do not override this unless you know what you are doing.
 
@@ -190,7 +190,7 @@ tunnel_interface: "bond6"
 # To provide encryption and authentication on the kolla_external_vip_interface,
 # TLS can be enabled.  When TLS is enabled, certificates must be provided to
 # allow clients to perform authentication.
-#kolla_enable_tls_internal: "no"
+kolla_enable_tls_internal: "no"
 #kolla_enable_tls_external: "{{ kolla_enable_tls_internal if kolla_same_external_internal_vip | bool else 'no' }}"
 #kolla_certificates_dir: "{{ node_config }}/certificates"
 #kolla_external_fqdn_cert: "{{ kolla_certificates_dir }}/haproxy.pem"
@@ -349,7 +349,7 @@ enable_mariabackup: "yes"
 #enable_neutron_port_forwarding: "no"
 #enable_nova_serialconsole_proxy: "no"
 #enable_nova_ssh: "yes"
-#enable_octavia: "no"
+enable_octavia: "yes"
 #enable_openvswitch: "{{ enable_neutron | bool and neutron_plugin_agent != 'linuxbridge' }}"
 #enable_ovn: "{{ enable_neutron | bool and neutron_plugin_agent == 'ovn' }}"
 #enable_ovs_dpdk: "no"
