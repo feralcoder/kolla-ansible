@@ -96,14 +96,17 @@ place_ceph_hacks () {
 
   XXX=$CEPH_CHECKOUT_DIR/roles/ceph-container-common/tasks/fetch_image.yml
   ( [[ -f $XXX.orig ]] || cp $XXX $XXX.orig ) &&
+  [[ diff $XXX.orig $CEPH_FILE_DIR/ceph-fetch_image-orig.yml ]] || { echo "$XXX has changed in the upstream!  RESOLVE."; return 1; }
   cp $CEPH_FILE_DIR/ceph-fetch_image.yml $XXX || return 1
 
   XXX=$CEPH_CHECKOUT_DIR/roles/ceph-facts/tasks/container_binary.yml
   ( [[ -f $XXX.orig ]] || cp $XXX $XXX.orig ) &&
+  [[ diff $XXX.orig $CEPH_FILE_DIR/ceph-container_binary-orig.yml ]] || { echo "$XXX has changed in the upstream!  RESOLVE."; return 1; }
   cp $CEPH_FILE_DIR/ceph-container_binary.yml $XXX || return 1
 
   XXX=$CEPH_CHECKOUT_DIR/roles/ceph-container-engine/tasks/pre_requisites/prerequisites.yml
   ( [[ -f $XXX.orig ]] || cp $XXX $XXX.orig ) &&
+  [[ diff $XXX.orig $CEPH_FILE_DIR/ceph-docker-prerequisites-orig.yml ]] || { echo "$XXX has changed in the upstream!  RESOLVE."; return 1; }
   cp $CEPH_FILE_DIR/ceph-docker-prerequisites.yml $XXX || return 1
 
 #  XXX=$CEPH_CHECKOUT_DIR/infrastructure-playbooks/purge-docker-cluster.yml
