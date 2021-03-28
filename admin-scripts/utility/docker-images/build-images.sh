@@ -10,7 +10,9 @@ cat $REPOFILE.template | sed "s/<<REPOIP>>/$YUM_REPO_IP/g" > $REPOFILE
 for IMAGE in  centos-feralcoder  centos-updated-feralcoder; do
   cd $IMAGE  &&  docker build -t $IMAGE .  &&  cd ..
   docker tag $IMAGE $DOCKER_LOCAL_REGISTRY/feralcoder/$IMAGE:feralcoder_$NOW
+  docker tag $IMAGE $DOCKER_LOCAL_REGISTRY/feralcoder/$IMAGE:8
   docker tag $IMAGE $DOCKER_LOCAL_REGISTRY/feralcoder/$IMAGE:latest
   docker push $DOCKER_LOCAL_REGISTRY/feralcoder/$IMAGE:feralcoder_$NOW
+  docker push $DOCKER_LOCAL_REGISTRY/feralcoder/$IMAGE:8
   docker push $DOCKER_LOCAL_REGISTRY/feralcoder/$IMAGE:latest
 done
