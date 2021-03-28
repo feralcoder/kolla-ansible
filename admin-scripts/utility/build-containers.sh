@@ -6,6 +6,7 @@ SUDO_PASS_FILE=~/.password
 
 LOCAL_DOCKER_REGISTRY=192.168.127.220:4001
 NOW=`date +%Y%m%d_%H%M`
+NOW=20210328_0157
 NOW_TARBALLS=/registry/kolla_tarballs/victoria_$NOW
 TAG=feralcoder-$NOW
 KOLLA_CODE_DIR=~/CODE/openstack/kolla
@@ -39,21 +40,24 @@ setup_kolla () {
 generate_kolla_build_configs () {
   cd $KOLLA_CODE_DIR
   tox -e genconfig
+}
+
+fetch_kolla_container_source () {
+  cd $KOLLA_CODE_DIR
   cat $SUDO_PASS_FILE | sudo -S ls > /dev/null
   sudo mkdir -p $NOW_TARBALLS && sudo chown cliff:cliff $NOW_TARBALLS
-{
-
-fetch_kolla_source () {
   grep '^#location = .*tar.gz' etc/kolla/kolla-build.conf > $NOW_TARBALLS/locations
-  sed -i 's|^#location = \$tarballs_base|wget https://tarballs.opendev.org|g' $NOW_TARBALLS/locations
+  sed -i 's|^#location = .tarballs_base|wget -P $NOW_TARBALLS https://tarballs.opendev.org|g' $NOW_TARBALLS/locations
+  sed -i 's|^#location = |wget -P $NOW_TARBALLS |g' $NOW_TARBALLS/locations
   . $NOW_TARBALLS/locations
 }
 
 build_kolla_containers () {
-  cat etc/kolla/kolla-build.conf | sed -E 's/#type = url/type = local/g' |  sed -E "s|^#location = $tarballs_base.*/([^/]*.tar.gz)|location = $NOW_TARBALLS/\1|g" > etc/kolla/kolla-build-local.conf
+  cd $KOLLA_CODE_DIR
+  cat etc/kolla/kolla-build.conf | sed -E 's/#type = url/type = local/g' |  sed -E "s|^#location = .tarballs_base.*/([^/]*.tar.gz)|location = $NOW_TARBALLS/\1|g" | sed -E "s|^#location = .*/([^/]*.tar.gz)|location = $NOW_TARBALLS/\1|g" > etc/kolla/kolla-build-local.conf
   # kolla will use tag "8" with following base image...
   BASE_IMAGE="--base-image $LOCAL_DOCKER_REGISTRY/feralcoder/centos-feralcoder"
-  kolla-build -t source -b centos $BASE_IMAGE --push --registry $LOCAL_DOCKER_REGISTRY -n feralcoder --tag $TAG   --config-file etc/kolla/kolla-build-local.conf
+  kolla-build -t source -b centos $BASE_IMAGE --push --registry $LOCAL_DOCKER_REGISTRY -n feralcoder --tag $TAG   --config-file etc/kolla/kolla-build-local.conf --profile failed
 }
 
 tag_as_latest () {
@@ -64,12 +68,11 @@ tag_as_latest () {
 }
 
 
-new_venv
+#new_venv
 use_venv
-install_packages
-
-setup_kolla
-generate_kolla_build_configs
-fetch_kolla_source
+#install_packages
+#setup_kolla
+#generate_kolla_build_configs
+#fetch_kolla_container_source
 build_kolla_containers
 tag_as_latest
