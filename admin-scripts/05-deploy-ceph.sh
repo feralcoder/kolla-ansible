@@ -78,9 +78,13 @@ install_prereqs () {
 place_ceph_configs () {
   # These are pure configuration, no need to back up targets
   cp $CEPH_FILE_DIR/ceph-osds.yml $CEPH_CHECKOUT_DIR/group_vars/osds.yml &&
+  [[ diff $CEPH_CHECKOUT_DIR/group_vars/all.yml.sample $CEPH_FILE_DIR/ceph-all-sample.yml ]] || { echo "all.yml.sample has changed in the upstream!  RESOLVE."; return 1; }
   cp $CEPH_FILE_DIR/ceph-all.yml $CEPH_CHECKOUT_DIR/group_vars/all.yml &&
+  [[ diff $CEPH_CHECKOUT_DIR/site.yml.sample $CEPH_FILE_DIR/ceph-site-sample.yml ]] || { echo "site.yml.sample has changed in the upstream!  RESOLVE."; return 1; }
   cp $CEPH_FILE_DIR/ceph-site.yml $CEPH_CHECKOUT_DIR/site.yml &&
+  [[ diff $CEPH_CHECKOUT_DIR/group_vars/mons.yml.sample $CEPH_FILE_DIR/ceph-mons-sample.yml ]] || { echo "mons.yml.sample has changed in the upstream!  RESOLVE."; return 1; }
   cp $CEPH_FILE_DIR/ceph-mons.yml $CEPH_CHECKOUT_DIR/group_vars/mons.yml &&
+  [[ diff $CEPH_CHECKOUT_DIR/site-docker.yml.sample $CEPH_FILE_DIR/ceph-site-docker-sample.yml ]] || { echo "site-docker.yml.sample has changed in the upstream!  RESOLVE."; return 1; }
   cp $CEPH_FILE_DIR/ceph-site-docker.yml $CEPH_CHECKOUT_DIR/site-docker.yml &&
   cp $CEPH_FILE_DIR/ceph-hosts $CEPH_CHECKOUT_DIR/hosts || return 1
 }
