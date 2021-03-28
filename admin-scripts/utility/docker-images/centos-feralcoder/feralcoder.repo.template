@@ -1,11 +1,11 @@
-[BaseOS]
+[baseos]
 name=CentOS-$releasever - Base
 baseurl=http://<<REPOIP>>/centos/$releasever/BaseOS/$basearch/os/
 gpgcheck=1
 enabled=1
 gpgkey=http://<<REPOIP>>/centos/$releasever/RPM-GPG-KEY-CentOS-Official
 
-[AppStream]
+[appstream]
 name=CentOS-$releasever - AppStream
 baseurl=http://<<REPOIP>>/centos/$releasever/AppStream/$basearch/os/
 gpgcheck=1
@@ -26,7 +26,7 @@ gpgcheck=1
 enabled=1
 gpgkey=http://<<REPOIP>>/centos/$releasever/RPM-GPG-KEY-CentOS-Official
 
-[PowerTools]
+[powertools]
 name=CentOS-$releasever - PowerTools
 baseurl=http://<<REPOIP>>/centos/$releasever/PowerTools/$basearch/os/
 gpgcheck=1
