@@ -56,6 +56,12 @@ build_kolla_containers () {
   kolla-build -t source -b centos $BASE_IMAGE --push --registry $LOCAL_DOCKER_REGISTRY -n feralcoder --tag $TAG   --config-file etc/kolla/kolla-build-local.conf
 }
 
+tag_as_latest () {
+  for CONTAINER in `docker image list | grep $TAG | awk '{print $1}'`; do
+    docker tag $CONTAINER:$TAG $CONTAINER:latest
+    docker push $CONTAINER:latest
+  done
+}
 
 
 new_venv
@@ -66,3 +72,4 @@ setup_kolla
 generate_kolla_build_configs
 fetch_kolla_source
 build_kolla_containers
+tag_as_latest
