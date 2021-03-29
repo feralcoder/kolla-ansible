@@ -82,7 +82,7 @@ setup_for_installers () {
   echo; echo "CHECKING OUT / UPDATING ~CODE/feralcoder/kolla-ansible ON ANSIBLE_CONTROLLER: $ANSIBLE_CONTROLLER"
   ssh_control_run_as_user cliff "cd CODE/feralcoder; [[ -d kolla-ansible ]] || git clone https://feralcoder:`cat ~/.git_password`@github.com/feralcoder/kolla-ansible" $ANSIBLE_CONTROLLER || exit 1
   ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSIBLE_CONTROLLER || exit 1
-  
+ 
   # Set up stack user password
   echo; echo "SETTING stack USER PASSWORD ON ANSIBLE_CONTROLLER: $ANSIBLE_CONTROLLER"
   STACKPASSFILE=`ssh_control_get_password ~/.stack_password false` || exit 1
@@ -92,57 +92,57 @@ setup_for_installers () {
   # Run: setup-kolla.sh,   make_and_setup_stack_bonds.sh,   test_bonds.sh,   pre-deploy.sh,   deploy-registry.sh
   echo; echo "SETTING UP LOG DIRECTORY $LOG_DIR ON $ANSIBLE_CONTROLLER.  GO THERE FOR PROGRESS OUTPUT."
   ssh_control_run_as_user cliff "mkdir -p $LOG_DIR" $ANSIBLE_CONTROLLER || exit 1
-  echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/setup-kolla.sh ON $ANSIBLE_CONTROLLER"
-  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/setup-kolla.sh > $LOG_DIR/01-setup-kolla_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 1: Kolla Host Setup"
+  echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/01-setup-kolla.sh ON $ANSIBLE_CONTROLLER"
+  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/01-setup-kolla.sh > $LOG_DIR/01-setup-kolla_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 1: Kolla Host Setup"
   echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/fix-bonds/make_and_setup_stack_bonds.sh ON $ANSIBLE_CONTROLLER"
-  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/fix-bonds/make_and_setup_stack_bonds.sh > $LOG_DIR/02-bonds_setup_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 2: Bond Setup"
+  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/fix-bonds/make_and_setup_stack_bonds.sh > $LOG_DIR/02a-bonds_setup_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 2a: Bond Setup"
   echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/fix-bonds/util/test_bonds.sh ON $ANSIBLE_CONTROLLER"
-  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/fix-bonds/util/test_bonds.sh > $LOG_DIR/03-test-bonds_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 3: Test Bonds"
-  echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/pre-deploy.sh ON $ANSIBLE_CONTROLLER"
-  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/pre-deploy.sh > $LOG_DIR/04-pre-deploy_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 4: Kolla Pre Deployment"
-  echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/deploy-registry.sh ON $ANSIBLE_CONTROLLER"
-  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/deploy-registry.sh > $LOG_DIR/05-deploy-registry_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 5: Registry Deployment"
+  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/fix-bonds/util/test_bonds.sh > $LOG_DIR/02b-test-bonds_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 2b: Test Bonds"
+  echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/03-deploy-registry.sh ON $ANSIBLE_CONTROLLER"
+  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/03-deploy-registry.sh > $LOG_DIR/03-deploy-registry_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 3: Registry Deployment"
+  echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/04-pre-deploy.sh ON $ANSIBLE_CONTROLLER"
+  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/04-pre-deploy.sh > $LOG_DIR/04-pre-deploy_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 4: Kolla Pre Deployment"
 }
 
 
 deploy_ceph () {
   # Run: deploy-ceph.sh
-  echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/deploy-ceph.sh ON $ANSIBLE_CONTROLLER"
-  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/deploy-ceph.sh > $LOG_DIR/06-deploy-ceph_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 6: Deploy Ceph"
+  echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/05-deploy-ceph.sh ON $ANSIBLE_CONTROLLER"
+  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/05-deploy-ceph.sh > $LOG_DIR/05-deploy-ceph_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 5: Deploy Ceph"
 }
 
 
 deploy_kolla () {
   # Run: post-deploy-ceph.sh,  deploy-kolla.sh
-  echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/post-deploy-ceph.sh ON $ANSIBLE_CONTROLLER"
-  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/post-deploy-ceph.sh > $LOG_DIR/07-post-deploy-ceph_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 7: Post-Deploy Ceph"
-  echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/deploy-kolla.sh ON $ANSIBLE_CONTROLLER"
-  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/deploy-kolla.sh > $LOG_DIR/08-deploy-kolla_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 8: Stack Deployment"
+  echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/06-post-deploy-ceph.sh ON $ANSIBLE_CONTROLLER"
+  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/06-post-deploy-ceph.sh > $LOG_DIR/06-post-deploy-ceph_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 6: Post-Deploy Ceph"
+  echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/07-deploy-kolla.sh ON $ANSIBLE_CONTROLLER"
+  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/07-deploy-kolla.sh > $LOG_DIR/07-deploy-kolla_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 7: Stack Deployment"
 }
 
 
 post_deploy_kolla () {
   # Run: post-deploy-kolla.sh
-  echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/post-deploy-kolla.sh ON $ANSIBLE_CONTROLLER"
-  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/post-deploy-kolla.sh > $LOG_DIR/09-post-deploy-kolla_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 9: Post-Deploy Kolla"
+  echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/08-post-deploy-kolla.sh ON $ANSIBLE_CONTROLLER"
+  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/08-post-deploy-kolla.sh > $LOG_DIR/08-post-deploy-kolla_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 8: Post-Deploy Kolla"
 }
 
 
 
 # Boot all hosts to default
-echo; echo "BOOTING ALL STACK HOSTS TO default OS FOR SETUP: $STACK_HOSTS"
-boot_to_target default                          || fail_exit "boot_to_target default"
-
-remediate_hosts                                 || fail_exit "remediate_hosts"
-take_backups 01b_CentOS_8_3_Admin_Install       || fail_exit "take_backups 01b_CentOS_8_3_Admin_Install.sh"
-
-postmediate_hosts                               || fail_exit "postmediate_hosts"
-take_backups 01c_CentOS_8_3_Admin_Install       || fail_exit "take_backups 01c_CentOS_8_3_Admin_Install.sh"
-setup_for_installers                            || fail_exit "setup_for_installers"
-take_backups 02a_Kolla-Ansible_Setup            || fail_exit "take_backups 02a_Kolla-Ansible_Setup"
+#echo; echo "BOOTING ALL STACK HOSTS TO default OS FOR SETUP: $STACK_HOSTS"
+#boot_to_target default                          || fail_exit "boot_to_target default"
+#
+#remediate_hosts                                 || fail_exit "remediate_hosts"
+#take_backups 01b_CentOS_8_3_Admin_Install       || fail_exit "take_backups 01b_CentOS_8_3_Admin_Install.sh"
+#
+#postmediate_hosts                               || fail_exit "postmediate_hosts"
+#take_backups 01c_CentOS_8_3_Admin_Install       || fail_exit "take_backups 01c_CentOS_8_3_Admin_Install.sh"
+#setup_for_installers                            || fail_exit "setup_for_installers"
+#take_backups 02a_Kolla-Ansible_Setup            || fail_exit "take_backups 02a_Kolla-Ansible_Setup"
 
 # ASSUME WE COULD BE STARTING FROM A FREEZE-THAW...
-ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSIBLE_CONTROLLER || fail_exit "git pull kolla-ansible"
+#ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSIBLE_CONTROLLER || fail_exit "git pull kolla-ansible"
 
 deploy_ceph                                     || fail_exit "deploy_ceph"
 #take_backups 02b_Ceph_Setup                     || fail_exit "take_backups 02b_Ceph_Setup"
