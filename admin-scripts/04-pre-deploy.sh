@@ -56,6 +56,10 @@ localize_latest_containers () {
   done
 }
 
+democratize_docker () {
+  ssh_control_run_as_user_these_hosts root "usermod -a -G docker cliff" "$STACK_HOSTS"
+}
+
 
 refetch_api_keys                                                                         || fail_exit "refetch_api_keys"
 kolla-genpwd                                                                             || fail_exit "kolla-genpwd"
@@ -63,6 +67,7 @@ ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack all -m ping     
 ## Use local registry so insecure-registries is set up correctly by bootstrap-servers
 use_localized_containers                                                                 || fail_exit "use_localized_containers"
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack bootstrap-servers  || fail_exit "kolla-ansible bootstrap-servers"
+democratize_docker                                                                       || fail_exit "democratize_docker"
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack prechecks          || fail_exit "kolla-ansible prechecks"
 ## This will point globals.yml at dockerhub, until pull completes
 #    Set globals.yml to inform package names (kolla/*:victoria)
