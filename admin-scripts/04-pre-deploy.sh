@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# RUN ON ANSIBLE CONTROLLER
-
 # BAIL OUT IF USER SOURCES SCRIPT, INSTEAD OF RUNNING IT
 if [ ! "${BASH_SOURCE[0]}" -ef "$0" ]; then
   echo "Do not source this script (exits will bail you...)."
@@ -12,13 +10,22 @@ fi
 . ~/CODE/venvs/kolla-ansible/bin/activate                                               || fail_exit "venv activate"
 . ~/CODE/feralcoder/host_control/control_scripts.sh
 
+REGISTRY_HOST=dmb
+# Bail out if not running on registry host
+if [[ $(group_logic_get_short_name `hostnname`) != $REGISTRY_HOST ]]; then
+  echo "You must run this script on the registry host, which should also be the ansile host."
+  exit 1
+fi
+
+NOW=`date +%Y%m%d_%H%M`
+NOW=20210324
+TAG=feralcoder-$NOW
+
 KOLLA_SETUP_SOURCE="${BASH_SOURCE[0]}"
 KOLLA_SETUP_DIR=$( realpath `dirname $KOLLA_SETUP_SOURCE` )
 KOLLA_PULL_THRU_CACHE=/registry/docker/pullthru-registry/docker/registry/v2/repositories/kolla/
 LOCAL_REGISTRY=192.168.127.220:4001
 PULL_HOST=kgn
-TAG=feralcoder-20210324
-#TAG=feralcoder-`date  +%Y%m%d`
 
 
 fail_exit () {
@@ -48,6 +55,14 @@ use_dockerhub_containers () {
   cat $KOLLA_SETUP_DIR/../files/kolla-globals-remainder.yml >> /etc/kolla/globals.yml      ||  return 1
 }
 
+# Uses kolla-ansible to pull latest containers...
+pull_latest_containers () {
+  use_dockerhub_containers                                                                 || return 1
+  kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack pull               || return 1
+  use_localized_containers                                                                 || return 1
+}
+
+# For all existing kolla containers in registry: Pull the latest from docker.io, retag, and stuff locally
 localize_latest_containers () {
   for CONTAINER in `ls $KOLLA_PULL_THRU_CACHE`; do
     ssh_control_run_as_user root "docker image pull kolla/$CONTAINER:victoria" $PULL_HOST
@@ -56,8 +71,22 @@ localize_latest_containers () {
   done
 }
 
+checkout_kolla_ansible_on_host () {
+  local HOST=$1
+  FERALCODER_SOURCE=~/CODE/feralcoder
+  KOLLA_ANSIBLE_SOURCE=$FERALCODER_SOURCE/kolla-ansible
+  ssh_control_run_as_user cliff "if ( -d $KOLLA_ANSIBLE_SOURCE ); then cd $KOLLA_ANSIBLE_SOURCE; git pull; else cd $FERALCODER_SOURCE && git clone https://feralcoder:\`cat ~/.git_password\`@github.com/feralcoder/kolla-ansible kolla-ansible; fi" $HOST
+}
+
+build_and_use_containers () {
+  checkout_kolla_ansible_on_host $PULL_HOST                                                                         || return 1
+  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_SOURCE/admin-scripts/utility/build-containers.sh $NOW" $PULL_HOST   || return 1
+  sed -i 's/^openstack_release.*/openstack_release: "$TAG"/g' $KOLLA_SETUP_DIR/../files/kolla-globals-localpull.yml || return 1
+  use_localized_containers                                                                                          || return 1
+}
+
 democratize_docker () {
-  ssh_control_run_as_user_these_hosts root "usermod -a -G docker cliff" "$STACK_HOSTS"
+  ssh_control_run_as_user_these_hosts root "usermod -a -G docker cliff" "$STACK_HOSTS"                              || return 1
 }
 
 
@@ -68,14 +97,12 @@ ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack all -m ping     
 use_localized_containers                                                                 || fail_exit "use_localized_containers"
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack bootstrap-servers  || fail_exit "kolla-ansible bootstrap-servers"
 democratize_docker                                                                       || fail_exit "democratize_docker"
+kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack certificates       || fail_exit "kolla-ansible certificates"
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack prechecks          || fail_exit "kolla-ansible prechecks"
-## This will point globals.yml at dockerhub, until pull completes
-#    Set globals.yml to inform package names (kolla/*:victoria)
-#    BUT DO NOT re-bootstrap
-# NO PULL NECESSARY WHEN USING SELF-BUILT CONTAINERS
-#use_dockerhub_containers                                                                 || fail_exit "use_dockerhub_containers"
-#kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack pull               || fail_exit "kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack pull"
-use_localized_containers                                                                 || fail_exit "use_localized_containers"
-localize_latest_containers                                                               || fail_exit "localize_latest_containers"
-## Use local registry so we use pinned versions for deployments
-use_localized_containers                                                                 || fail_exit "use_localized_containers"
+
+# BUILD SOURCE CONTAINERS (UNTESTED!)
+#build_and_use_containers                                                                 || fail_exit "build_and_use_containers"
+
+# PULL BINARY CONTAINERS FROM DOCKERIO
+#pull_latest_containers                                                                   || fail_exit "pull_latest_containers"
+#localize_latest_containers                                                               || fail_exit "localize_latest_containers"
