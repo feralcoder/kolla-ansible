@@ -67,8 +67,9 @@ kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack prechecks 
 ## This will point globals.yml at dockerhub, until pull completes
 #    Set globals.yml to inform package names (kolla/*:victoria)
 #    BUT DO NOT re-bootstrap
-use_dockerhub_containers                                                                 || fail_exit "use_dockerhub_containers"
-kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack pull               || fail_exit "kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack pull"
+# NO PULL NECESSARY WHEN USING SELF-BUILT CONTAINERS
+#use_dockerhub_containers                                                                 || fail_exit "use_dockerhub_containers"
+#kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack pull               || fail_exit "kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack pull"
 use_localized_containers                                                                 || fail_exit "use_localized_containers"
 localize_latest_containers                                                               || fail_exit "localize_latest_containers"
 ## Use local registry so we use pinned versions for deployments
