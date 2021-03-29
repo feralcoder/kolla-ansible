@@ -81,8 +81,8 @@ echo Configuring neutron.
 $KOLLA_OPENSTACK_COMMAND router create admin-router
 
 $KOLLA_OPENSTACK_COMMAND network create admin1-net
-$KOLLA_OPENSTACK_COMMAND subnet create --subnet-range 10.0.0.0/24 --network admin1-net \
-    --gateway 10.0.0.1 --dns-nameserver 8.8.8.8 admin1-subnet
+$KOLLA_OPENSTACK_COMMAND subnet create --subnet-range 10.254.0.0/24 --network admin1-net \
+    --gateway 10.254.0.1 --dns-nameserver 8.8.8.8 admin1-subnet
 $KOLLA_OPENSTACK_COMMAND router add subnet admin-router admin1-subnet
 
 if [[ $ENABLE_EXT_NET -eq 1 ]]; then
