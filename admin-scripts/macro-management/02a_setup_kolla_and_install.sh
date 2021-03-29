@@ -135,11 +135,14 @@ post_deploy_kolla () {
 #
 #remediate_hosts                                 || fail_exit "remediate_hosts"
 #take_backups 01b_CentOS_8_3_Admin_Install       || fail_exit "take_backups 01b_CentOS_8_3_Admin_Install.sh"
-#
-#postmediate_hosts                               || fail_exit "postmediate_hosts"
-#take_backups 01c_CentOS_8_3_Admin_Install       || fail_exit "take_backups 01c_CentOS_8_3_Admin_Install.sh"
-#setup_for_installers                            || fail_exit "setup_for_installers"
-#take_backups 02a_Kolla-Ansible_Setup            || fail_exit "take_backups 02a_Kolla-Ansible_Setup"
+
+# ASSUME WE COULD BE STARTING FROM A FREEZE-THAW...
+ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSIBLE_CONTROLLER || fail_exit "git pull kolla-ansible"
+
+postmediate_hosts                               || fail_exit "postmediate_hosts"
+take_backups 01c_CentOS_8_3_Admin_Install       || fail_exit "take_backups 01c_CentOS_8_3_Admin_Install.sh"
+setup_for_installers                            || fail_exit "setup_for_installers"
+take_backups 02a_Kolla-Ansible_Setup            || fail_exit "take_backups 02a_Kolla-Ansible_Setup"
 
 # ASSUME WE COULD BE STARTING FROM A FREEZE-THAW...
 #ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSIBLE_CONTROLLER || fail_exit "git pull kolla-ansible"
