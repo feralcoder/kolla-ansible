@@ -4,11 +4,14 @@
 
 SUDO_PASS_FILE=~/.password
 
-LOCAL_DOCKER_REGISTRY=192.168.127.220:4001
-NOW=`date +%Y%m%d_%H%M`
-NOW_TARBALLS=/registry/kolla_tarballs/victoria_$NOW
+NOW=$1
+[[ $NOW != "" ]]  ||  NOW=`date +%Y%m%d_%H%M`
 TAG=feralcoder-$NOW
+NOW_TARBALLS=/registry/kolla_tarballs/victoria_$NOW
+
+LOCAL_DOCKER_REGISTRY=192.168.127.220:4001
 KOLLA_CODE_DIR=~/CODE/openstack/kolla
+
 
 fail_exit () {
   echo; echo "FAILED: $1"
@@ -73,11 +76,11 @@ tag_as_latest () {
 }
 
 
-new_venv                        || faile_exit "new_venv"
-use_venv                          || faile_exit "use_venv"
-install_packages                || faile_exit "install_packages"
-setup_kolla                     || faile_exit "setup_kolla"
-generate_kolla_build_configs    || faile_exit "generate_kolla_build_configs"
-fetch_kolla_container_source    || faile_exit "fetch_kolla_container_source"
-build_kolla_containers            || faile_exit "build_kolla_containers"
-tag_as_latest                   || faile_exit "tag_as_latest"
+new_venv                        || fail_exit "new_venv"
+use_venv                        || fail_exit "use_venv"
+install_packages                || fail_exit "install_packages"
+setup_kolla                     || fail_exit "setup_kolla"
+generate_kolla_build_configs    || fail_exit "generate_kolla_build_configs"
+fetch_kolla_container_source    || fail_exit "fetch_kolla_container_source"
+build_kolla_containers          || fail_exit "build_kolla_containers"
+tag_as_latest                   || fail_exit "tag_as_latest"
