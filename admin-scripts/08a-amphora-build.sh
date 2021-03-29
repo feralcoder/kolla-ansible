@@ -27,3 +27,5 @@ create_amphora () {
   (cd ~/amphora_cache ; docker build -t os .)
   docker run -it -v $(pwd):/lab --privileged os
 }
+
+create_amphora
