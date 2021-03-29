@@ -54,7 +54,7 @@ correct_compute_perms () {
 place_and_run_init () {
   XXX=~/CODE/venvs/kolla-ansible/share/kolla-ansible/init-runonce
   [[ -f $XXX.orig ]] || cp $XXX $XXX.orig
-  [[ diff $XXX.orig  $KOLLA_SETUP_DIR/../files/kolla-init-runonce.orig ]] || { echo "$XXX.orig has changed upstream!  Resolve."; return 1; }
+  ( diff $XXX.orig  $KOLLA_SETUP_DIR/../files/kolla-init-runonce.orig ) || { echo "$XXX.orig has changed upstream!  Resolve."; return 1; }
   cp $KOLLA_SETUP_DIR/../files/kolla-init-runonce $XXX
   chmod 755 $XXX
   $XXX

@@ -78,13 +78,13 @@ install_prereqs () {
 place_ceph_configs () {
   # These are pure configuration, no need to back up targets
   cp $CEPH_FILE_DIR/ceph-osds.yml $CEPH_CHECKOUT_DIR/group_vars/osds.yml
-  [[ diff $CEPH_CHECKOUT_DIR/group_vars/all.yml.sample $CEPH_FILE_DIR/ceph-all-sample.yml ]] || { echo "all.yml.sample has changed in the upstream!  RESOLVE."; return 1; }
+  ( diff $CEPH_CHECKOUT_DIR/group_vars/all.yml.sample $CEPH_FILE_DIR/ceph-all-sample.yml ) || { echo "all.yml.sample has changed in the upstream!  RESOLVE."; return 1; }
   cp $CEPH_FILE_DIR/ceph-all.yml $CEPH_CHECKOUT_DIR/group_vars/all.yml
-  [[ diff $CEPH_CHECKOUT_DIR/site.yml.sample $CEPH_FILE_DIR/ceph-site-sample.yml ]] || { echo "site.yml.sample has changed in the upstream!  RESOLVE."; return 1; }
+  ( diff $CEPH_CHECKOUT_DIR/site.yml.sample $CEPH_FILE_DIR/ceph-site-sample.yml ) || { echo "site.yml.sample has changed in the upstream!  RESOLVE."; return 1; }
   cp $CEPH_FILE_DIR/ceph-site.yml $CEPH_CHECKOUT_DIR/site.yml
-  [[ diff $CEPH_CHECKOUT_DIR/group_vars/mons.yml.sample $CEPH_FILE_DIR/ceph-mons-sample.yml ]] || { echo "mons.yml.sample has changed in the upstream!  RESOLVE."; return 1; }
+  ( diff $CEPH_CHECKOUT_DIR/group_vars/mons.yml.sample $CEPH_FILE_DIR/ceph-mons-sample.yml ) || { echo "mons.yml.sample has changed in the upstream!  RESOLVE."; return 1; }
   cp $CEPH_FILE_DIR/ceph-mons.yml $CEPH_CHECKOUT_DIR/group_vars/mons.yml
-  [[ diff $CEPH_CHECKOUT_DIR/site-docker.yml.sample $CEPH_FILE_DIR/ceph-site-docker-sample.yml ]] || { echo "site-docker.yml.sample has changed in the upstream!  RESOLVE."; return 1; }
+  ( diff $CEPH_CHECKOUT_DIR/site-docker.yml.sample $CEPH_FILE_DIR/ceph-site-docker-sample.yml ) || { echo "site-docker.yml.sample has changed in the upstream!  RESOLVE."; return 1; }
   cp $CEPH_FILE_DIR/ceph-site-docker.yml $CEPH_CHECKOUT_DIR/site-docker.yml
   cp $CEPH_FILE_DIR/ceph-hosts $CEPH_CHECKOUT_DIR/hosts
 }
@@ -100,17 +100,17 @@ place_ceph_hacks () {
 
   XXX=$CEPH_CHECKOUT_DIR/roles/ceph-container-common/tasks/fetch_image.yml
   ( [[ -f $XXX.orig ]] || cp $XXX $XXX.orig )
-  [[ diff $XXX.orig $CEPH_FILE_DIR/ceph-fetch_image-orig.yml ]] || { echo "$XXX has changed in the upstream!  RESOLVE."; return 1; }
+  ( diff $XXX.orig $CEPH_FILE_DIR/ceph-fetch_image-orig.yml ) || { echo "$XXX has changed in the upstream!  RESOLVE."; return 1; }
   cp $CEPH_FILE_DIR/ceph-fetch_image.yml $XXX || return 1
 
   XXX=$CEPH_CHECKOUT_DIR/roles/ceph-facts/tasks/container_binary.yml
   ( [[ -f $XXX.orig ]] || cp $XXX $XXX.orig )
-  [[ diff $XXX.orig $CEPH_FILE_DIR/ceph-container_binary-orig.yml ]] || { echo "$XXX has changed in the upstream!  RESOLVE."; return 1; }
+  ( diff $XXX.orig $CEPH_FILE_DIR/ceph-container_binary-orig.yml ) || { echo "$XXX has changed in the upstream!  RESOLVE."; return 1; }
   cp $CEPH_FILE_DIR/ceph-container_binary.yml $XXX || return 1
 
   XXX=$CEPH_CHECKOUT_DIR/roles/ceph-container-engine/tasks/pre_requisites/prerequisites.yml
   ( [[ -f $XXX.orig ]] || cp $XXX $XXX.orig )
-  [[ diff $XXX.orig $CEPH_FILE_DIR/ceph-docker-prerequisites-orig.yml ]] || { echo "$XXX has changed in the upstream!  RESOLVE."; return 1; }
+  ( diff $XXX.orig $CEPH_FILE_DIR/ceph-docker-prerequisites-orig.yml ) || { echo "$XXX has changed in the upstream!  RESOLVE."; return 1; }
   cp $CEPH_FILE_DIR/ceph-docker-prerequisites.yml $XXX || return 1
 
 #  XXX=$CEPH_CHECKOUT_DIR/infrastructure-playbooks/purge-docker-cluster.yml
