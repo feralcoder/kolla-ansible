@@ -14,7 +14,7 @@ fi
 
 REGISTRY_HOST=dmb
 # Bail out if not running on registry host
-if [[ $(group_logic_get_short_name `hostnname`) != $REGISTRY_HOST ]]; then
+if [[ $(group_logic_get_short_name `hostname`) != $REGISTRY_HOST ]]; then
   echo "You must run this script on the registry host, which should also be the ansile host."
   exit 1
 fi
@@ -80,7 +80,7 @@ checkout_kolla_ansible_on_host () {
   local HOST=$1
   FERALCODER_SOURCE=~/CODE/feralcoder
   KOLLA_ANSIBLE_SOURCE=$FERALCODER_SOURCE/kolla-ansible
-  ssh_control_run_as_user cliff "if ( -d $KOLLA_ANSIBLE_SOURCE ); then cd $KOLLA_ANSIBLE_SOURCE; git pull; else cd $FERALCODER_SOURCE && git clone https://feralcoder:\`cat ~/.git_password\`@github.com/feralcoder/kolla-ansible kolla-ansible; fi" $HOST
+  ssh_control_run_as_user cliff "if [[ -d $KOLLA_ANSIBLE_SOURCE ]]; then cd $KOLLA_ANSIBLE_SOURCE; git pull; else cd $FERALCODER_SOURCE && git clone https://feralcoder:\`cat ~/.git_password\`@github.com/feralcoder/kolla-ansible kolla-ansible; fi" $HOST
 }
 
 
