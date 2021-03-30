@@ -1,8 +1,11 @@
 #!/bin/bash
 CEPH_SETUP_SOURCE="${BASH_SOURCE[0]}"
 CEPH_SETUP_DIR=$( realpath `dirname $CEPH_SETUP_SOURCE` )
-# CEPH_SETUP_DIR=~/CODE/feralcoder/kolla-ansible/admin-scripts
 CEPH_FILE_DIR=$CEPH_SETUP_DIR/../files
+
+. $CEPH_SETUP_DIR/common.sh
+bail_if_sourced
+source_host_control_scripts       || fail_exit "source_host_control_scripts"
 
 CODE_DIR=~/CODE
 CEPH_CODE_DIR=$CODE_DIR/ceph
@@ -12,14 +15,6 @@ CEPH_CHECKOUT_DIR=$CEPH_CODE_DIR/ceph-ansible
 CEPH_DOCKER_VERSION=master-86da1a4-nautilus-centos-7
 #CEPH_DOCKER_VERSION=latest-nautilus
 
-# BAIL OUT IF USER SOURCES SCRIPT, INSTEAD OF RUNNING IT
-if [ ! "${BASH_SOURCE[0]}" -ef "$0" ]; then
-  echo "Do not source this script (exits will bail you...)."
-  echo "Run it instead"
-  return 1
-fi
-
-. ~/CODE/feralcoder/host_control/control_scripts.sh
 
 
 # THIS SCRIPT IS MEANT TO RUN AFTER A KOLLA-ANSIBLE SCRIPT
@@ -35,22 +30,7 @@ adjust_firewall () {
 }
 
 
-fail_exit () {
-  echo; echo "INSTALLATION FAILED AT STEP: $1"
-  echo "Check the logs and try again.  Or just give up.  I don't care."
-  python3 ~/CODE/feralcoder/twilio-pager/pager.py "Fallen.  Can't get up.  Installation failed at $1."
-  exit 1
-}
 
-
-venv () {
-  ( [[ -f ~/CODE/venvs/ceph-ansible/bin/activate ]] || {
-    mkdir -p ~/CODE/venvs/ceph-ansible &&
-    python3 -m venv ~/CODE/venvs/ceph-ansible
-  } ) || return 1
-
-  source ~/CODE/venvs/ceph-ansible/bin/activate || return 1
-}
 
 checkout_ceph-ansible_for_dev () {
   echo; echo "INSTALLING CEPH-ANSIBLE"
@@ -156,7 +136,8 @@ adjust_firewall     || fail_exit "adjust_firewall"
 start_docker_pull   || fail_exit "start_docker_pull"
 
 checkout_ceph-ansible_for_dev         || fail_exit "checkout_ceph-ansible_for_dev"
-venv                                  || fail_exit "venv"
+new_venv ceph-ansible                 || fail_exit "new_venv ceph-ansible"
+use_venv ceph-ansible                 || fail_exit "use_venv ceph-ansible"
 install_prereqs                       || fail_exit "install_prereqs"
 place_ceph_configs                    || fail_exit "place_ceph_files"
 place_ceph_hacks                      || fail_exit "place_ceph_files"

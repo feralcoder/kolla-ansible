@@ -1,7 +1,12 @@
 #!/bin/bash
+UTILITY_SOURCE="${BASH_SOURCE[0]}"
+UTILITY_DIR=$( realpath `dirname $MACRO_SOURCE` )
+
+. $UTILITY_DIR/../common.sh
+bail_if_sourced
+source_host_control_scripts       || fail_exit "source_host_control_scripts"
 
 # FROM: https://twpower.github.io/180-build-kolla-images-from-source-en
-
 SUDO_PASS_FILE=~/.password
 
 NOW=$1
@@ -12,20 +17,6 @@ NOW_TARBALLS=/registry/kolla_tarballs/victoria_$NOW
 LOCAL_DOCKER_REGISTRY=192.168.127.220:4001
 KOLLA_CODE_DIR=~/CODE/openstack/kolla
 
-
-fail_exit () {
-  echo; echo "FAILED: $1"
-  exit 1
-}
-
-new_venv () {
-  mkdir -p ~/CODE/venvs/kolla &&
-  python3 -m venv ~/CODE/venvs/kolla
-}
-
-use_venv () {
-  source ~/CODE/venvs/kolla/bin/activate
-}
 
 
 install_packages () {
@@ -76,8 +67,8 @@ tag_as_latest () {
 }
 
 
-new_venv                        || fail_exit "new_venv"
-use_venv                        || fail_exit "use_venv"
+new_venv kolla                  || fail_exit "new_venv kolla"
+use_venv kolla                  || fail_exit "use_venv kolla"
 install_packages                || fail_exit "install_packages"
 setup_kolla                     || fail_exit "setup_kolla"
 generate_kolla_build_configs    || fail_exit "generate_kolla_build_configs"

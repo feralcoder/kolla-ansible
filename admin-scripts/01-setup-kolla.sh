@@ -2,31 +2,10 @@
 KOLLA_SETUP_SOURCE="${BASH_SOURCE[0]}"
 KOLLA_SETUP_DIR=$( realpath `dirname $KOLLA_SETUP_SOURCE` )
 
-# BAIL OUT IF USER SOURCES SCRIPT, INSTEAD OF RUNNING IT
-if [ ! "${BASH_SOURCE[0]}" -ef "$0" ]; then
-  echo "Do not source this script (exits will bail you...)."
-  echo "Run it instead"
-  return 1
-fi
+. $KOLLA_SETUP_DIR/common.sh
+bail_if_sourced
+source_host_control_scripts       || fail_exit "source_host_control_scripts"
 
-. ~/CODE/feralcoder/host_control/control_scripts.sh
-
-
-fail_exit () {
-  echo; echo "INSTALLATION FAILED AT STEP: $1"
-  echo "Check the logs and try again.  Or just give up.  I don't care."
-  python3 ~/CODE/feralcoder/twilio-pager/pager.py "Fallen.  Can't get up.  Installation failed at $1."
-  exit 1
-}
-
-test_sudo () {
-  sudo -K
-  if [[ $SUDO_PASS_FILE == "" ]]; then
-    echo "SUDO_PASS_FILE is undefined!"
-    return 1
-  fi
-  cat $SUDO_PASS_FILE | sudo -S ls > /dev/null 2>&1
-}
 
 
 decrypt_secure_files () {
@@ -40,16 +19,6 @@ setup_local_passwordless_sudo () {
   ( sudo grep "cliff ALL" /etc/sudoers.d/cliff >/dev/null 2>&1 ) || { echo "cliff ALL=(root) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/cliff; }
   sudo chmod 0440 /etc/sudoers.d/cliff
 }
-
-new_venv () {
-  mkdir -p ~/CODE/venvs/kolla-ansible &&
-  python3 -m venv ~/CODE/venvs/kolla-ansible
-}
-
-use_venv () {
-  source ~/CODE/venvs/kolla-ansible/bin/activate
-}
-
 
 
 
@@ -110,8 +79,8 @@ install_prereqs () {
   echo; echo "INSTALLING PREREQ'S"
   test_sudo || return 1
   sudo dnf -y install python3-devel libffi-devel gcc openssl-devel python3-libselinux &&
-  new_venv &&
-  use_venv &&
+  new_venv kolla-ansible &&
+  use_venv kolla-ansible &&
   pip install -U pip &&
   pip install 'ansible<2.10' || return 1
 }
