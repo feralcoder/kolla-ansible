@@ -1,3 +1,4 @@
 all-in-one
 multinode
 files/kolla-passwords.yml
+files/kolla-certificates.tar
