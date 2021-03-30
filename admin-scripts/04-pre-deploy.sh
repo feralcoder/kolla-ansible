@@ -23,6 +23,9 @@ NOW=`date +%Y%m%d_%H%M`
 NOW=20210330_0226
 TAG=feralcoder-$NOW
 
+FERALCODER_SOURCE=~/CODE/feralcoder
+KOLLA_ANSIBLE_SOURCE=$FERALCODER_SOURCE/kolla-ansible
+
 KOLLA_PULL_THRU_CACHE=/registry/docker/pullthru-registry/docker/registry/v2/repositories/kolla/
 LOCAL_REGISTRY=192.168.127.220:4001
 PULL_HOST=kgn
@@ -78,26 +81,24 @@ localize_latest_containers () {
 
 checkout_kolla_ansible_on_host () {
   local HOST=$1
-  FERALCODER_SOURCE=~/CODE/feralcoder
-  KOLLA_ANSIBLE_SOURCE=$FERALCODER_SOURCE/kolla-ansible
   ssh_control_run_as_user cliff "if [[ -d $KOLLA_ANSIBLE_SOURCE ]]; then cd $KOLLA_ANSIBLE_SOURCE; git pull; else cd $FERALCODER_SOURCE && git clone https://feralcoder:\`cat ~/.git_password\`@github.com/feralcoder/kolla-ansible kolla-ansible; fi" $HOST
 }
 
 
 build_and_use_containers () {
 #  # Build base image
-#  $KOLLA_ANSIBLE_SOURCE/utility/docker-images/build-images.sh                                                       || return 1
+#  $KOLLA_ANSIBLE_SOURCE/utility/docker-images/build-images.sh                                                            || return 1
 
   # Build kolla images, using feralcoder base image
-  checkout_kolla_ansible_on_host $PULL_HOST                                                                         || return 1
-  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_SOURCE/admin-scripts/utility/build-containers.sh $NOW" $PULL_HOST   || return 1
-  sed -i "s/^openstack_release.*/openstack_release: '$TAG'/g" $KOLLA_SETUP_DIR/../files/kolla-globals-localpull.yml || return 1
-  use_localized_containers                                                                                          || return 1
+  checkout_kolla_ansible_on_host $PULL_HOST                                                                              || return 1
+  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_SOURCE/admin-scripts/utility/build-containers.sh $NOW 2>&1" $PULL_HOST   || return 1
+  sed -i 's/^openstack_release.*/openstack_release: "$TAG"/g' $KOLLA_SETUP_DIR/../files/kolla-globals-localpull.yml      || return 1
+  use_localized_containers                                                                                               || return 1
 }
 
 
 democratize_docker () {
-  ssh_control_run_as_user_these_hosts root "usermod -a -G docker cliff" "$STACK_HOSTS"                              || return 1
+  ssh_control_run_as_user_these_hosts root "usermod -a -G docker cliff" "$STACK_HOSTS"                                   || return 1
 }
 
 
