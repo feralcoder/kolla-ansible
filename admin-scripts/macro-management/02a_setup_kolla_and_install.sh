@@ -130,11 +130,11 @@ post_deploy_kolla () {
 
 
 # Boot all hosts to default
-#echo; echo "BOOTING ALL STACK HOSTS TO default OS FOR SETUP: $STACK_HOSTS"
-#boot_to_target default                          || fail_exit "boot_to_target default"
-#
-#remediate_hosts                                 || fail_exit "remediate_hosts"
-#take_backups 01b_CentOS_8_3_Admin_Install       || fail_exit "take_backups 01b_CentOS_8_3_Admin_Install.sh"
+echo; echo "BOOTING ALL STACK HOSTS TO default OS FOR SETUP: $STACK_HOSTS"
+boot_to_target default                          || fail_exit "boot_to_target default"
+
+remediate_hosts                                 || fail_exit "remediate_hosts"
+take_backups 01b_CentOS_8_3_Admin_Install       || fail_exit "take_backups 01b_CentOS_8_3_Admin_Install.sh"
 
 # ASSUME WE COULD BE STARTING FROM A FREEZE-THAW...
 ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSIBLE_CONTROLLER || fail_exit "git pull kolla-ansible"
@@ -145,7 +145,7 @@ setup_for_installers                            || fail_exit "setup_for_installe
 take_backups 02a_Kolla-Ansible_Setup            || fail_exit "take_backups 02a_Kolla-Ansible_Setup"
 
 # ASSUME WE COULD BE STARTING FROM A FREEZE-THAW...
-#ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSIBLE_CONTROLLER || fail_exit "git pull kolla-ansible"
+ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSIBLE_CONTROLLER || fail_exit "git pull kolla-ansible"
 
 deploy_ceph                                     || fail_exit "deploy_ceph"
 #take_backups 02b_Ceph_Setup                     || fail_exit "take_backups 02b_Ceph_Setup"
