@@ -1,7 +1,7 @@
 #!/bin/bash
 
 bail_if_sourced () {
-  if [ ! "${BASH_SOURCE[0]}" -ef "$0" ]; then
+  if [ "${BASH_SOURCE[0]}" -ef "$0" ]; then
     echo "Do not source this script (exits will bail you...)."
     echo "Run it instead"
     exit 1
