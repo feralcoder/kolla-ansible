@@ -1,6 +1,6 @@
 #!/bin/bash
 OCTAVIA_SOURCE="${BASH_SOURCE[0]}"
-OCTAVIA_DIR=$( realpath `dirname $MACRO_SOURCE` )
+OCTAVIA_DIR=$( realpath `dirname $OCTAVIA_SOURCE` )
 
 . $OCTAVIA_DIR/../../common.sh
 [ "${BASH_SOURCE[0]}" -ef "$0" ]  || { echo "Don't source this script!  Run it."; return 1; }
