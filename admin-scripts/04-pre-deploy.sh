@@ -20,7 +20,7 @@ if [[ $(group_logic_get_short_name `hostname`) != $REGISTRY_HOST ]]; then
 fi
 
 NOW=`date +%Y%m%d_%H%M`
-NOW=20210324
+NOW=20210330_0226
 TAG=feralcoder-$NOW
 
 KOLLA_PULL_THRU_CACHE=/registry/docker/pullthru-registry/docker/registry/v2/repositories/kolla/
@@ -91,7 +91,7 @@ build_and_use_containers () {
   # Build kolla images, using feralcoder base image
   checkout_kolla_ansible_on_host $PULL_HOST                                                                         || return 1
   ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_SOURCE/admin-scripts/utility/build-containers.sh $NOW" $PULL_HOST   || return 1
-  sed -i 's/^openstack_release.*/openstack_release: "$TAG"/g' $KOLLA_SETUP_DIR/../files/kolla-globals-localpull.yml || return 1
+  sed -i "s/^openstack_release.*/openstack_release: '$TAG'/g" $KOLLA_SETUP_DIR/../files/kolla-globals-localpull.yml || return 1
   use_localized_containers                                                                                          || return 1
 }
 
@@ -132,8 +132,8 @@ democratize_docker                                                              
 setup_ssl_certs                                                                          || fail_exit "setup_ssl_certs"
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack prechecks          || fail_exit "kolla-ansible prechecks"
 
-# BUILD SOURCE CONTAINERS (UNTESTED!)
-build_and_use_containers                                                                 || fail_exit "build_and_use_containers"
+# BUILD SOURCE CONTAINERS
+#build_and_use_containers                                                                 || fail_exit "build_and_use_containers"
 
 # PULL BINARY CONTAINERS FROM DOCKERIO
 #pull_latest_containers                                                                   || fail_exit "pull_latest_containers"
