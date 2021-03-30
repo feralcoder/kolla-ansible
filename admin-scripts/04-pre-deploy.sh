@@ -1,4 +1,6 @@
 #!/bin/bash
+KOLLA_SETUP_SOURCE="${BASH_SOURCE[0]}"
+KOLLA_SETUP_DIR=$( realpath `dirname $KOLLA_SETUP_SOURCE` )
 
 # BAIL OUT IF USER SOURCES SCRIPT, INSTEAD OF RUNNING IT
 if [ ! "${BASH_SOURCE[0]}" -ef "$0" ]; then
@@ -21,8 +23,6 @@ NOW=`date +%Y%m%d_%H%M`
 NOW=20210324
 TAG=feralcoder-$NOW
 
-KOLLA_SETUP_SOURCE="${BASH_SOURCE[0]}"
-KOLLA_SETUP_DIR=$( realpath `dirname $KOLLA_SETUP_SOURCE` )
 KOLLA_PULL_THRU_CACHE=/registry/docker/pullthru-registry/docker/registry/v2/repositories/kolla/
 LOCAL_REGISTRY=192.168.127.220:4001
 PULL_HOST=kgn
@@ -43,11 +43,13 @@ refetch_api_keys () {
   done
 }
 
+
 use_localized_containers () {
   # Switch back to local (pinned) fetches for deployment
   cp $KOLLA_SETUP_DIR/../files/kolla-globals-localpull.yml /etc/kolla/globals.yml         ||  return 1
   cat $KOLLA_SETUP_DIR/../files/kolla-globals-remainder.yml >> /etc/kolla/globals.yml     ||  return 1
 }
+
 
 use_dockerhub_containers () {
   # We switch to dockerhub container fetches, to get the latest "victoria" containers
@@ -55,12 +57,14 @@ use_dockerhub_containers () {
   cat $KOLLA_SETUP_DIR/../files/kolla-globals-remainder.yml >> /etc/kolla/globals.yml      ||  return 1
 }
 
+
 # Uses kolla-ansible to pull latest containers...
 pull_latest_containers () {
   use_dockerhub_containers                                                                 || return 1
   kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack pull               || return 1
   use_localized_containers                                                                 || return 1
 }
+
 
 # For all existing kolla containers in registry: Pull the latest from docker.io, retag, and stuff locally
 localize_latest_containers () {
@@ -71,6 +75,7 @@ localize_latest_containers () {
   done
 }
 
+
 checkout_kolla_ansible_on_host () {
   local HOST=$1
   FERALCODER_SOURCE=~/CODE/feralcoder
@@ -78,16 +83,42 @@ checkout_kolla_ansible_on_host () {
   ssh_control_run_as_user cliff "if ( -d $KOLLA_ANSIBLE_SOURCE ); then cd $KOLLA_ANSIBLE_SOURCE; git pull; else cd $FERALCODER_SOURCE && git clone https://feralcoder:\`cat ~/.git_password\`@github.com/feralcoder/kolla-ansible kolla-ansible; fi" $HOST
 }
 
+
 build_and_use_containers () {
+#  # Build base image
+#  $KOLLA_ANSIBLE_SOURCE/utility/docker-images/build-images.sh                                                       || return 1
+
+  # Build kolla images, using feralcoder base image
   checkout_kolla_ansible_on_host $PULL_HOST                                                                         || return 1
   ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_SOURCE/admin-scripts/utility/build-containers.sh $NOW" $PULL_HOST   || return 1
   sed -i 's/^openstack_release.*/openstack_release: "$TAG"/g' $KOLLA_SETUP_DIR/../files/kolla-globals-localpull.yml || return 1
   use_localized_containers                                                                                          || return 1
 }
 
+
 democratize_docker () {
   ssh_control_run_as_user_these_hosts root "usermod -a -G docker cliff" "$STACK_HOSTS"                              || return 1
 }
+
+
+setup_ssl_certs () {
+#  # DO ONCE: Have kolla-ansible generate certs, then stash them into git://feralcoder (encrypted)
+#  #  Also place stack's root ca for building into base container image.
+#  kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack certificates       || return 1
+#  tar -C /etc/kolla -cf $KOLLA_SETUP_DIR/../files/kolla-certificates.tar certificates
+#  openssl enc -aes-256-cfb8 --pass file:/home/cliff/.password -md sha256 -in $KOLLA_SETUP_DIR/../files/kolla-certificates.tar -out $KOLLA_SETUP_DIR/../files/kolla-certificates.encrypted
+#  cp /etc/kolla/certificates/ca/root.crt $KOLLA_SETUP_DIR/utility/docker-images/centos-feralcoder/stack.crt
+
+  # AFTER REGENERATION: copy /etc/kolla/certificates/ca/root.crt into all containers.
+  #   The root.crt will be copied as stack.crt into base container build directory
+  #   Containers must then be rebuilt, via build_and_use_containers
+
+  openssl enc --pass file:/home/cliff/.password -d -aes-256-cfb8 -md sha256 -in $KOLLA_SETUP_DIR/../files/kolla-certificates.encrypted -out $KOLLA_SETUP_DIR/../files/kolla-certificates.tar
+  tar -C /etc/kolla -xf $KOLLA_SETUP_DIR/../files/kolla-certificates.tar
+}
+
+
+
 
 
 refetch_api_keys                                                                         || fail_exit "refetch_api_keys"
@@ -97,11 +128,12 @@ ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack all -m ping     
 use_localized_containers                                                                 || fail_exit "use_localized_containers"
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack bootstrap-servers  || fail_exit "kolla-ansible bootstrap-servers"
 democratize_docker                                                                       || fail_exit "democratize_docker"
-kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack certificates       || fail_exit "kolla-ansible certificates"
+
+setup_ssl_certs                                                                          || fail_exit "setup_ssl_certs"
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack prechecks          || fail_exit "kolla-ansible prechecks"
 
 # BUILD SOURCE CONTAINERS (UNTESTED!)
-#build_and_use_containers                                                                 || fail_exit "build_and_use_containers"
+build_and_use_containers                                                                 || fail_exit "build_and_use_containers"
 
 # PULL BINARY CONTAINERS FROM DOCKERIO
 #pull_latest_containers                                                                   || fail_exit "pull_latest_containers"
