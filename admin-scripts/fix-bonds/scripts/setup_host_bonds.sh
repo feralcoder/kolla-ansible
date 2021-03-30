@@ -1,5 +1,7 @@
 #!/bin/bash
 
+[ "${BASH_SOURCE[0]}" -ef "$0" ]  || { echo "Don't source this script!  Run it."; return 1; }
+
 cd /etc/sysconfig/network-scripts
 
 cat ifcfg-bond1 | grep 'IP' | sed 's/192.168.127/192.168.40/g' >> ifcfg-bond2
