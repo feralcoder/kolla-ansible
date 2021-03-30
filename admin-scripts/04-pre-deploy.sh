@@ -93,6 +93,8 @@ democratize_docker () {
 
 
 setup_ssl_certs () {
+#  SELF-SIGNED CERTS DON'T WORK IN KOLLA-ANSIBLE AS DOCUMENTED
+
 #  # DO ONCE: Have kolla-ansible generate certs, then stash them into git://feralcoder (encrypted)
 #  #  Also place stack's root ca for building into base container image.
 #  kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack certificates       || return 1
@@ -123,7 +125,7 @@ use_localized_containers                                                        
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack bootstrap-servers  || fail_exit "kolla-ansible bootstrap-servers"
 democratize_docker                                                                       || fail_exit "democratize_docker"
 
-setup_ssl_certs                                                                          || fail_exit "setup_ssl_certs"
+#setup_ssl_certs                                                                          || fail_exit "setup_ssl_certs"
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack prechecks          || fail_exit "kolla-ansible prechecks"
 
 # BUILD SOURCE CONTAINERS.  This must be done if self-signed certs are used, after certs are generated.
