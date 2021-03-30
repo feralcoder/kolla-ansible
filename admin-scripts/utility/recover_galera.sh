@@ -1,6 +1,6 @@
 #!/bin/bash
 UTILITY_SOURCE="${BASH_SOURCE[0]}"
-UTILITY_DIR=$( realpath `dirname $MACRO_SOURCE` )
+UTILITY_DIR=$( realpath `dirname $UTILITY_SOURCE` )
 
 . $UTILITY_DIR/../common.sh
 [ "${BASH_SOURCE[0]}" -ef "$0" ]  || { echo "Don't source this script!  Run it."; return 1; }
