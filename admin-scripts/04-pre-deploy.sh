@@ -108,6 +108,7 @@ setup_ssl_certs () {
 #  kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack certificates       || return 1
 #  tar -C /etc/kolla -cf $KOLLA_SETUP_DIR/../files/kolla-certificates.tar certificates
 #  openssl enc -aes-256-cfb8 --pass file:/home/cliff/.password -md sha256 -in $KOLLA_SETUP_DIR/../files/kolla-certificates.tar -out $KOLLA_SETUP_DIR/../files/kolla-certificates.encrypted
+#  # PLACE root CA into base image container.  REBUILD CONTAINERS!
 #  cp /etc/kolla/certificates/ca/root.crt $KOLLA_SETUP_DIR/utility/docker-images/centos-feralcoder/stack.crt
 
   # AFTER REGENERATION: copy /etc/kolla/certificates/ca/root.crt into all containers.
@@ -116,6 +117,8 @@ setup_ssl_certs () {
 
   openssl enc --pass file:/home/cliff/.password -d -aes-256-cfb8 -md sha256 -in $KOLLA_SETUP_DIR/../files/kolla-certificates.encrypted -out $KOLLA_SETUP_DIR/../files/kolla-certificates.tar
   tar -C /etc/kolla -xf $KOLLA_SETUP_DIR/../files/kolla-certificates.tar
+  ssh_control_sync_as_user_these_hosts root /etc/kolla/certificates/ca/root.crt /etc/pki/ca-trust/source/anchors/stack.crt "$ALL_HOSTS"
+  ssh_control_run_as_user_these_hosts root update-ca-trust "$ALL_HOSTS"
 }
 
 
@@ -133,7 +136,7 @@ democratize_docker                                                              
 setup_ssl_certs                                                                          || fail_exit "setup_ssl_certs"
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack prechecks          || fail_exit "kolla-ansible prechecks"
 
-# BUILD SOURCE CONTAINERS
+# BUILD SOURCE CONTAINERS.  This must be done if self-signed certs are used, after certs are generated.
 #build_and_use_containers                                                                 || fail_exit "build_and_use_containers"
 
 # PULL BINARY CONTAINERS FROM DOCKERIO
