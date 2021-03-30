@@ -2,15 +2,10 @@
 CONTAINER_BUILD_SOURCE="${BASH_SOURCE[0]}"
 CONTAINER_BUILD_DIR=$( realpath `dirname $CONTAINER_BUILD_SOURCE` )
 
-# BAIL OUT IF USER SOURCES SCRIPT, INSTEAD OF RUNNING IT
-if [ ! "${BASH_SOURCE[0]}" -ef "$0" ]; then
-  echo "Do not source this script (exits will bail you...)."
-  echo "Run it instead"
-  return 1
-fi
-
-. ~/CODE/venvs/kolla-ansible/bin/activate                                               || fail_exit "venv activate"
-. ~/CODE/feralcoder/host_control/control_scripts.sh
+. $CONTAINER_BUILD_DIR/../../common.sh
+bail_if_sourced
+source_host_control_scripts       || fail_exit "source_host_control_scripts"
+use_venv kolla-ansible            || fail_exit "use_venv kolla-ansible"
 
 
 

@@ -1,12 +1,17 @@
 #!/bin/bash
+UTILITY_SOURCE="${BASH_SOURCE[0]}"
+UTILITY_DIR=$( realpath `dirname $MACRO_SOURCE` )
+
+. $UTILITY_DIR/../common.sh
+bail_if_sourced
+source_host_control_scripts       || fail_exit "source_host_control_scripts"
+use_venv kolla-ansible            || fail_exit "use_venv kolla-ansible"
 
 KOLLA_CHECKOUT=/home/cliff/CODE/feralcoder/kolla-ansible
-KOLLA_VENV=/home/cliff/CODE/venvs/kolla-ansible
 NOW=`date +%Y%m%d-%H%M%S`
 LOG_DIR=~/kolla-ansible-logs/
 
 
-. $KOLLA_VENV/bin/activate
 ansible -i ~/CODE/feralcoder/kolla-ansible/files/kolla-inventory-feralstack   control   -m command -a "docker stop mariadb"
 kolla-ansible -i $KOLLA_CHECKOUT/files/kolla-inventory-feralstack mariadb_recovery >$LOG_DIR/recover_galera_$NOW.log 2>&1
 

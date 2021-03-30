@@ -1,16 +1,12 @@
 #!/bin/bash
-
+UTILITY_SOURCE="${BASH_SOURCE[0]}"
+UTILITY_DIR=$( realpath `dirname $MACRO_SOURCE` )
 # RUN ON ANSIBLE CONTROLLER
 
-# BAIL OUT IF USER SOURCES SCRIPT, INSTEAD OF RUNNING IT
-if [ ! "${BASH_SOURCE[0]}" -ef "$0" ]; then
-  echo "Do not source this script (exits will bail you...)."
-  echo "Run it instead"
-  return 1
-fi
-
-. ~/CODE/venvs/kolla-ansible/bin/activate                                               || fail_exit "venv activate"
-. ~/CODE/feralcoder/host_control/control_scripts.sh
+. $UTILITY_DIR/../common.sh
+bail_if_sourced
+source_host_control_scripts       || fail_exit "source_host_control_scripts"
+use_venv kolla-ansible            || fail_exit "use_venv kolla-ansible"
 
 KOLLA_UTIL_SOURCE="${BASH_SOURCE[0]}"
 KOLLA_UTIL_DIR=$( realpath `dirname $KOLLA_UTIL_SOURCE` )
@@ -22,12 +18,6 @@ TAG=feralcoder-20210324
 #TAG=feralcoder-`date  +%Y%m%d`
 
 
-fail_exit () {
-  echo; echo "INSTALLATION FAILED AT STEP: $1"
-  echo "Check the logs and try again.  Or just give up.  I don't care."
-  python3 ~/CODE/feralcoder/twilio-pager/pager.py "Fallen.  Can't get up.  Installation failed at $1."
-  exit 1
-}
 
 
 refetch_api_keys () {

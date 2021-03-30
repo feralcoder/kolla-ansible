@@ -2,26 +2,16 @@
 MACRO_SOURCE="${BASH_SOURCE[0]}"
 MACRO_DIR=$( realpath `dirname $MACRO_SOURCE` )
 
-# BAIL OUT IF USER SOURCES SCRIPT, INSTEAD OF RUNNING IT
-if [ ! "${BASH_SOURCE[0]}" -ef "$0" ]; then
-  echo "Do not source this script (exits will bail you...)."
-  echo "Run it instead"
-  return 1
-fi
+. $MACRO_DIR/../common.sh
+bail_if_sourced
+source_host_control_scripts       || fail_exit "source_host_control_scripts"
 
-. ~/CODE/feralcoder/host_control/control_scripts.sh
 
 NOW=`date +%Y%m%d-%H%M%S`
 KOLLA_ANSIBLE_CHECKOUT=~/CODE/feralcoder/kolla-ansible/
 LOG_DIR=~/kolla-ansible-logs/
 ANSIBLE_CONTROLLER=dmb
 
-fail_exit () {
-  echo; echo "INSTALLATION FAILED AT STEP: $1"
-  echo "Check the logs and try again.  Or just give up.  I don't care."
-  python3 ~/CODE/feralcoder/twilio-pager/pager.py "Fallen.  Can't get up.  Installation failed at $1."
-  exit 1
-}
 
 boot_to_target () {
   local TARGET=$1

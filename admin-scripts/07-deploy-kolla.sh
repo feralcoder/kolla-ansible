@@ -2,22 +2,11 @@
 KOLLA_SETUP_SOURCE="${BASH_SOURCE[0]}"
 KOLLA_SETUP_DIR=$( realpath `dirname $KOLLA_SETUP_SOURCE` )
 
-# BAIL OUT IF USER SOURCES SCRIPT, INSTEAD OF RUNNING IT
-if [ ! "${BASH_SOURCE[0]}" -ef "$0" ]; then
-  echo "Do not source this script (exits will bail you...)."
-  echo "Run it instead"
-  return 1
-fi
+. $KOLLA_SETUP_DIR/common.sh
+bail_if_sourced
+source_host_control_scripts       || fail_exit "source_host_control_scripts"
+use_venv kolla-ansible            || fail_exit "use_venv kolla-ansible"
 
-. ~/CODE/venvs/kolla-ansible/bin/activate
-. ~/CODE/feralcoder/host_control/control_scripts.sh
-
-fail_exit () {
-  echo; echo "INSTALLATION FAILED AT STEP: $1"
-  echo "Check the logs and try again.  Or just give up.  I don't care."
-  python3 ~/CODE/feralcoder/twilio-pager/pager.py "Fallen.  Can't get up.  Installation failed at $1."
-  exit 1
-}
 
 use_localized_containers () {
   # Switch back to local (pinned) fetches for deployment
@@ -26,7 +15,7 @@ use_localized_containers () {
 }
 
 adjust_firewall () {
-  echo; echo ", AND POKING HOLE IN FIREWALL"
+  echo; echo "DISABLING FIREWALL again."
   ssh_control_run_as_user_these_hosts root "systemctl disable firewalld" "$STACK_HOSTS"                    || return 1
   ssh_control_run_as_user_these_hosts root "systemctl stop firewalld" "$STACK_HOSTS"                       || return 1
 #  ssh_control_run_as_user_these_hosts root "firewall-cmd --zone=public --add-port=4567/tcp" "$CONTROL_HOSTS"                    || return 1
