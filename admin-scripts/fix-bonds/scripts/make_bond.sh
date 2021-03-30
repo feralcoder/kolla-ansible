@@ -1,5 +1,7 @@
 #!/bin/bash
 
+[ "${BASH_SOURCE[0]}" -ef "$0" ]  || { echo "Don't source this script!  Run it."; return 1; }
+
 cd /etc/sysconfig/network-scripts/
 
 IF_NAME=$1

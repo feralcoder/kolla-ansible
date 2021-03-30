@@ -2,6 +2,8 @@
 BONDSCRIPT_SOURCE="${BASH_SOURCE[0]}"
 BONDSCRIPT_DIR=$( realpath `dirname $BONDSCRIPT_SOURCE` )
 
+[ "${BASH_SOURCE[0]}" -ef "$0" ]  || { echo "Don't source this script!  Run it."; return 1; }
+
 . $BONDSCRIPT_DIR/bond_config.sh
 . ~/CODE/feralcoder/host_control/control_scripts.sh
 

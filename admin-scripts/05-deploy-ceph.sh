@@ -4,7 +4,8 @@ CEPH_SETUP_DIR=$( realpath `dirname $CEPH_SETUP_SOURCE` )
 CEPH_FILE_DIR=$CEPH_SETUP_DIR/../files
 
 . $CEPH_SETUP_DIR/common.sh
-bail_if_sourced
+[ "${BASH_SOURCE[0]}" -ef "$0" ]  || { echo "Don't source this script!  Run it."; return 1; }
+
 source_host_control_scripts       || fail_exit "source_host_control_scripts"
 
 CODE_DIR=~/CODE

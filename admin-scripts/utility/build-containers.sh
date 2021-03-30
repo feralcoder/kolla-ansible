@@ -3,7 +3,8 @@ UTILITY_SOURCE="${BASH_SOURCE[0]}"
 UTILITY_DIR=$( realpath `dirname $MACRO_SOURCE` )
 
 . $UTILITY_DIR/../common.sh
-bail_if_sourced
+[ "${BASH_SOURCE[0]}" -ef "$0" ]  || { echo "Don't source this script!  Run it."; return 1; }
+
 source_host_control_scripts       || fail_exit "source_host_control_scripts"
 
 # FROM: https://twpower.github.io/180-build-kolla-images-from-source-en
