@@ -735,17 +735,20 @@ nova_backend_ceph: "yes"
 # - gateway_ip (optional)
 # - name
 # - no_gateway_ip (optional)
-#octavia_amp_network:
-#  name: lb-mgmt-net
-#  shared: false
-#  subnet:
-#    name: lb-mgmt-subnet
-#    cidr: "{{ octavia_amp_network_cidr }}"
-#    no_gateway_ip: yes
-#    enable_dhcp: yes
+octavia_amp_network:
+  name: lb-mgmt-net
+  shared: true
+  subnet:
+    name: lb-mgmt-subnet
+    cidr: "{{ octavia_amp_network_cidr }}"
+    no_gateway_ip: no
+    enable_dhcp: yes
+    gateway_ip: 172.31.0.1
+    allocation_pool_start: 172.31.0.100
+    allocation_pool_end: 172.31.0.199
 
 # Octavia management network subnet CIDR.
-#octavia_amp_network_cidr: 172.31.0.0/24
+octavia_amp_network_cidr: 172.31.0.0/24
 
 #octavia_amp_image_tag: "amphora"
 
