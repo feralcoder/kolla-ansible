@@ -33,7 +33,7 @@ destroy_vms () {
 }
 
 destroy_and_rebuild () {
-  kolla-ansible -i $UTILITY_DIR/../../files/kolla-inventory-feralstack destroy     --yes-i-really-really-mean-it
+  kolla-ansible -i $UTILITY_DIR/../../files/kolla-inventory-feralstack destroy     --yes-i-really-really-mean-it &&
   $UTILITY_DIR/../07-deploy-kolla.sh && 
   $UTILITY_DIR/../08-post-deploy-kolla.sh
 }
