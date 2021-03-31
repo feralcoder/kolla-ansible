@@ -31,7 +31,7 @@ setup_magnum () {
 
 setup_octavia () {
   pip3 install python-octaviaclient    || return 1
-  openstack image create --container-format bare --disk-format raw --public --file /registry/images/amphora-x64-haproxy.img --tag amphora amphora --project service
+  openstack image create --container-format bare --disk-format qcow2 --public --file /registry/images/amphora-x64-centos-haproxy.qcow2 --min-disk 2 --min-ram 1024 --tag amphora amphora --project service
 }
 
 correct_compute_perms () {
