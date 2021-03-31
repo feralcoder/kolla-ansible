@@ -16,7 +16,7 @@ if [[ $(group_logic_get_short_name `hostname`) != $REGISTRY_HOST ]]; then
 fi
 
 NOW=`date +%Y%m%d_%H%M`
-NOW=20210330_0226
+NOW=20210328_0157
 TAG=feralcoder-$NOW
 
 FERALCODER_SOURCE=~/CODE/feralcoder
@@ -117,7 +117,7 @@ setup_ssl_certs () {
 
 
 
-refetch_api_keys                                                                         || fail_exit "refetch_api_keys"
+#refetch_api_keys                                                                         || fail_exit "refetch_api_keys"
 kolla-genpwd                                                                             || fail_exit "kolla-genpwd"
 ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack all -m ping              || fail_exit "ansible ping"
 ## Use local registry so insecure-registries is set up correctly by bootstrap-servers
