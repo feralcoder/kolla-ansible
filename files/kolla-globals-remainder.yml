@@ -340,7 +340,7 @@ enable_mariabackup: "yes"
 #enable_neutron_qos: "no"
 #enable_neutron_agent_ha: "no"
 #enable_neutron_bgp_dragent: "no"
-#enable_neutron_provider_networks: "no"
+enable_neutron_provider_networks: "yes"
 #enable_neutron_segments: "no"
 #enable_neutron_sfc: "no"
 #enable_neutron_trunk: "no"
@@ -740,18 +740,19 @@ octavia_amp_network:
   shared: true
   external: true
   provider_physical_network: physnet1
-  provider_network_type: flat
+  provider_segmentation_id: 131
+  provider_network_type: vxlan
   subnet:
     name: lb-mgmt-subnet
     cidr: "{{ octavia_amp_network_cidr }}"
     no_gateway_ip: no
     enable_dhcp: yes
-    gateway_ip: 192.168.40.241
-    allocation_pool_start: 192.168.40.100
-    allocation_pool_end: 192.168.40.149
+    gateway_ip: 172.31.0.1
+    allocation_pool_start: 172.31.0.100
+    allocation_pool_end: 172.31.0.199
 
 # Octavia management network subnet CIDR.
-octavia_amp_network_cidr: 192.168.40.0/24
+octavia_amp_network_cidr: 172.31.0.0/24
 
 #octavia_amp_image_tag: "amphora"
 
