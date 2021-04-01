@@ -4,7 +4,7 @@ SUDO_PASS_FILE=~/.password
 REGISTRY_HOST=dmb
 CACHE_DIR=~/amphora_cache/
 
-# Need USER to be passwordless sudoer, because disk-image-create calls sudo, over with millions of minutes between
+# Need USER to be passwordless sudoer, because disk-image-create calls sudo, with millions of minutes between
 cat $SUDO_PASS_FILE | sudo -S ls > /dev/null
 echo "$USER ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/temp_$USER
 
