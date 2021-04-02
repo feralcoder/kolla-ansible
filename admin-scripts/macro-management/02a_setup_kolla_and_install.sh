@@ -121,6 +121,8 @@ post_deploy_kolla () {
 
 
 
+
+
 # Boot all hosts to default
 echo; echo "BOOTING ALL STACK HOSTS TO default OS FOR SETUP: $STACK_HOSTS"
 boot_to_target default                          || fail_exit "boot_to_target default"
