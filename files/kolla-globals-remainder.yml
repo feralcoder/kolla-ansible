@@ -782,21 +782,21 @@ nova_backend_ceph: "yes"
 #    cidr: "{{ octavia_amp_network_cidr }}"
 #    no_gateway_ip: yes
 #    enable_dhcp: yes
-octavia_amp_network:
-  name: lb-mgmt-net
+#octavia_amp_network:
+#  name: lb-mgmt-net
 #  shared: true
 #  external: true
 #  provider_physical_network: physnet1
 #  provider_segmentation_id: 131
 #  provider_network_type: vxlan
-  subnet:
-    name: lb-mgmt-subnet
-    cidr: "{{ octavia_amp_network_cidr }}"
-    no_gateway_ip: no
-    enable_dhcp: yes
-    gateway_ip: 172.17.0.241
-    allocation_pool_start: 172.17.0.100
-    allocation_pool_end: 172.17.0.199
+#  subnet:
+#    name: lb-mgmt-subnet
+#    cidr: "{{ octavia_amp_network_cidr }}"
+#    no_gateway_ip: no
+#    enable_dhcp: yes
+#    gateway_ip: 172.17.0.241
+#    allocation_pool_start: 172.17.0.100
+#    allocation_pool_end: 172.17.0.199
 octavia_amp_network_cidr: 172.17.0.0/24
 
 # Octavia management network subnet CIDR.
