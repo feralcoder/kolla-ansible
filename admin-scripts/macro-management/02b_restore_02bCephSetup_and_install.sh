@@ -33,7 +33,7 @@ restore_from_backup () {
   echo; echo "BOOTING ALL STACK HOSTS TO ADMIN OS FOR RESTORE OPERATION: $STACK_HOSTS"
   boot_to_target admin || exit 1
   echo; echo "RESTORING STACK_HOSTS $BACKUP_NAME: $STACK_HOSTS"
-  backup_control_restore_all $BACKUP_NAME || exit 1
+  backup_control_restore_these_hosts "$STACK_HOSTS" $BACKUP_NAME || exit 1
   echo; echo "BOOTING ALL STACK HOSTS TO DEFAULT OS: $STACK_HOSTS"
   boot_to_target default || exit 1
 }
