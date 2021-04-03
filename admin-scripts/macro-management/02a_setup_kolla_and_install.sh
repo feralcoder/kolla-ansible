@@ -36,7 +36,7 @@ take_backups () {
   echo; echo "BOOTING ALL STACK HOSTS TO ADMIN OS FOR BACKUP OPERATION: $STACK_HOSTS"
   boot_to_target admin || exit 1
   echo; echo "BACKING UP STACK_HOSTS $BACKUP_NAME: $STACK_HOSTS"
-  backup_control_backup_all $BACKUP_NAME || exit 1
+  backup_control_backup_these_hosts "$STACK_HOSTS" $BACKUP_NAME || exit 1
   echo; echo "BOOTING ALL STACK HOSTS TO DEFAULT OS: $STACK_HOSTS"
   boot_to_target default || exit 1
 }
