@@ -38,7 +38,8 @@ add_stack_user_everywhere () {
 
   echo; echo "ADDING STACK USER TO LOCAL SUDOERS"
   cat $SUDO_PASS_FILE | sudo -S ls > /dev/null
-  (( sudo grep "stack ALL" /etc/sudoers.d/stack >/dev/null 2>&1 ) || { echo "stack ALL=(root) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/stack >/dev/null; })    || { echo "Failed to add stack to local sudoers."; return 1; }
+#  (( sudo grep "stack ALL" /etc/sudoers.d/stack >/dev/null 2>&1 ) || { echo "stack ALL=(root) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/stack >/dev/null; })    || { echo "Failed to add stack to local sudoers."; return 1; }
+  (( sudo grep "stack ALL" /etc/sudoers.d/stack >/dev/null 2>&1 ) || { echo "stack ALL=(root) ALL" | sudo tee -a /etc/sudoers.d/stack >/dev/null; })    || { echo "Failed to add stack to local sudoers."; return 1; }
   sudo chmod 0440 /etc/sudoers.d/stack || return 1
 
   echo; echo "ADDING STACK USER TO SUDOERS EVERYWHERE"
