@@ -43,15 +43,10 @@ take_backups () {
 
 
 # Separate function because I'd like to get this stuff into the base image...
-# I THINK THIS STUFF IS CAPTURED in hostcontrol/02a_hosts_setup.sh
 remediate_hosts () {
-  ssh_control_run_as_user_these_hosts root "touch /tmp/x" "$STACK_HOSTS"
-  ssh_control_run_as_user_these_hosts root "yum -y install telnet" "$STACK_HOSTS"
-  ssh_control_run_as_user root "hostname strange.feralcoder.org" str
-  ssh_control_run_as_user root "hostnamectl set-hostname strange.feralcoder.org" str
-  ssh_control_run_as_user_these_hosts root "$ALL_HOSTS"
-  ssh_control_run_as_user_these_hosts cliff "~/CODE/feralcoder/workstation/update.sh" "$ALL_HOSTS"
-  ssh_control_run_as_user_these_hosts root "rm /etc/yum.repos.d/docker.repo" "$ALL_HOSTS"
+  ssh_control_run_as_user_these_hosts cliff "cd ~/CODE/feralcoder/workstation && git pull" "$ALL_HOSTS"
+  ssh_control_run_as_user_these_hosts cliff "~/CODE/feralcoder/workstation/update.sh" "$ALL_HOSTS" || return 1
+  ssh_control_run_as_user_these_hosts cliff "python3 $TWILIO_PAGER_DIR/pager.py \"hello from \`hostname\`\"" "$STACK_HOSTS"
   echo
 }
 
@@ -127,31 +122,31 @@ post_deploy_kolla () {
 
 # Boot all hosts to default
 echo; echo "BOOTING ALL STACK HOSTS TO default OS FOR SETUP: $STACK_HOSTS"
-boot_to_target default                          || fail_exit "boot_to_target default"
+boot_to_target default                            || fail_exit "boot_to_target default"
 
-remediate_hosts                                 || fail_exit "remediate_hosts"
-take_backups 01b_CentOS_8_3_Admin_Install       || fail_exit "take_backups 01b_CentOS_8_3_Admin_Install.sh"
+remediate_hosts                                   || fail_exit "remediate_hosts"
+take_backups 01c_CentOS_8_3_Remediated            || fail_exit "take_backups 01c_CentOS_8_3_Remediated.sh"
+
+# ASSUME WE COULD BE STARTING FROM A FREEZE-THAW...
+#ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSIBLE_CONTROLLER || fail_exit "git pull kolla-ansible"
+
+#postmediate_hosts                                 || fail_exit "postmediate_hosts"
+#take_backups 01c_CentOS_8_3_Admin_Install         || fail_exit "take_backups 01c_CentOS_8_3_Admin_Install.sh"
+setup_for_installers                              || fail_exit "setup_for_installers"
+take_backups 02a_Kolla-Ansible_Setup              || fail_exit "take_backups 02a_Kolla-Ansible_Setup"
 
 # ASSUME WE COULD BE STARTING FROM A FREEZE-THAW...
 ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSIBLE_CONTROLLER || fail_exit "git pull kolla-ansible"
 
-postmediate_hosts                               || fail_exit "postmediate_hosts"
-take_backups 01c_CentOS_8_3_Admin_Install       || fail_exit "take_backups 01c_CentOS_8_3_Admin_Install.sh"
-setup_for_installers                            || fail_exit "setup_for_installers"
-take_backups 02a_Kolla-Ansible_Setup            || fail_exit "take_backups 02a_Kolla-Ansible_Setup"
-
-# ASSUME WE COULD BE STARTING FROM A FREEZE-THAW...
-ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSIBLE_CONTROLLER || fail_exit "git pull kolla-ansible"
-
-deploy_ceph                                     || fail_exit "deploy_ceph"
-#take_backups 02b_Ceph_Setup                     || fail_exit "take_backups 02b_Ceph_Setup"
+deploy_ceph                                       || fail_exit "deploy_ceph"
+#take_backups 02b_Ceph_Setup                       || fail_exit "take_backups 02b_Ceph_Setup"
 # NEED CEPH EXPORT FUNCTION
 
 # ASSUME WE COULD BE STARTING FROM A FREEZE-THAW...
 ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSIBLE_CONTROLLER || fail_exit "git pull kolla-ansible"
 
-deploy_kolla                                    || fail_exit "deploy_kolla"
-post_deploy_kolla                               || fail_exit "post_deploy_kolla"
-#take_backups 03_Kolla-Ansible_Installed         || fail_exit "take_backups 03_Kolla-Ansible_Installed"
+deploy_kolla                                      || fail_exit "deploy_kolla"
+post_deploy_kolla                                 || fail_exit "post_deploy_kolla"
+#take_backups 03_Kolla-Ansible_Installed           || fail_exit "take_backups 03_Kolla-Ansible_Installed"
 
 
