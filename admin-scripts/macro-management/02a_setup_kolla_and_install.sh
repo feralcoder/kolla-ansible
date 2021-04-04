@@ -43,6 +43,7 @@ take_backups () {
 
 
 # Separate function because I'd like to get this stuff into the base image...
+# I THINK THIS STUFF IS CAPTURED in hostcontrol/02a_hosts_setup.sh
 remediate_hosts () {
   ssh_control_run_as_user_these_hosts root "touch /tmp/x" "$STACK_HOSTS"
   ssh_control_run_as_user_these_hosts root "yum -y install telnet" "$STACK_HOSTS"
@@ -55,6 +56,7 @@ remediate_hosts () {
 }
 
 postmediate_hosts () {
+# I THINK THIS STUFF IS CAPTURED in hostcontrol/02a_hosts_setup.sh and workstation/setup.sh
   # not exactly prerequisites for the stack, but I also don't want this stuff in the base image.  Yet.
   TWILIO_PAGER_DIR=~/CODE/feralcoder/twilio-pager/
   ssh_control_run_as_user_these_hosts root "dnf -y install bcc perf systemtap" "$STACK_HOSTS"
