@@ -23,7 +23,7 @@ CEPH_DOCKER_VERSION=master-86da1a4-nautilus-centos-7
 VERSION=4.0 # Nautilus
 
 adjust_firewall () {
-  echo; echo ", AND POKING HOLE IN FIREWALL"
+  echo; echo "DISABLING FIREWALL"
   ssh_control_run_as_user_these_hosts root "systemctl disable firewalld" "$STACK_HOSTS"                    || return 1
   ssh_control_run_as_user_these_hosts root "systemctl stop firewalld" "$STACK_HOSTS"                       || return 1
 #  ssh_control_run_as_user_these_hosts root "firewall-cmd --zone=public --add-port=4567/tcp" "$CONTROL_HOSTS"                    || return 1
