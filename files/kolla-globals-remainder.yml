@@ -130,6 +130,7 @@ swift_storage_interface: "bond4" # I BELIEVE there's no interface defined for ce
 tunnel_interface: "bond6"
 #dns_interface: "{{ network_interface }}"
 #octavia_network_interface: "{{ api_interface }}"
+octavia_network_interface: "bond2"
 
 # Configure the address family (AF) per network.
 # Valid options are [ ipv4, ipv6 ]
@@ -782,22 +783,22 @@ nova_backend_ceph: "yes"
 #    cidr: "{{ octavia_amp_network_cidr }}"
 #    no_gateway_ip: yes
 #    enable_dhcp: yes
-#octavia_amp_network:
-#  name: lb-mgmt-net
-#  shared: true
-#  external: true
-#  provider_physical_network: physnet1
-#  provider_segmentation_id: 131
-#  provider_network_type: vxlan
-#  subnet:
-#    name: lb-mgmt-subnet
-#    cidr: "{{ octavia_amp_network_cidr }}"
+octavia_amp_network:
+  name: lb-mgmt-net
+  provider_network_type: vlan
+  provider_segmentation_id: 131
+  provider_physical_network: physnet1
+  external: false
+  shared: false
+  subnet:
+    name: lb-mgmt-subnet
+    cidr: "172.31.0.0/24"
+    allocation_pool_start: 172.31.0.100
+    allocation_pool_end: 172.31.0.199
+    gateway_ip: 172.31.0.241
 #    no_gateway_ip: no
-#    enable_dhcp: yes
-#    gateway_ip: 172.17.0.241
-#    allocation_pool_start: 172.17.0.100
-#    allocation_pool_end: 172.17.0.199
-octavia_amp_network_cidr: 172.17.0.0/24
+    enable_dhcp: yes
+#octavia_amp_network_cidr: 172.17.0.0/24
 
 # Octavia management network subnet CIDR.
 #octavia_amp_network_cidr: 10.0.0.0/24
