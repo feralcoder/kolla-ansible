@@ -66,7 +66,7 @@ pull_latest_containers () {
 
 
 # For all existing kolla containers in registry: Pull the latest from docker.io, retag, and stuff locally
-localize_latest_containers () {
+update_and_localize_existing_containers () {
   for CONTAINER in `ls -d $KOLLA_PULL_THRU_CACHE/*${INSTALL_TYPE}*`; do
     ssh_control_run_as_user root "docker image pull kolla/$CONTAINER:victoria" $PULL_HOST                                                      || return 1
     ssh_control_run_as_user root "docker image tag kolla/$CONTAINER:victoria $LOCAL_REGISTRY/feralcoder/$CONTAINER:latest" $PULL_HOST          || return 1
@@ -148,4 +148,4 @@ kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack prechecks 
 #
 ## PULL BINARY CONTAINERS FROM DOCKERIO
 #pull_latest_containers                                                                   || fail_exit "pull_latest_containers"
-#localize_latest_containers                                                               || fail_exit "localize_latest_containers"
+#update_and_localize_existing_containers                                                               || fail_exit "update_and_localize_existing_containers"
