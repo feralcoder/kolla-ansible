@@ -32,6 +32,10 @@ setup_magnum () {
 setup_octavia () {
   pip3 install python-octaviaclient    || return 1
   openstack image create --container-format bare --disk-format qcow2 --public --file /registry/images/amphora-x64-centos-haproxy-ssh.qcow2 --min-disk 2 --min-ram 1024 --tag amphora amphora --project service
+# Command as provided in docs:
+#   openstack image create amphora-x64-haproxy.qcow2 --container-format bare --disk-format qcow2 --private --tag amphora --file amphora-x64-haproxy.qcow2 --property hw_architecture='x86_64' --property hw_rng_model=virtio
+
+# Debugging: router needed for lb-net?
 #  openstack router create --centralized octavia_router --project service
 #  openstack router add subnet octavia_router lb-mgmt-subnet
 #  openstack router set --external-gateway public1 octavia_router
