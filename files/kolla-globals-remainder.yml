@@ -790,6 +790,7 @@ octavia_amp_network:
   provider_physical_network: physnet1
   external: false
   shared: false
+  gateway_ip: 172.31.0.241
   subnet:
     name: lb-mgmt-subnet
     cidr: "172.31.0.0/24"
