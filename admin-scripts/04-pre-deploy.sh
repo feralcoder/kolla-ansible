@@ -20,6 +20,10 @@ UPSTREAM_TAG=upstream-$NOW
 LOCAL_TAG=feralcoder-$NOW
 
 INSTALL_TYPE=source
+# OR GET INSTALL_TYPE FROM /etc/kolla/globals.yml
+get_install_type () {
+  INSTALL_TYPE=`grep '^kolla_install_type' /etc/kolla/globals.yml | tail -n 1 | awk '{print $2}' | sed 's/"//g'`
+}
 
 FERALCODER_SOURCE=~/CODE/feralcoder
 KOLLA_ANSIBLE_SOURCE=$FERALCODER_SOURCE/kolla-ansible
@@ -72,6 +76,9 @@ localize_latest_containers () {
     ssh_control_run_as_user root "docker image tag kolla/$CONTAINER:victoria $LOCAL_REGISTRY/feralcoder/$CONTAINER:$UPSTREAM_TAG" $PULL_HOST   || return 1
     ssh_control_run_as_user root "docker image push $LOCAL_REGISTRY/feralcoder/$CONTAINER:$UPSTREAM_TAG" $PULL_HOST                            || return 1
   done
+  # build_and_use_containers also updates TAG in globals.yml
+  sed -i 's/^openstack_release.*/openstack_release: "$UPSTREAM_TAG"/g' $KOLLA_SETUP_DIR/../files/kolla-globals-localpull.yml                   || return 1
+  use_localized_containers                                                                                                                     || return 1
 }
 
 
@@ -83,18 +90,19 @@ checkout_kolla_ansible_on_host () {
 
 build_and_use_containers () {
 #  # Build base image
-#  $KOLLA_ANSIBLE_SOURCE/utility/docker-images/build-images.sh                                                            || return 1
+#  $KOLLA_ANSIBLE_SOURCE/utility/docker-images/build-images.sh                                                                 || return 1
 
   # Build kolla images, using feralcoder base image
-  checkout_kolla_ansible_on_host $PULL_HOST                                                                              || return 1
-  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_SOURCE/admin-scripts/utility/build-containers.sh $NOW 2>&1" $PULL_HOST   || return 1
+  checkout_kolla_ansible_on_host $PULL_HOST                                                                                    || return 1
+  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_SOURCE/admin-scripts/utility/build-containers.sh $NOW 2>&1" $PULL_HOST         || return 1
+  # localize_latest_containers also updates TAG in globals.yml
   sed -i 's/^openstack_release.*/openstack_release: "$LOCAL_TAG"/g' $KOLLA_SETUP_DIR/../files/kolla-globals-localpull.yml      || return 1
-  use_localized_containers                                                                                               || return 1
+  use_localized_containers                                                                                                     || return 1
 }
 
 
 democratize_docker () {
-  ssh_control_run_as_user_these_hosts root "usermod -a -G docker cliff" "$STACK_HOSTS"                                   || return 1
+  ssh_control_run_as_user_these_hosts root "usermod -a -G docker cliff" "$STACK_HOSTS"                                         || return 1
 }
 
 
