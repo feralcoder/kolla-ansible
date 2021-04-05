@@ -4,7 +4,6 @@
 ## PINNED CONTAINER VERSIONS
 #docker_registry: 192.168.127.220:4001
 #docker_namespace: "feralcoder"
-#openstack_release: "feralcoder-20210322"
 #openstack_release: "feralcoder-20210323"
 
 # LATEST CONTAINER VERSIONS

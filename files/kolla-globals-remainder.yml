@@ -18,7 +18,6 @@ docker_custom_config:
 
 # Valid options are ['centos', 'debian', 'rhel', 'ubuntu']
 #kolla_base_distro: "centos"
-kolla_base_distro: "centos"
 
 # Valid options are [ binary, source ]
 #kolla_install_type: "binary"
