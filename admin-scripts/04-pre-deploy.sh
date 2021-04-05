@@ -16,8 +16,10 @@ if [[ $(group_logic_get_short_name `hostname`) != $REGISTRY_HOST ]]; then
 fi
 
 NOW=`date +%Y%m%d_%H%M`
-NOW=20210328_0157
-TAG=feralcoder-$NOW
+UPSTREAM_TAG=upstream-$NOW
+LOCAL_TAG=feralcoder-$NOW
+
+INSTALL_TYPE=source
 
 FERALCODER_SOURCE=~/CODE/feralcoder
 KOLLA_ANSIBLE_SOURCE=$FERALCODER_SOURCE/kolla-ansible
@@ -61,10 +63,14 @@ pull_latest_containers () {
 
 # For all existing kolla containers in registry: Pull the latest from docker.io, retag, and stuff locally
 localize_latest_containers () {
-  for CONTAINER in `ls $KOLLA_PULL_THRU_CACHE`; do
-    ssh_control_run_as_user root "docker image pull kolla/$CONTAINER:victoria" $PULL_HOST
-    ssh_control_run_as_user root "docker image tag kolla/$CONTAINER:victoria $LOCAL_REGISTRY/feralcoder/$CONTAINER:$TAG" $PULL_HOST
-    ssh_control_run_as_user root "docker image push $LOCAL_REGISTRY/feralcoder/$CONTAINER:$TAG" $PULL_HOST
+  for CONTAINER in `ls -d $KOLLA_PULL_THRU_CACHE/*${INSTALL_TYPE}*`; do
+    ssh_control_run_as_user root "docker image pull kolla/$CONTAINER:victoria" $PULL_HOST                                                      || return 1
+    ssh_control_run_as_user root "docker image tag kolla/$CONTAINER:victoria $LOCAL_REGISTRY/feralcoder/$CONTAINER:latest" $PULL_HOST          || return 1
+    ssh_control_run_as_user root "docker image push $LOCAL_REGISTRY/feralcoder/$CONTAINER:latest" $PULL_HOST                                   || return 1
+    ssh_control_run_as_user root "docker image tag kolla/$CONTAINER:victoria $LOCAL_REGISTRY/feralcoder/$CONTAINER:upstream-latest" $PULL_HOST || return 1
+    ssh_control_run_as_user root "docker image push $LOCAL_REGISTRY/feralcoder/$CONTAINER:upstream-latest" $PULL_HOST                          || return 1
+    ssh_control_run_as_user root "docker image tag kolla/$CONTAINER:victoria $LOCAL_REGISTRY/feralcoder/$CONTAINER:$UPSTREAM_TAG" $PULL_HOST   || return 1
+    ssh_control_run_as_user root "docker image push $LOCAL_REGISTRY/feralcoder/$CONTAINER:$UPSTREAM_TAG" $PULL_HOST                            || return 1
   done
 }
 
@@ -82,7 +88,7 @@ build_and_use_containers () {
   # Build kolla images, using feralcoder base image
   checkout_kolla_ansible_on_host $PULL_HOST                                                                              || return 1
   ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_SOURCE/admin-scripts/utility/build-containers.sh $NOW 2>&1" $PULL_HOST   || return 1
-  sed -i 's/^openstack_release.*/openstack_release: "$TAG"/g' $KOLLA_SETUP_DIR/../files/kolla-globals-localpull.yml      || return 1
+  sed -i 's/^openstack_release.*/openstack_release: "$LOCAL_TAG"/g' $KOLLA_SETUP_DIR/../files/kolla-globals-localpull.yml      || return 1
   use_localized_containers                                                                                               || return 1
 }
 
@@ -117,20 +123,20 @@ setup_ssl_certs () {
 
 
 
-#refetch_api_keys                                                                         || fail_exit "refetch_api_keys"
-kolla-genpwd                                                                             || fail_exit "kolla-genpwd"
-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack all -m ping              || fail_exit "ansible ping"
-## Use local registry so insecure-registries is set up correctly by bootstrap-servers
-use_localized_containers                                                                 || fail_exit "use_localized_containers"
-kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack bootstrap-servers  || fail_exit "kolla-ansible bootstrap-servers"
-democratize_docker                                                                       || fail_exit "democratize_docker"
-
-#setup_ssl_certs                                                                          || fail_exit "setup_ssl_certs"
-kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack prechecks          || fail_exit "kolla-ansible prechecks"
-
+##refetch_api_keys                                                                         || fail_exit "refetch_api_keys"
+#kolla-genpwd                                                                             || fail_exit "kolla-genpwd"
+#ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack all -m ping              || fail_exit "ansible ping"
+### Use local registry so insecure-registries is set up correctly by bootstrap-servers
+#use_localized_containers                                                                 || fail_exit "use_localized_containers"
+#kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack bootstrap-servers  || fail_exit "kolla-ansible bootstrap-servers"
+#democratize_docker                                                                       || fail_exit "democratize_docker"
+#
+##setup_ssl_certs                                                                          || fail_exit "setup_ssl_certs"
+#kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack prechecks          || fail_exit "kolla-ansible prechecks"
+#
 # BUILD SOURCE CONTAINERS.  This must be done if self-signed certs are used, after certs are generated.
 #build_and_use_containers                                                                 || fail_exit "build_and_use_containers"
 
 # PULL BINARY CONTAINERS FROM DOCKERIO
-#pull_latest_containers                                                                   || fail_exit "pull_latest_containers"
-#localize_latest_containers                                                               || fail_exit "localize_latest_containers"
+pull_latest_containers                                                                   || fail_exit "pull_latest_containers"
+localize_latest_containers                                                               || fail_exit "localize_latest_containers"
