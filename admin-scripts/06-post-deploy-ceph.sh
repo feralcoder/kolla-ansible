@@ -16,9 +16,7 @@ set_up_ceph_volumes_and_users () {
   CEPH_MON=`echo "$CEPH_MON_HOSTS" | tr ' ' '\n' | head -n 1`                                                                                     || return 1
   MON_CONTAINER=`ssh_control_run_as_user root "docker container list" $CEPH_MON | grep ' ceph-mon-' | awk '{print $1}'`                           || return 1
 
-# DISABLE CEPHX
   ( grep auth_cluster_required /etc/ceph/ceph.conf ) || ( echo "mon initial members = strange-api,merlin-api,gandalf-api" && echo "auth_cluster_required = cephx" && echo "auth_service_required = cephx" && echo "auth_client_required = cephx" ) | sudo tee -a /etc/ceph/ceph.conf    || return 1
-  ( grep "mon initial members" /etc/ceph/ceph.conf ) || ( echo "mon initial members = strange-api,merlin-api,gandalf-api" ) | sudo tee -a /etc/ceph/ceph.conf    || return 1
 
   # Default Pools Have Too Few Page Groups
   ssh_control_run_as_user root "docker exec $MON_CONTAINER ceph osd pool set cephfs_data pg_num 16" $CEPH_MON                                     || return 1
