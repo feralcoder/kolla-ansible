@@ -13,12 +13,13 @@ ANSIBLE_CONTROLLER=dmb
 
 install_packages () {
   echo; echo "INSTALLING YUM-UTILS and DOCKER.CE REPO"
-  ssh_control_run_as_user root "yum install -y yum-utils" $ANSIBLE_CONTROLLER                                                                                                        || return 1
+  ssh_control_run_as_user root "yum install -y yum-utils" $ANSIBLE_CONTROLLER                || return 1
   echo; echo "INSTALLING CONTAINERD AND DOCKER.CE"
   ssh_control_run_as_user root "(dnf repolist | grep docker) || yum-config-manager     --add-repo     https://download.docker.com/linux/centos/docker-ce.repo" $ANSIBLE_CONTROLLER   || return 1
-  ssh_control_run_as_user root "dnf -y install docker-ce" $ANSIBLE_CONTROLLER                                                                                                        || return 1
-  ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/docker-daemon.json /etc/docker/daemon.json $ANSIBLE_CONTROLLER                                                             || return 1
-  ssh_control_run_as_user root "systemctl enable --now docker" $ANSIBLE_CONTROLLER                                                                                                   || return 1
+  ssh_control_run_as_user root "dnf -y install docker-ce" $ANSIBLE_CONTROLLER                || return 1
+  ssh_control_run_as_user root "mkdir /etc/docker" $ANSIBLE_CONTROLLER                       || return 1
+  ssh_control_sync_as_user root $KOLLA_SETUP_DIR/../files/docker-daemon.json /etc/docker/daemon.json $ANSIBLE_CONTROLLER                 || return 1
+  ssh_control_run_as_user root "systemctl enable --now docker" $ANSIBLE_CONTROLLER           || return 1
 }
 
 disable_firewall () {
