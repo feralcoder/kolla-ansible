@@ -62,12 +62,12 @@ build_kolla_containers () {
 
 tag_as_latest () {
   for CONTAINER in `docker image list | grep $TAG | awk '{print $1}'`; do
-    docker tag $CONTAINER:$TAG $CONTAINER:latest              || return 1
-    docker push $CONTAINER:latest                             || return 1
-    docker tag $CONTAINER:$TAG $CONTAINER:feralcoder-latest   || return 1
-    docker push $CONTAINER:feralcoder-latest                  || return 1
-    docker tag $CONTAINER:$TAG $CONTAINER:$TAG                || return 1
-    docker push $CONTAINER:$TAG                               || return 1
+    docker tag $CONTAINER:$TAG $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:latest              || return 1
+    docker push $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:latest                             || return 1
+    docker tag $CONTAINER:$TAG $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:feralcoder-latest   || return 1
+    docker push $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:feralcoder-latest                  || return 1
+    docker tag $CONTAINER:$TAG $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:$TAG                || return 1
+    docker push $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:$TAG                               || return 1
   done
 }
 
