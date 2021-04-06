@@ -121,6 +121,10 @@ democratize_docker () {
 
 
 setup_ssl_certs () {
+  kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack certificates                                           || return 1
+
+}
+#setup_ssl_certs () {
 #  SELF-SIGNED CERTS DON'T WORK IN KOLLA-ANSIBLE AS DOCUMENTED
 
 #  # DO ONCE: Have kolla-ansible generate certs, then stash them into git://feralcoder (encrypted)
@@ -130,16 +134,16 @@ setup_ssl_certs () {
 #  openssl enc -aes-256-cfb8 --pass file:/home/cliff/.password -md sha256 -in $KOLLA_SETUP_DIR/../files/kolla-certificates.tar -out $KOLLA_SETUP_DIR/../files/kolla-certificates.encrypted
 #  # PLACE root CA into base image container.  REBUILD CONTAINERS!
 #  cp /etc/kolla/certificates/ca/root.crt $KOLLA_SETUP_DIR/utility/docker-images/centos-feralcoder/stack.crt
-
-  # AFTER REGENERATION: copy /etc/kolla/certificates/ca/root.crt into all containers.
-  #   The root.crt will be copied as stack.crt into base container build directory
-  #   Containers must then be rebuilt, via build_and_use_containers
-
-  openssl enc --pass file:/home/cliff/.password -d -aes-256-cfb8 -md sha256 -in $KOLLA_SETUP_DIR/../files/kolla-certificates.encrypted -out $KOLLA_SETUP_DIR/../files/kolla-certificates.tar
-  tar -C /etc/kolla -xf $KOLLA_SETUP_DIR/../files/kolla-certificates.tar
-  ssh_control_sync_as_user_these_hosts root /etc/kolla/certificates/ca/root.crt /etc/pki/ca-trust/source/anchors/stack.crt "$ALL_HOSTS"
-  ssh_control_run_as_user_these_hosts root update-ca-trust "$ALL_HOSTS"
-}
+#
+#  # AFTER REGENERATION: copy /etc/kolla/certificates/ca/root.crt into all containers.
+#  #   The root.crt will be copied as stack.crt into base container build directory
+#  #   Containers must then be rebuilt, via build_and_use_containers
+#
+#  openssl enc --pass file:/home/cliff/.password -d -aes-256-cfb8 -md sha256 -in $KOLLA_SETUP_DIR/../files/kolla-certificates.encrypted -out $KOLLA_SETUP_DIR/../files/kolla-certificates.tar
+#  tar -C /etc/kolla -xf $KOLLA_SETUP_DIR/../files/kolla-certificates.tar
+#  ssh_control_sync_as_user_these_hosts root /etc/kolla/certificates/ca/root.crt /etc/pki/ca-trust/source/anchors/stack.crt "$ALL_HOSTS"
+#  ssh_control_run_as_user_these_hosts root update-ca-trust "$ALL_HOSTS"
+#}
 
 
 
