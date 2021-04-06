@@ -151,21 +151,23 @@ setup_ssl_certs () {
 get_install_type                                                                         || fail_exit "get_install_type"
 use_localized_containers                                                                 || fail_exit "use_localized_containers"
 
-##refetch_api_keys                                                                         || fail_exit "refetch_api_keys"
-#kolla-genpwd                                                                             || fail_exit "kolla-genpwd"
-#ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack all -m ping              || fail_exit "ansible ping"
-### Use local registry so insecure-registries is set up correctly by bootstrap-servers
-#use_localized_containers                                                                 || fail_exit "use_localized_containers"
-#kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack bootstrap-servers  || fail_exit "kolla-ansible bootstrap-servers"
-#democratize_docker                                                                       || fail_exit "democratize_docker"
-#
+#refetch_api_keys                                                                         || fail_exit "refetch_api_keys"
+kolla-genpwd                                                                             || fail_exit "kolla-genpwd"
+ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack all -m ping              || fail_exit "ansible ping"
+## Use local registry so insecure-registries is set up correctly by bootstrap-servers
+use_localized_containers                                                                 || fail_exit "use_localized_containers"
+kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack bootstrap-servers  || fail_exit "kolla-ansible bootstrap-servers"
+democratize_docker                                                                       || fail_exit "democratize_docker"
+
+kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack prechecks          || fail_exit "kolla-ansible prechecks"
 setup_ssl_certs                                                                          || fail_exit "setup_ssl_certs"
-#kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack prechecks          || fail_exit "kolla-ansible prechecks"
 
 ## BUILD SOURCE CONTAINERS.  This must be done if self-signed certs are used, after certs are generated.
 #build_and_use_containers                                                                 || fail_exit "build_and_use_containers"
 #
-## ONLY USE KOLLA-ANSIBLE TO FETCH IF CONTAINER USAGE CHANGES - PROBLEMATIC
-#kolla_ansible_pull_containers                                                            || fail_exit "pull_latest_containers"
+## ONLY USE KOLLA-ANSIBLE TO FETCH UPDATES IF CONTAINER USAGE CHANGES - PROBLEMATIC
+#   Stampeding herd hoses local registries
+kolla_ansible_pull_containers                                                            || fail_exit "pull_latest_containers"
+
 #update_existing_containers                                                                || fail_exit "update_existing_containers"
-update_and_localize_existing_containers                                                   || fail_exit "update_and_localize_existing_containers"
+#update_and_localize_existing_containers                                                   || fail_exit "update_and_localize_existing_containers"
