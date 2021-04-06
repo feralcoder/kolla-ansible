@@ -94,8 +94,10 @@ setup_for_installers () {
   ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/fix-bonds/util/test_bonds.sh > $LOG_DIR/02b-test-bonds_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 2b: Test Bonds"
   echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/03-deploy-registry.sh ON $ANSIBLE_CONTROLLER"
   ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/03-deploy-registry.sh > $LOG_DIR/03-deploy-registry_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 3: Registry Deployment"
-  echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/04-pre-deploy.sh ON $ANSIBLE_CONTROLLER"
-  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/04-pre-deploy.sh > $LOG_DIR/04-pre-deploy_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 4: Kolla Pre Deployment"
+  echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/04a-pre-deploy.sh ON $ANSIBLE_CONTROLLER"
+  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/04a-pre-deploy.sh > $LOG_DIR/04a-pre-deploy_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 4a: Kolla Pre Deployment"
+  echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/04b-container-setup_.sh ON $ANSIBLE_CONTROLLER"
+  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/04b-container-setup_.sh > $LOG_DIR/04b-container-setup_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 4b: Container Setup"
 }
 
 
