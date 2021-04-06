@@ -91,7 +91,7 @@ update_and_localize_existing_containers () {
     ssh_control_run_as_user root "docker image push $LOCAL_REGISTRY/feralcoder/$CONTAINER:$UPSTREAM_TAG" $PULL_HOST                            || return 1
   done
   # build_and_use_containers also updates TAG in globals.yml
-  sed -i 's/^openstack_release.*/openstack_release: "$UPSTREAM_TAG"/g' $KOLLA_SETUP_DIR/../files/kolla-globals-localpull.yml                   || return 1
+  sed -i "s/^openstack_release.*/openstack_release: '$UPSTREAM_TAG'/g" $KOLLA_SETUP_DIR/../files/kolla-globals-localpull.yml                   || return 1
   use_localized_containers                                                                                                                     || return 1
 }
 
@@ -110,7 +110,7 @@ build_and_use_containers () {
   checkout_kolla_ansible_on_host $PULL_HOST                                                                                    || return 1
   ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_SOURCE/admin-scripts/utility/build-containers.sh $NOW 2>&1" $PULL_HOST         || return 1
   # localize_latest_containers also updates TAG in globals.yml
-  sed -i 's/^openstack_release.*/openstack_release: "$LOCAL_TAG"/g' $KOLLA_SETUP_DIR/../files/kolla-globals-localpull.yml      || return 1
+  sed -i "s/^openstack_release.*/openstack_release: '$LOCAL_TAG'/g" $KOLLA_SETUP_DIR/../files/kolla-globals-localpull.yml      || return 1
   use_localized_containers                                                                                                     || return 1
 }
 
@@ -151,16 +151,16 @@ setup_ssl_certs () {
 get_install_type                                                                         || fail_exit "get_install_type"
 use_localized_containers                                                                 || fail_exit "use_localized_containers"
 
-#refetch_api_keys                                                                         || fail_exit "refetch_api_keys"
-kolla-genpwd                                                                             || fail_exit "kolla-genpwd"
-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack all -m ping              || fail_exit "ansible ping"
-## Use local registry so insecure-registries is set up correctly by bootstrap-servers
-use_localized_containers                                                                 || fail_exit "use_localized_containers"
-kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack bootstrap-servers  || fail_exit "kolla-ansible bootstrap-servers"
-democratize_docker                                                                       || fail_exit "democratize_docker"
-
-#setup_ssl_certs                                                                          || fail_exit "setup_ssl_certs"
-kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack prechecks          || fail_exit "kolla-ansible prechecks"
+##refetch_api_keys                                                                         || fail_exit "refetch_api_keys"
+#kolla-genpwd                                                                             || fail_exit "kolla-genpwd"
+#ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack all -m ping              || fail_exit "ansible ping"
+### Use local registry so insecure-registries is set up correctly by bootstrap-servers
+#use_localized_containers                                                                 || fail_exit "use_localized_containers"
+#kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack bootstrap-servers  || fail_exit "kolla-ansible bootstrap-servers"
+#democratize_docker                                                                       || fail_exit "democratize_docker"
+#
+setup_ssl_certs                                                                          || fail_exit "setup_ssl_certs"
+#kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack prechecks          || fail_exit "kolla-ansible prechecks"
 
 ## BUILD SOURCE CONTAINERS.  This must be done if self-signed certs are used, after certs are generated.
 #build_and_use_containers                                                                 || fail_exit "build_and_use_containers"
@@ -168,4 +168,4 @@ kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack prechecks 
 ## ONLY USE KOLLA-ANSIBLE TO FETCH IF CONTAINER USAGE CHANGES - PROBLEMATIC
 #kolla_ansible_pull_containers                                                            || fail_exit "pull_latest_containers"
 #update_existing_containers                                                                || fail_exit "update_existing_containers"
-#update_and_localize_existing_containers                                                   || fail_exit "update_and_localize_existing_containers"
+update_and_localize_existing_containers                                                   || fail_exit "update_and_localize_existing_containers"
