@@ -42,6 +42,11 @@ refetch_api_keys () {
   done
 }
 
+block_dockerio () {
+  NON_REGISTRY_HOSTS=`group_logic_remove_host "$ALL_HOSTS" $REGISTRY_HOST`
+
+  ssh_control_run_as_user_these_hosts root "(grep '0.0.0.0.*auth.docker.io.*' /etc/hosts ) && sed -i 's/.*0.0.0.0 auth.docker.io.*/0.0.0.0  auth.docker.io registry-1.docker.io index.docker.io dseasb33srnrn.cloudfront.net production.cloudflare.docker.com/g' /etc/hosts || echo '0.0.0.0  auth.docker.io registry-1.docker.io index.docker.io dseasb33srnrn.cloudfront.net production.cloudflare.docker.com' >> /etc/hosts" "$NON_REGISTRY_HOSTS"
+}
 
 use_localized_containers () {
   # Switch back to local (pinned) fetches for deployment
@@ -151,6 +156,7 @@ untar_ssl_certs () {
 
 get_install_type                                                                         || fail_exit "get_install_type"
 use_localized_containers                                                                 || fail_exit "use_localized_containers"
+block_dockerio                                                                           || fail_exit "block_dockerio"
 
 #refetch_api_keys                                                                         || fail_exit "refetch_api_keys"
 kolla-genpwd                                                                             || fail_exit "kolla-genpwd"
