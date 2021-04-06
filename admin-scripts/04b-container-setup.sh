@@ -19,11 +19,13 @@ NOW=`date +%Y%m%d_%H%M`
 UPSTREAM_TAG=upstream-$NOW
 LOCAL_TAG=feralcoder-$NOW
 
-INSTALL_TYPE=source
-# OR GET INSTALL_TYPE FROM /etc/kolla/globals.yml
+#INSTALL_TYPE=source
+# GET INSTALL_TYPE FROM /etc/kolla/globals.yml
 get_install_type () {
   INSTALL_TYPE=`grep '^kolla_install_type' /etc/kolla/globals.yml | tail -n 1 | awk '{print $2}' | sed 's/"//g'`
 }
+[[ $INSTALL_TYPE != "" ]] || { echo "No INSTALL_TYPE discovered!  Define in /etc/kolla/globals.yml or supply as ENV VAR!"; exit 1; }
+
 
 FERALCODER_SOURCE=~/CODE/feralcoder
 KOLLA_ANSIBLE_SOURCE=$FERALCODER_SOURCE/kolla-ansible
@@ -34,13 +36,6 @@ PULL_HOST=kgn
 
 
 
-
-refetch_api_keys () {
-  echo; echo "REFETCHING HOST KEYS FOR API NETWORK EVERYWHERE"
-  for HOST in $ALL_HOSTS; do
-    ssh_control_run_as_user cliff "ssh_control_refetch_hostkey_these_hosts \"$STACK_HOSTS_API_NET\"" $HOST 2>/dev/null  || fail_exit "ssh_control_refetch_hostkey_these_hosts"
-  done
-}
 
 block_dockerio () {
   NON_REGISTRY_HOSTS=`group_logic_remove_host "$ALL_HOSTS" $REGISTRY_HOST`
@@ -54,8 +49,7 @@ use_localized_containers () {
   cat $KOLLA_SETUP_DIR/../files/kolla-globals-remainder.yml >> /etc/kolla/globals.yml     ||  return 1
 }
 
-
-use_dockerhub_containers () {
+use_upstream_containers () {
   # We switch to dockerhub container fetches, to get the latest "victoria" containers
   cp $KOLLA_SETUP_DIR/../files/kolla-globals-dockerpull.yml /etc/kolla/globals.yml         ||  return 1
   cat $KOLLA_SETUP_DIR/../files/kolla-globals-remainder.yml >> /etc/kolla/globals.yml      ||  return 1
@@ -63,7 +57,7 @@ use_dockerhub_containers () {
 
 
 # Uses kolla-ansible to pull latest containers...
-#  This is bad - Docker doesn't handle stampeding herd well.
+#  This is bad - Docker registries don't handle stampeding herd well.
 #  Use update_existing_containers first, then run this
 kolla_ansible_pull_containers () {
   kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack pull               || return 1
@@ -73,17 +67,16 @@ kolla_ansible_pull_containers () {
 # This is preferable to allowing kolla-ansible to do it:
 #  Docker-pullthru-registry doesn't handle the stampeding herd well
 #  Better to serialize both clients and pulls
-update_existing_containers () {
+update_existing_upstream_containers () {
   cd $KOLLA_PULL_THRU_CACHE
   for CONTAINER in `ls -d *${INSTALL_TYPE}*`; do
     echo $CONTAINER
-    echo ssh_control_run_as_user root "docker image pull kolla/$CONTAINER:victoria" $PULL_HOST                                                      || return 1
     ssh_control_run_as_user root "docker image pull kolla/$CONTAINER:victoria" $PULL_HOST                                                      || return 1
   done 
 }
 
 # For all existing kolla containers in registry: Pull the latest from docker.io, retag, and stuff locally
-update_and_localize_existing_containers () {
+update_and_localize_existing_upstream_containers () {
   cd $KOLLA_PULL_THRU_CACHE
   for CONTAINER in `ls -d *${INSTALL_TYPE}*`; do
     ssh_control_run_as_user root "docker image pull kolla/$CONTAINER:victoria" $PULL_HOST                                                      || return 1
@@ -94,7 +87,7 @@ update_and_localize_existing_containers () {
     ssh_control_run_as_user root "docker image tag kolla/$CONTAINER:victoria $LOCAL_REGISTRY/feralcoder/$CONTAINER:$UPSTREAM_TAG" $PULL_HOST   || return 1
     ssh_control_run_as_user root "docker image push $LOCAL_REGISTRY/feralcoder/$CONTAINER:$UPSTREAM_TAG" $PULL_HOST                            || return 1
   done
-  # build_and_use_containers also updates TAG in globals.yml
+  # build_and_use_containers also updates TAG in globals.yml: Watch for Race!
   sed -i "s/^openstack_release.*/openstack_release: '$UPSTREAM_TAG'/g" $KOLLA_SETUP_DIR/../files/kolla-globals-localpull.yml                   || return 1
   use_localized_containers                                                                                                                     || return 1
 }
@@ -113,7 +106,7 @@ build_and_use_containers () {
   # Build kolla images, using feralcoder base image
   checkout_kolla_ansible_on_host $PULL_HOST                                                                                    || return 1
   ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_SOURCE/admin-scripts/utility/build-containers.sh $NOW 2>&1" $PULL_HOST         || return 1
-  # localize_latest_containers also updates TAG in globals.yml
+  # localize_latest_containers also updates TAG in globals.yml: Watch for Race!
   sed -i "s/^openstack_release.*/openstack_release: '$LOCAL_TAG'/g" $KOLLA_SETUP_DIR/../files/kolla-globals-localpull.yml      || return 1
   use_localized_containers                                                                                                     || return 1
 }
@@ -124,32 +117,6 @@ democratize_docker () {
 }
 
 
-generate_ssl_certs () {
-  kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack certificates                                           || return 1
-
-}
-
-untar_ssl_certs () {
-#  SELF-SIGNED CERTS DON'T WORK IN KOLLA-ANSIBLE AS DOCUMENTED
-#
-#  # DO ONCE: Have kolla-ansible generate certs, then stash them into git://feralcoder (encrypted)
-#  #  Also place stack's root ca for building into base container image.
-#  kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack certificates       || return 1
-#  tar -C /etc/kolla -cf $KOLLA_SETUP_DIR/../files/kolla-certificates.tar certificates
-#  openssl enc -aes-256-cfb8 --pass file:/home/cliff/.password -md sha256 -in $KOLLA_SETUP_DIR/../files/kolla-certificates.tar -out $KOLLA_SETUP_DIR/../files/kolla-certificates.encrypted
-#  # PLACE root CA into base image container.  REBUILD CONTAINERS!
-#  cp /etc/kolla/certificates/ca/root.crt $KOLLA_SETUP_DIR/utility/docker-images/centos-feralcoder/stack.crt
-#
-#  # AFTER REGENERATION: copy /etc/kolla/certificates/ca/root.crt into all containers.
-#  #   The root.crt will be copied as stack.crt into base container build directory
-#  #   Containers must then be rebuilt, via build_and_use_containers
-
-  openssl enc --pass file:/home/cliff/.password -d -aes-256-cfb8 -md sha256 -in $KOLLA_SETUP_DIR/../files/kolla-certificates.encrypted -out $KOLLA_SETUP_DIR/../files/kolla-certificates.tar
-  tar -C /etc/kolla -xf $KOLLA_SETUP_DIR/../files/kolla-certificates.tar
-  tar -C /tmp/testcerts -xf $KOLLA_SETUP_DIR/../files/kolla-certificates.tar
-#  ssh_control_sync_as_user_these_hosts root /etc/kolla/certificates/ca/root.crt /etc/pki/ca-trust/source/anchors/stack.crt "$ALL_HOSTS"
-#  ssh_control_run_as_user_these_hosts root update-ca-trust "$ALL_HOSTS"
-}
 
 
 
@@ -158,26 +125,15 @@ get_install_type                                                                
 use_localized_containers                                                                 || fail_exit "use_localized_containers"
 block_dockerio                                                                           || fail_exit "block_dockerio"
 
-#refetch_api_keys                                                                         || fail_exit "refetch_api_keys"
-kolla-genpwd                                                                             || fail_exit "kolla-genpwd"
-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack all -m ping              || fail_exit "ansible ping"
-## Use local registry so insecure-registries is set up correctly by bootstrap-servers
-use_localized_containers                                                                 || fail_exit "use_localized_containers"
-kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack bootstrap-servers  || fail_exit "kolla-ansible bootstrap-servers"
 democratize_docker                                                                       || fail_exit "democratize_docker"
 
-generate_ssl_certs                                                                          || fail_exit "setup_ssl_certs"
-#untar_ssl_certs
-kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack prechecks          || fail_exit "kolla-ansible prechecks"
-
-## BUILD SOURCE CONTAINERS.  This must be done if self-signed certs are used, after certs are generated.
 #build_and_use_containers                                                                 || fail_exit "build_and_use_containers"
-#
-## ONLY USE KOLLA-ANSIBLE TO FETCH UPDATES IF CONTAINER USAGE CHANGES - PROBLEMATIC
-#   Stampeding herd hoses local registries
-#use_dockerhub_containers                                                                 || return 1
+
+#update_existing_upstream_containers                                                      || fail_exit "update_existing_upstream_containers"
+#update_and_localize_existing_upstream_containers                                         || fail_exit "update_and_localize_existing_upstream_containers"
+
+
+#use_upstream_containers                                                                 || return 1
 use_localized_containers                                                                 || fail_exit "use_localized_containers"
 kolla_ansible_pull_containers                                                            || fail_exit "pull_latest_containers"
 
-#update_existing_containers                                                                || fail_exit "update_existing_containers"
-#update_and_localize_existing_containers                                                   || fail_exit "update_and_localize_existing_containers"
