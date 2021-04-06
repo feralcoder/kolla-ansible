@@ -24,6 +24,7 @@ LOCAL_TAG=feralcoder-$NOW
 get_install_type () {
   INSTALL_TYPE=`grep '^kolla_install_type' /etc/kolla/globals.yml | tail -n 1 | awk '{print $2}' | sed 's/"//g'`
 }
+get_install_type
 [[ $INSTALL_TYPE != "" ]] || { echo "No INSTALL_TYPE discovered!  Define in /etc/kolla/globals.yml or supply as ENV VAR!"; exit 1; }
 
 
