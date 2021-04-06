@@ -56,7 +56,7 @@ build_kolla_containers () {
   cd $KOLLA_CODE_DIR   || return 1
   cat etc/kolla/kolla-build.conf | sed -E 's/#type = url/type = local/g' |  sed -E "s|^#location = .tarballs_base.*/([^/]*.tar.gz)|location = $NOW_TARBALLS/\1|g" | sed -E "s|^#location = .*/([^/]*.tar.gz)|location = $NOW_TARBALLS/\1|g" > etc/kolla/kolla-build-local.conf
   # kolla will use tag "8" with following base image...
-  BASE_IMAGE="--base-image $LOCAL_DOCKER_REGISTRY/feralcoder/centos-feralcoder"
+  BASE_IMAGE="--base-image $LOCAL_DOCKER_REGISTRY/feralcoder/centos-feralcoder:latest"
   kolla-build -t source -b centos $BASE_IMAGE --push --registry $LOCAL_DOCKER_REGISTRY -n feralcoder --tag $TAG   --config-file etc/kolla/kolla-build-local.conf || return 1
 }
 
