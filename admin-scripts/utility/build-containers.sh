@@ -11,7 +11,10 @@ source_host_control_scripts       || fail_exit "source_host_control_scripts"
 SUDO_PASS_FILE=~/.password
 
 NOW=$1
+INSTALL_TYPE=$2
+
 [[ $NOW != "" ]]  ||  NOW=`date +%Y%m%d_%H%M`
+[[ $INSTALL_TYPE != "" ]]  ||  { "echo INSTALL_TYPE not provided!"; exit 1; }
 TAG=feralcoder-$NOW
 NOW_TARBALLS=/registry/kolla_tarballs/victoria_$NOW
 
@@ -31,6 +34,7 @@ setup_kolla () {
   mkdir -p ~/CODE/openstack && cd ~/CODE/openstack       || return 1
   git clone https://github.com/openstack/kolla.git       || { cd kolla && git pull; }       || return 1
   git checkout stable/victoria                           || return 1
+pwd
   cd ..
   pip3 install ./kolla                                    || return 1
   pip3 install tox                                       || return 1
@@ -58,16 +62,18 @@ build_kolla_containers () {
   docker image pull $LOCAL_DOCKER_REGISTRY/feralcoder/centos-feralcoder:8
   # kolla will use tag "8" with following base image...
   BASE_IMAGE="--base-image $LOCAL_DOCKER_REGISTRY/feralcoder/centos-feralcoder"
-  kolla-build -t source -b centos $BASE_IMAGE --push --registry $LOCAL_DOCKER_REGISTRY -n feralcoder --tag $TAG   --config-file etc/kolla/kolla-build-local.conf || return 1
+  kolla-build -t $INSTALL_TYPE -b centos $BASE_IMAGE --push --registry $LOCAL_DOCKER_REGISTRY -n feralcoder --tag $TAG   --config-file etc/kolla/kolla-build-local.conf || return 1
 }
 
 tag_as_latest () {
-  for CONTAINER in `docker image list | grep $TAG | awk '{print $1}'`; do
-    docker tag $CONTAINER:$TAG $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:latest              || return 1
+  # This function strips $LOCAL_DOCKER_REGISTRY/feralcoder/, then adds again
+  # This will allow easier repo-renaming and other distribution changes
+  for CONTAINER in `docker image list | grep "\-${INSTALL_TYPE}\-" | grep $TAG | awk '{print $1}' | awk -F'/' '{print $(NF)}'`; do
+    docker tag $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:$TAG $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:latest              || return 1
     docker push $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:latest                             || return 1
-    docker tag $CONTAINER:$TAG $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:feralcoder-latest   || return 1
+    docker tag $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:$TAG $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:feralcoder-latest   || return 1
     docker push $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:feralcoder-latest                  || return 1
-    docker tag $CONTAINER:$TAG $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:$TAG                || return 1
+    docker tag $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:$TAG $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:$TAG                || return 1
     docker push $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:$TAG                               || return 1
   done
 }
@@ -78,6 +84,8 @@ use_venv kolla                  || fail_exit "use_venv kolla"
 install_packages                || fail_exit "install_packages"
 setup_kolla                     || fail_exit "setup_kolla"
 generate_kolla_build_configs    || fail_exit "generate_kolla_build_configs"
-fetch_kolla_container_source    || fail_exit "fetch_kolla_container_source"
+if [[ ${INSTALL_TYPE,,} == source ]]; then
+  fetch_kolla_container_source    || fail_exit "fetch_kolla_container_source"
+fi
 build_kolla_containers          || fail_exit "build_kolla_containers"
 tag_as_latest                   || fail_exit "tag_as_latest"
