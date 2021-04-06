@@ -58,16 +58,30 @@ use_dockerhub_containers () {
 
 
 # Uses kolla-ansible to pull latest containers...
-pull_latest_containers () {
+#  This is bad - Docker doesn't handle stampeding herd well.
+#  Use update_existing_containers first, then run this
+kolla_ansible_pull_containers () {
   use_dockerhub_containers                                                                 || return 1
   kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack pull               || return 1
   use_localized_containers                                                                 || return 1
 }
 
+# This is preferable to allowing kolla-ansible to do it:
+#  Docker-pullthru-registry doesn't handle the stampeding herd well
+#  Better to serialize both clients and pulls
+update_existing_containers () {
+  cd $KOLLA_PULL_THRU_CACHE
+  for CONTAINER in `ls -d *${INSTALL_TYPE}*`; do
+    echo $CONTAINER
+    echo ssh_control_run_as_user root "docker image pull kolla/$CONTAINER:victoria" $PULL_HOST                                                      || return 1
+    ssh_control_run_as_user root "docker image pull kolla/$CONTAINER:victoria" $PULL_HOST                                                      || return 1
+  done 
+}
 
 # For all existing kolla containers in registry: Pull the latest from docker.io, retag, and stuff locally
 update_and_localize_existing_containers () {
-  for CONTAINER in `ls -d $KOLLA_PULL_THRU_CACHE/*${INSTALL_TYPE}*`; do
+  cd $KOLLA_PULL_THRU_CACHE
+  for CONTAINER in `ls -d *${INSTALL_TYPE}*`; do
     ssh_control_run_as_user root "docker image pull kolla/$CONTAINER:victoria" $PULL_HOST                                                      || return 1
     ssh_control_run_as_user root "docker image tag kolla/$CONTAINER:victoria $LOCAL_REGISTRY/feralcoder/$CONTAINER:latest" $PULL_HOST          || return 1
     ssh_control_run_as_user root "docker image push $LOCAL_REGISTRY/feralcoder/$CONTAINER:latest" $PULL_HOST                                   || return 1
@@ -131,6 +145,7 @@ setup_ssl_certs () {
 
 
 get_install_type                                                                         || fail_exit "get_install_type"
+use_localized_containers                                                                 || fail_exit "use_localized_containers"
 
 #refetch_api_keys                                                                         || fail_exit "refetch_api_keys"
 kolla-genpwd                                                                             || fail_exit "kolla-genpwd"
@@ -146,6 +161,7 @@ kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack prechecks 
 ## BUILD SOURCE CONTAINERS.  This must be done if self-signed certs are used, after certs are generated.
 #build_and_use_containers                                                                 || fail_exit "build_and_use_containers"
 #
-## PULL BINARY CONTAINERS FROM DOCKERIO
-#pull_latest_containers                                                                   || fail_exit "pull_latest_containers"
-#update_and_localize_existing_containers                                                               || fail_exit "update_and_localize_existing_containers"
+## ONLY USE KOLLA-ANSIBLE TO FETCH IF CONTAINER USAGE CHANGES - PROBLEMATIC
+#kolla_ansible_pull_containers                                                            || fail_exit "pull_latest_containers"
+#update_existing_containers                                                                || fail_exit "update_existing_containers"
+#update_and_localize_existing_containers                                                   || fail_exit "update_and_localize_existing_containers"
