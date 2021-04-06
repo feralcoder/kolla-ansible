@@ -61,7 +61,6 @@ use_dockerhub_containers () {
 #  This is bad - Docker doesn't handle stampeding herd well.
 #  Use update_existing_containers first, then run this
 kolla_ansible_pull_containers () {
-  use_dockerhub_containers                                                                 || return 1
   kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack pull               || return 1
   use_localized_containers                                                                 || return 1
 }
@@ -120,13 +119,14 @@ democratize_docker () {
 }
 
 
-setup_ssl_certs () {
+generate_ssl_certs () {
   kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack certificates                                           || return 1
 
 }
-#setup_ssl_certs () {
-#  SELF-SIGNED CERTS DON'T WORK IN KOLLA-ANSIBLE AS DOCUMENTED
 
+untar_ssl_certs () {
+#  SELF-SIGNED CERTS DON'T WORK IN KOLLA-ANSIBLE AS DOCUMENTED
+#
 #  # DO ONCE: Have kolla-ansible generate certs, then stash them into git://feralcoder (encrypted)
 #  #  Also place stack's root ca for building into base container image.
 #  kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack certificates       || return 1
@@ -138,12 +138,13 @@ setup_ssl_certs () {
 #  # AFTER REGENERATION: copy /etc/kolla/certificates/ca/root.crt into all containers.
 #  #   The root.crt will be copied as stack.crt into base container build directory
 #  #   Containers must then be rebuilt, via build_and_use_containers
-#
-#  openssl enc --pass file:/home/cliff/.password -d -aes-256-cfb8 -md sha256 -in $KOLLA_SETUP_DIR/../files/kolla-certificates.encrypted -out $KOLLA_SETUP_DIR/../files/kolla-certificates.tar
-#  tar -C /etc/kolla -xf $KOLLA_SETUP_DIR/../files/kolla-certificates.tar
+
+  openssl enc --pass file:/home/cliff/.password -d -aes-256-cfb8 -md sha256 -in $KOLLA_SETUP_DIR/../files/kolla-certificates.encrypted -out $KOLLA_SETUP_DIR/../files/kolla-certificates.tar
+  tar -C /etc/kolla -xf $KOLLA_SETUP_DIR/../files/kolla-certificates.tar
+  tar -C /tmp/testcerts -xf $KOLLA_SETUP_DIR/../files/kolla-certificates.tar
 #  ssh_control_sync_as_user_these_hosts root /etc/kolla/certificates/ca/root.crt /etc/pki/ca-trust/source/anchors/stack.crt "$ALL_HOSTS"
 #  ssh_control_run_as_user_these_hosts root update-ca-trust "$ALL_HOSTS"
-#}
+}
 
 
 
@@ -167,6 +168,8 @@ setup_ssl_certs                                                                 
 #
 ## ONLY USE KOLLA-ANSIBLE TO FETCH UPDATES IF CONTAINER USAGE CHANGES - PROBLEMATIC
 #   Stampeding herd hoses local registries
+#use_dockerhub_containers                                                                 || return 1
+use_localized_containers                                                                 || fail_exit "use_localized_containers"
 kolla_ansible_pull_containers                                                            || fail_exit "pull_latest_containers"
 
 #update_existing_containers                                                                || fail_exit "update_existing_containers"
