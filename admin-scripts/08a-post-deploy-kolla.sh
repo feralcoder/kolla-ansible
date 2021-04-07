@@ -47,6 +47,13 @@ place_and_run_init () {
   mv ~/KOLLA_SETUP_DIR/utility/cirros-0.5.1-x86_64-disk.img /registry/images
 }
 
+key_setup () {
+  # Encrypted via: openssl enc -aes-256-cfb8 -md sha256 -in $KOLLA_SETUP_DIR/../files/keypair.cliff_admin -out $KOLLA_SETUP_DIR/../files/keypair.cliff_admin.encrypted
+  openssl enc --pass file:/home/cliff/.password -d -aes-256-cfb8 -md sha256 -in $KOLLA_SETUP_DIR/../files/keypair.cliff_admin.encrypted -out $KOLLA_SETUP_DIR/../files/keypair.cliff_admin
+  chmod 600 $KOLLA_SETUP_DIR/../files/keypair.cliff_admin
+  openstack keypair create cliff_admin --public-key $KOLLA_SETUP_DIR/../files/keypair.cliff_admin.public
+}
+
 
 post_install_install       || fail_exit "post_install_install"
 setup_magnum               || fail_exit "setup_magnum"
