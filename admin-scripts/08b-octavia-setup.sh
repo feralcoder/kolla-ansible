@@ -51,22 +51,23 @@ EOT
 
 
 setup_octavia_net () {
-  ssh_control_sync_as_user_these_hosts root $KOLLA_SETUP_DIR/../files/kolla-veth-lbaas.sh /usr/local/bin/veth-lbaas.sh "$CONTROL_HOSTS"
-  ssh_control_run_as_user_these_hosts root "chmod 744 /usr/local/bin/veth-lbaas.sh" "$CONTROL_HOSTS"
+  OCTAVIA_MGMT_VLAN_ID=131
+  ssh_control_sync_as_user_these_hosts root $KOLLA_SETUP_DIR/../files/octavia-veth-lbaas.sh /usr/local/bin/veth-lbaas.sh "$CONTROL_HOSTS"  || return 1
+  ssh_control_run_as_user_these_hosts root "chmod 744 /usr/local/bin/veth-lbaas.sh" "$CONTROL_HOSTS"  || return 1
   for HOST in $CONTROL_HOSTS; do
-    LAST_OCTET=`ssh_control_run_as_user root "ip addr" $HOST | grep 192.168.127 | grep inet | awk '{print $2}' | awk -F'/' '{print $1}' | awk -F'.' '{print $4}'`
-    ssh_control_run_as_user root "sed -i 's|__IP__|172.31.0.$LAST_OCTET/24|g' /usr/local/bin/veth-lbaas.sh" $HOST
+    LAST_OCTET=`ssh_control_run_as_user root "ip addr" $HOST | grep 192.168.127 | grep inet | awk '{print $2}' | awk -F'/' '{print $1}' | awk -F'.' '{print $4}'`  || return 1
+    ssh_control_run_as_user root "sed -i 's|__IP__|172.31.0.$LAST_OCTET/24|g' /usr/local/bin/veth-lbaas.sh" $HOST  || return 1
   done
 
-  ssh_control_sync_as_user_these_hosts root $KOLLA_SETUP_DIR/../files/kolla-veth-lbaas.service /etc/systemd/system/veth-lbaas.service "$CONTROL_HOSTS"
-  ssh_control_run_as_user_these_hosts root "chmod 644 /etc/systemd/system/veth-lbaas.service" "$CONTROL_HOSTS"
+  ssh_control_sync_as_user_these_hosts root $KOLLA_SETUP_DIR/../files/octavia-veth-lbaas.service /etc/systemd/system/veth-lbaas.service "$CONTROL_HOSTS"  || return 1
+  ssh_control_run_as_user_these_hosts root "chmod 644 /etc/systemd/system/veth-lbaas.service" "$CONTROL_HOSTS"  || return 1
   
-  ssh_control_run_as_user_these_hosts root "systemctl daemon-reload" "$CONTROL_HOSTS"
-  ssh_control_run_as_user_these_hosts root "systemctl enable veth-lbaas.service" "$CONTROL_HOSTS"
-  ssh_control_run_as_user_these_hosts root "systemctl start veth-lbaas.service" "$CONTROL_HOSTS"
+  ssh_control_run_as_user_these_hosts root "systemctl daemon-reload" "$CONTROL_HOSTS"  || return 1
+  ssh_control_run_as_user_these_hosts root "systemctl enable veth-lbaas.service" "$CONTROL_HOSTS"  || return 1
+  ssh_control_run_as_user_these_hosts root "systemctl start veth-lbaas.service" "$CONTROL_HOSTS"  || return 1
   
-  ssh_control_run_as_user_these_hosts root "docker exec openvswitch_vswitchd ovs-vsctl add-port \
-                br-ex v-lbaas-vlan tag=$OCTAVIA_MGMT_VLAN_ID" "$CONTROL_HOSTS"
+  ssh_control_run_as_user_these_hosts root "docker exec openvswitch_vswitchd ovs-vsctl --may-exist  add-port \
+                br-ex v-lbaas-vlan tag=$OCTAVIA_MGMT_VLAN_ID" "$CONTROL_HOSTS"  || return 1
 }
 
 configure_octavia () {
@@ -93,7 +94,7 @@ EOT
 
 
 deploy_octavia () {
-  kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack deploy --tags common,horizon,octavia
+  kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack deploy --tags common,horizon,octavia,neutron
 }
 
 
@@ -144,7 +145,7 @@ upload_amphora () {
 patch_worker_for_userdata () {
   # Patch the user_data_config_drive_template
   cd ~/CODE/openstack/octavia
-  git apply  $KOLLA_SETUP_DIR/../files/kolla-octavia-Fix-userdata-template.patch
+  git apply  $KOLLA_SETUP_DIR/../files/octavia-Fix-userdata-template.patch
   # For now just update the octavia-worker container, no need to restart it
   ssh_control_sync_as_user_these_hosts root octavia/common/jinja/templates/user_data_config_drive.template /tmp/user_data_config_drive.template "$CONTROL_HOSTS"
   ssh_control_run_as_user_these_hosts root "docker cp /tmp/user_data_config_drive.template \
