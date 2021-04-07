@@ -59,6 +59,18 @@ untar_ssl_certs () {
 }
 
 
+fix_kolla_configs () {
+  XXX=/home/cliff/CODE/venvs/kolla-ansible/share/kolla-ansible/ansible/roles/swift/defaults/main.yml
+  ( [[ -f $XXX.orig ]] || cp $XXX $XXX.orig )
+  ( diff $XXX.orig $KOLLA_SETUP_DIR/../files/kolla-swift-defaults-main-orig.yml ) || { echo "$XXX has changed in the upstream!  RESOLVE."; return 1; }
+  cp $KOLLA_SETUP_DIR/../files/kolla-swift-defaults-main.yml $XXX || return 1
+
+  XXX=/home/cliff/CODE/venvs/kolla-ansible/share/kolla-ansible/ansible/roles/swift/templates/proxy-server.conf.j2
+  ( [[ -f $XXX.orig ]] || cp $XXX $XXX.orig )
+  ( diff $XXX.orig $KOLLA_SETUP_DIR/../files/kolla-swift-templates-proxy-server.conf-orig.yml ) || { echo "$XXX has changed in the upstream!  RESOLVE."; return 1; }
+  cp $KOLLA_SETUP_DIR/../files/kolla-swift-templates-proxy-server.conf.yml $XXX || return 1
+}
+
 
 
 #refetch_api_keys                                                                         || fail_exit "refetch_api_keys"
@@ -68,6 +80,8 @@ ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack all -m ping     
 ## Use local registry so insecure-registries is set up correctly by bootstrap-servers
 use_localized_containers                                                                 || fail_exit "use_localized_containers"
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack bootstrap-servers  || fail_exit "kolla-ansible bootstrap-servers"
+
+fix_kolla_configs                                                                        || fail_exit "fix_kolla_configs"
 
 generate_ssl_certs                                                                          || fail_exit "setup_ssl_certs"
 #untar_ssl_certs
