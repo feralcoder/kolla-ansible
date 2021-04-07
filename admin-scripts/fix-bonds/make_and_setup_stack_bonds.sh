@@ -7,7 +7,7 @@ BONDSCRIPT_DIR=$( realpath `dirname $BONDSCRIPT_SOURCE` )
 . $BONDSCRIPT_DIR/bond_config.sh
 . ~/CODE/feralcoder/host_control/control_scripts.sh
 
-for SERVER_BOND in $CTL_SERVER_BONDS $EXT_SERVER_BONDS $API_SERVER_BONDS $STR_SERVER_BONDS $STM_SERVER_BONDS $TNT_SERVER_BONDS; do 
+for SERVER_BOND in $CTL_SERVER_BONDS $EXT_SERVER_BONDS $API_SERVER_BONDS $STR_SERVER_BONDS $STM_SERVER_BONDS $TNT_SERVER_BONDS $KXT_SERVER_BONDS; do 
   SERVER=`echo $SERVER_BOND | awk -F':' '{print $1}'`
   IF=`echo $SERVER_BOND | awk -F':' '{print $2}'`
   BOND=`echo $SERVER_BOND | awk -F':' '{print $3}'`
