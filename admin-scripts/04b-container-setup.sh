@@ -102,14 +102,14 @@ checkout_kolla_ansible_on_host () {
 
 build_and_use_containers () {
 #  # Build base image
-#  $KOLLA_ANSIBLE_SOURCE/utility/docker-images/build-images.sh                                                                 || return 1
+#  $KOLLA_ANSIBLE_SOURCE/utility/docker-images/build-images.sh                                                                               || return 1
 
   # Build kolla images, using feralcoder base image
-  checkout_kolla_ansible_on_host $PULL_HOST                                                                                    || return 1
-  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_SOURCE/admin-scripts/utility/build-containers.sh $NOW 2>&1" $PULL_HOST         || return 1
+  checkout_kolla_ansible_on_host $PULL_HOST                                                                                                  || return 1
+  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_SOURCE/admin-scripts/utility/build-containers.sh $NOW $INSTALL_TYPE 2>&1" $PULL_HOST         || return 1
   # localize_latest_containers also updates TAG in globals.yml: Watch for Race!
-  sed -i "s/^openstack_release.*/openstack_release: '$LOCAL_TAG'/g" $KOLLA_SETUP_DIR/../files/kolla-globals-localpull.yml      || return 1
-  use_localized_containers                                                                                                     || return 1
+  sed -i "s/^openstack_release.*/openstack_release: '$LOCAL_TAG'/g" $KOLLA_SETUP_DIR/../files/kolla-globals-localpull.yml                    || return 1
+  use_localized_containers                                                                                                                   || return 1
 }
 
 
