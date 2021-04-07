@@ -43,8 +43,7 @@ user_domain_id = {{ default_user_domain_id }}
 project_name = service
 username = {{ swift_keystone_user }}
 password = {{ swift_keystone_password }}
-delay_auth_decision = True
-#delay_auth_decision = {{ swift_delay_auth_decision }}
+delay_auth_decision = {{ swift_delay_auth_decision }}
 cafile = {{ openstack_cacert }}
 
 memcache_security_strategy = ENCRYPT
