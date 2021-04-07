@@ -48,9 +48,10 @@ place_and_run_init () {
 }
 
 key_setup () {
-  # Encrypted via: openssl enc -aes-256-cfb8 -md sha256 -in $KOLLA_SETUP_DIR/../files/keypair.cliff_admin -out $KOLLA_SETUP_DIR/../files/keypair.cliff_admin.encrypted
-  openssl enc --pass file:/home/cliff/.password -d -aes-256-cfb8 -md sha256 -in $KOLLA_SETUP_DIR/../files/keypair.cliff_admin.encrypted -out $KOLLA_SETUP_DIR/../files/keypair.cliff_admin
-  chmod 600 $KOLLA_SETUP_DIR/../files/keypair.cliff_admin
+  # Encrypted via: openssl enc -aes-256-cfb8 -md sha256 -in $KOLLA_SETUP_DIR/../files/keypair.cliff_admin.private -out $KOLLA_SETUP_DIR/../files/keypair.cliff_admin.encrypted
+  openssl enc --pass file:/home/cliff/.password -d -aes-256-cfb8 -md sha256 -in $KOLLA_SETUP_DIR/../files/keypair.cliff_admin.encrypted -out $KOLLA_SETUP_DIR/../files/keypair.cliff_admin.private
+  chmod 600 $KOLLA_SETUP_DIR/../files/keypair.cliff_admin.private
+  mv $KOLLA_SETUP_DIR/../files/keypair.cliff_admin.private ~/.ssh/
   openstack keypair create cliff_admin --public-key $KOLLA_SETUP_DIR/../files/keypair.cliff_admin.public
 }
 
