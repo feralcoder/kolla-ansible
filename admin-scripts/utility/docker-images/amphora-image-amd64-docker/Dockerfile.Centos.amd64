@@ -7,4 +7,4 @@ RUN python3 -m pip install diskimage-builder
 WORKDIR /octavia/diskimage-create
 
 ENV CLOUD_INIT_DATASOURCES="ConfigDrive, OpenStack"
-CMD ./diskimage-create.sh -a amd64 -i centos-minimal -s 3
+CMD ./diskimage-create.sh -a amd64 -i centos-minimal -s 3 -r p7mp7n
