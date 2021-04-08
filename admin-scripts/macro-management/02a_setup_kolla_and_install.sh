@@ -96,8 +96,8 @@ setup_for_installers () {
   ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/03-deploy-registry.sh > $LOG_DIR/03-deploy-registry_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 3: Registry Deployment"
   echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/04a-pre-deploy.sh ON $ANSIBLE_CONTROLLER"
   ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/04a-pre-deploy.sh > $LOG_DIR/04a-pre-deploy_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 4a: Kolla Pre Deployment"
-  echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/04b-container-setup_.sh ON $ANSIBLE_CONTROLLER"
-  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/04b-container-setup_.sh > $LOG_DIR/04b-container-setup_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 4b: Container Setup"
+  echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/04b-container-setup.sh ON $ANSIBLE_CONTROLLER"
+  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/04b-container-setup.sh > $LOG_DIR/04b-container-setup_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 4b: Container Setup"
 }
 
 
@@ -134,13 +134,13 @@ echo; echo "BOOTING ALL STACK HOSTS TO default OS FOR SETUP: $STACK_HOSTS"
 boot_to_target default                            || fail_exit "boot_to_target default"
 
 remediate_hosts                                   || fail_exit "remediate_hosts"
-take_backups 01c_CentOS_8_3_Remediated            || fail_exit "take_backups 01c_CentOS_8_3_Remediated.sh"
+take_backups 01d_CentOS_8_3_Remediated            || fail_exit "take_backups 01d_CentOS_8_3_Remediated.sh"
 
 # ASSUME WE COULD BE STARTING FROM A FREEZE-THAW...
 ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSIBLE_CONTROLLER || fail_exit "git pull kolla-ansible"
 
-#postmediate_hosts                                 || fail_exit "postmediate_hosts"
-#take_backups 01d_CentOS_8_3_Postmediated          || fail_exit "take_backups 01d_CentOS_8_3_Postmediated.sh"
+postmediate_hosts                                 || fail_exit "postmediate_hosts"
+take_backups 01e_CentOS_8_3_Postmediated          || fail_exit "take_backups 01e_CentOS_8_3_Postmediated.sh"
 setup_for_installers                              || fail_exit "setup_for_installers"
 take_backups 02a_Kolla-Ansible_Setup              || fail_exit "take_backups 02a_Kolla-Ansible_Setup"
 
