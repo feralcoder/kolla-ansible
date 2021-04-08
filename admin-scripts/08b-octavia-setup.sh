@@ -27,6 +27,7 @@ configure_octavia_net () {
   OCTAVIA_MGMT_SUBNET=172.31.0.0/24
   OCTAVIA_MGMT_SUBNET_START=172.31.0.10
   OCTAVIA_MGMT_SUBNET_END=172.31.0.254
+  OCTAVIA_MGMT_ROUTER_IP=172.31.0.241/24
   OCTAVIA_MGMT_HOST_IP=172.31.0.1/24
   OCTAVIA_MGMT_VLAN_ID=131
   
@@ -44,7 +45,7 @@ octavia_amp_network:
     cidr: "$OCTAVIA_MGMT_SUBNET"
     allocation_pool_start: "$OCTAVIA_MGMT_SUBNET_START"
     allocation_pool_end: "$OCTAVIA_MGMT_SUBNET_END"
-    gateway_ip: "$OCTAVIA_MGMT_HOST_IP"
+    gateway_ip: "$OCTAVIA_MGMT_ROUTER_IP"
     enable_dhcp: yes
 EOT
 }
