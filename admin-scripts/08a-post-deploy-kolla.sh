@@ -44,7 +44,7 @@ place_and_run_init () {
   cp $KOLLA_SETUP_DIR/../files/kolla-init-runonce $XXX
   chmod 755 $XXX
   $XXX
-  mv ~/KOLLA_SETUP_DIR/utility/cirros-0.5.1-x86_64-disk.img /registry/images
+  mv cirros-0.5.1-x86_64-disk.img /registry/images
 }
 
 key_setup () {
@@ -61,4 +61,4 @@ setup_magnum               || fail_exit "setup_magnum"
 correct_compute_perms      || fail_exit "correct_compute_perms"
 place_and_run_init         || fail_exit "place_and_run_init"
 
-
+key_setup
