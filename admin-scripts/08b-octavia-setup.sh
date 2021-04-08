@@ -144,6 +144,7 @@ upload_amphora () {
 
 patch_worker_for_userdata () {
   # Patch the user_data_config_drive_template
+  [[ -d ~/CODE/openstack/octavia ]] || { mkdir -p  ~/CODE/openstack/ && cd  ~/CODE/openstack/ && git clone https://github.com/openstack/octavia; }
   cd ~/CODE/openstack/octavia
   git apply  $KOLLA_SETUP_DIR/../files/octavia-Fix-userdata-template.patch
   # For now just update the octavia-worker container, no need to restart it
