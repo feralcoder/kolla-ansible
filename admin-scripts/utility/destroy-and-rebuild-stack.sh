@@ -9,6 +9,8 @@ UTILITY_DIR=$( realpath `dirname $UTILITY_SOURCE` )
 source_host_control_scripts       || fail_exit "source_host_control_scripts"
 use_venv kolla-ansible            || fail_exit "use_venv kolla-ansible"
 
+. /etc/kolla/admin-openrc.sh
+
 
 pull_changes () {
   cd $UTILITY_DIR
