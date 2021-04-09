@@ -31,18 +31,38 @@ destroy_vms () {
     openstack server delete $SERVER
   done
 }
+destroy_lbs () {
+  POOLS=`openstack loadbalancer pool list | grep -iv '\-\-\-\-\|project_id' | awk '{print $2}'`
+  for POOL in $POOLS; do
+    MEMBERS=`openstack loadbalancer member list $POOL | grep -iv '\-\-\-\-\|project_id' | awk '{print $2}'`
+    for MEMBER in $MEMBERS; do
+      openstack loadbalancer member delete $POOL $MEMBER
+    done
+    openstack loadbalancer pool delete $POOL
+  done
+  LISTENERS=`openstack loadbalancer listener list | grep -iv '\-\-\-\-\|project_id' | awk '{print $2}'`
+  for LISTENER in $LISTENERS; do
+    openstack loadbalancer listener delete $LISTENER
+  done
+  LBS=`openstack loadbalancer list | grep -iv '\-\-\-\-\|project_id' | awk '{print $2}'`
+  for LB in $LBS; do
+    openstack loadbalancer delete $LB
+  done
+}
 
 destroy_and_rebuild () {
   kolla-ansible -i $UTILITY_DIR/../../files/kolla-inventory-feralstack destroy     --yes-i-really-really-mean-it &&
   $UTILITY_DIR/../07-deploy-kolla.sh && 
   $UTILITY_DIR/../08a-post-deploy-kolla.sh &&
   $UTILITY_DIR/../08b-octavia-setup.sh
+  $UTILITY_DIR/../09a-setup-test-envs.sh
 }
 
 
 
 
 pull_changes            || fail_exit "pull_changes"
-regenerate_global_conf  || fail_exit "regenerate_global_conf"
+destroy_lbs             || fail_exit "destroy_lbs"
 destroy_vms             || fail_exit "destroy_vms"
+regenerate_global_conf  || fail_exit "regenerate_global_conf"
 destroy_and_rebuild     || fail_exit "destroy_and_rebuild"
