@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 UTILITY_SOURCE="${BASH_SOURCE[0]}"
 UTILITY_DIR=$( realpath `dirname $UTILITY_SOURCE` )
 # RUN ON ANSIBLE CONTROLLER
