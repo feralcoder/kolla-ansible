@@ -190,7 +190,7 @@ enable_provider_vlan                           || fail_exit "enable_provider_vla
 deploy_octavia                                 || fail_exit "deploy_octavia"
 
 #build_amphora                                  || fail_exit "build_amphora"
-#upload_amphora                                 || fail_exit "upload_amphora"
+upload_amphora                                 || fail_exit "upload_amphora"
 patch_worker_for_userdata                      || fail_exit "patch_worker_for_userdata"
 
 setup_octavia_client                           || fail_exit "setup_octavia_client"
