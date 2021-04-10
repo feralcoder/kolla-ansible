@@ -72,6 +72,6 @@ destroy_and_rebuild () {
 pull_changes            || fail_exit "pull_changes"
 destroy_lbs             || fail_exit "destroy_lbs"
 destroy_vms             || fail_exit "destroy_vms"
-detroy_clusters         || fail_exit "destroy_clusters"
+destroy_clusters         || fail_exit "destroy_clusters"
 regenerate_global_conf  || fail_exit "regenerate_global_conf"
 destroy_and_rebuild     || fail_exit "destroy_and_rebuild"
