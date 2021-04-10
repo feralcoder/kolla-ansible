@@ -26,9 +26,9 @@ IMAGE_TYPE=linux
 
 # This EXT_NET_CIDR is your public network,that you want to connect to the internet via.
 ENABLE_EXT_NET=${ENABLE_EXT_NET:-1}
-EXT_NET_CIDR=${EXT_NET_CIDR:-'172.30.0.0/24'}
-EXT_NET_RANGE=${EXT_NET_RANGE:-'start=172.30.0.150,end=172.30.0.199'}
-EXT_NET_GATEWAY=${EXT_NET_GATEWAY:-'172.30.0.241'}
+EXT_NET_CIDR=${EXT_NET_CIDR:-'172.30.1.0/24'}
+EXT_NET_RANGE=${EXT_NET_RANGE:-'start=172.30.1.150,end=172.30.1.199'}
+EXT_NET_GATEWAY=${EXT_NET_GATEWAY:-'172.30.1.241'}
 
 # Sanitize language settings to avoid commands bailing out
 # with "unsupported locale setting" errors.
