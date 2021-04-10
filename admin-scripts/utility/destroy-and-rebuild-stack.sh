@@ -54,7 +54,7 @@ destroy_lbs () {
 destroy_clusters () {
   CLUSTERS=`openstack coe cluster list | grep -iv '\-\-\-\-\| uuid ' | awk '{print $2}'`
   for CLUSTER in $CLUSTERS; do
-    echo $CLUSTER
+    openstack coe cluster delete $CLUSTER
   done
 }
 
