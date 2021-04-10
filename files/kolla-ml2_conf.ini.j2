@@ -15,9 +15,9 @@ extension_drivers = {{ neutron_extension_drivers | map(attribute='name') | join(
 
 [ml2_type_vlan]
 {% if enable_ironic | bool %}
-network_vlan_ranges = physnet1:131:131
+network_vlan_ranges = physnet1:100:299
 {% else %}
-network_vlan_ranges = physnet1:131:131
+network_vlan_ranges = physnet1:100:299
 {% endif %}
 
 [ml2_type_flat]
