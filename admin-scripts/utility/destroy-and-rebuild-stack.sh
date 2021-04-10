@@ -51,6 +51,12 @@ destroy_lbs () {
     openstack loadbalancer delete $LB
   done
 }
+destroy_clusters () {
+  CLUSTERS=`openstack coe cluster list | grep -iv '\-\-\-\-\| uuid ' | awk '{print $2}'`
+  for CLUSTER in $CLUSTERS; do
+    echo $CLUSTER
+  done
+}
 
 destroy_and_rebuild () {
   kolla-ansible -i $UTILITY_DIR/../../files/kolla-inventory-feralstack destroy     --yes-i-really-really-mean-it &&
@@ -66,5 +72,6 @@ destroy_and_rebuild () {
 pull_changes            || fail_exit "pull_changes"
 destroy_lbs             || fail_exit "destroy_lbs"
 destroy_vms             || fail_exit "destroy_vms"
+detroy_clusters         || fail_exit "destroy_clusters"
 regenerate_global_conf  || fail_exit "regenerate_global_conf"
 destroy_and_rebuild     || fail_exit "destroy_and_rebuild"
