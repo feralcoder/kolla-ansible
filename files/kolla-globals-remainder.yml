@@ -42,7 +42,7 @@ kolla_install_type: "source"
 # in "OpenStack options" section, and set this value to the IP of your
 # 'network_interface' as set in the Networking section below.
 #kolla_internal_vip_address: "10.10.10.254"
-kolla_internal_vip_address: "172.17.0.104"
+kolla_internal_vip_address: "172.19.4.104"
 
 # This is the DNS name that maps to the kolla_internal_vip_address VIP. By
 # default it is the same as kolla_internal_vip_address.

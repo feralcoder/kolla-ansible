@@ -4,8 +4,8 @@ journal_size: 5120
 radosgw_interface: bond4
 monitor_interface: bond4
 cluster_interface: bond5
-public_network: 172.18.0.0/24
-cluster_network: 172.19.0.0/24
+public_network: 172.19.2.0/24
+cluster_network: 172.19.3.0/24
 ceph_docker_image: "ceph/daemon"
 ceph_docker_image_tag: master-86da1a4-nautilus-centos-7
 containerized_deployment: true
@@ -20,7 +20,7 @@ dashboard_protocol: https
 dashboard_port: 8443
 dashboard_crt: ''
 dashboard_key: ''
-dashboard_frontend_vip: '172.18.0.10'
+dashboard_frontend_vip: '172.19.2.10'
 
 # Variables here are applicable to all host groups NOT roles
 
