@@ -44,30 +44,30 @@ take_backups () {
 
 # Separate function because I'd like to get this stuff into the base image...
 remediate_hosts () {
-  ssh_control_run_as_user_these_hosts cliff "cd ~/CODE/feralcoder/workstation && git pull" "$ALL_HOSTS"
-  ssh_control_run_as_user_these_hosts cliff "~/CODE/feralcoder/workstation/update.sh" "$ALL_HOSTS" || return 1
-  ssh_control_run_as_user_these_hosts cliff "python3 $TWILIO_PAGER_DIR/pager.py \"hello from \`hostname\`\"" "$STACK_HOSTS"
-
-  ssh_control_run_as_user_these_hosts cliff "( grep 'PATH.*share.bcc.tools' .bash_profile ) && sed -i 's|.*PATH.*share.bcc.tools.*|export PATH=\$PATH:/usr/share/bcc/tools:~cliff/CODE/brendangregg/perf-tools|g' .bash_profile || echo 'export PATH=\$PATH:/usr/share/bcc/tools:~cliff/CODE/brendangregg/perf-tools' >> ~/.bash_profile" "$STACK_HOSTS"
-  ssh_control_run_as_user_these_hosts root "( grep 'PATH.*share.bcc.tools' .bash_profile ) && sed -i 's|.*PATH.*share.bcc.tools.*|export PATH=\$PATH:/usr/share/bcc/tools:~cliff/CODE/brendangregg/perf-tools|g' .bash_profile || echo 'export PATH=\$PATH:/usr/share/bcc/tools:~cliff/CODE/brendangregg/perf-tools' >> ~/.bash_profile" "$STACK_HOSTS"
-
-  ssh_control_run_as_user cliff "rm .local_settings && cd ~/CODE/feralcoder/bootstrap-scripts && ./stack_control.sh" $ANSIBLE_CONTROLLER
+# Captured in 02aHostSetup.sh and 01b_..._REBUILT
+#  ssh_control_run_as_user_these_hosts cliff "cd ~/CODE/feralcoder/workstation && git pull" "$ALL_HOSTS"
+#  ssh_control_run_as_user_these_hosts cliff "~/CODE/feralcoder/workstation/update.sh" "$ALL_HOSTS" || return 1
+#  ssh_control_run_as_user_these_hosts cliff "python3 $TWILIO_PAGER_DIR/pager.py \"hello from \`hostname\`\"" "$STACK_HOSTS"
+#
+#  ssh_control_run_as_user_these_hosts cliff "( grep 'PATH.*share.bcc.tools' .bash_profile ) && sed -i 's|.*PATH.*share.bcc.tools.*|export PATH=\$PATH:/usr/share/bcc/tools:~cliff/CODE/brendangregg/perf-tools|g' .bash_profile || echo 'export PATH=\$PATH:/usr/share/bcc/tools:~cliff/CODE/brendangregg/perf-tools' >> ~/.bash_profile" "$STACK_HOSTS"
+#  ssh_control_run_as_user_these_hosts root "( grep 'PATH.*share.bcc.tools' .bash_profile ) && sed -i 's|.*PATH.*share.bcc.tools.*|export PATH=\$PATH:/usr/share/bcc/tools:~cliff/CODE/brendangregg/perf-tools|g' .bash_profile || echo 'export PATH=\$PATH:/usr/share/bcc/tools:~cliff/CODE/brendangregg/perf-tools' >> ~/.bash_profile" "$STACK_HOSTS"
+#
+#  ssh_control_run_as_user cliff "rm .local_settings && cd ~/CODE/feralcoder/bootstrap-scripts && ./stack_control.sh" $ANSIBLE_CONTROLLER
   echo
 }
 
 postmediate_hosts () {
-# I THINK THIS STUFF IS CAPTURED in hostcontrol/02a_hosts_setup.sh and workstation/setup.sh
-  # not exactly prerequisites for the stack, but I also don't want this stuff in the base image.  Yet.
-  TWILIO_PAGER_DIR=~/CODE/feralcoder/twilio-pager/
-  ssh_control_run_as_user_these_hosts root "dnf -y install bcc perf systemtap" "$STACK_HOSTS"
-  ssh_control_run_as_user_these_hosts cliff "mkdir -p ~/CODE/brendangregg && cd ~/CODE/brendangregg && git clone https://github.com/brendangregg/perf-tools.git || ( cd ~/CODE/brendangregg/perf-tools && git pull )" "$STACK_HOSTS"
-
-  ssh_control_run_as_user_these_hosts cliff "cd ~/CODE/feralcoder/ && git clone https://feralcoder:\`cat ~/.git_password\`@github.com/feralcoder/twilio-pager.git" "$STACK_HOSTS"
-  ssh_control_run_as_user_these_hosts cliff "cd $TWILIO_PAGER_DIR && git git pull" "$STACK_HOSTS"
-  for HOST in $STACK_HOSTS; do
-    ssh_control_run_as_user cliff "cd $TWILIO_PAGER_DIR && ./setup.sh" $HOST
-  done
-  ssh_control_run_as_user_these_hosts cliff "python3 $TWILIO_PAGER_DIR/pager.py \"hello from \`hostname\`\"" "$STACK_HOSTS"
+# Captured in 02aHostSetup.sh and 01b_..._REBUILT
+#  TWILIO_PAGER_DIR=~/CODE/feralcoder/twilio-pager/
+#  ssh_control_run_as_user_these_hosts root "dnf -y install bcc perf systemtap" "$STACK_HOSTS"
+#  ssh_control_run_as_user_these_hosts cliff "mkdir -p ~/CODE/brendangregg && cd ~/CODE/brendangregg && git clone https://github.com/brendangregg/perf-tools.git || ( cd ~/CODE/brendangregg/perf-tools && git pull )" "$STACK_HOSTS"
+#
+#  ssh_control_run_as_user_these_hosts cliff "cd ~/CODE/feralcoder/ && git clone https://feralcoder:\`cat ~/.git_password\`@github.com/feralcoder/twilio-pager.git" "$STACK_HOSTS"
+#  ssh_control_run_as_user_these_hosts cliff "cd $TWILIO_PAGER_DIR && git git pull" "$STACK_HOSTS"
+#  for HOST in $STACK_HOSTS; do
+#    ssh_control_run_as_user cliff "cd $TWILIO_PAGER_DIR && ./setup.sh" $HOST
+#  done
+#  ssh_control_run_as_user_these_hosts cliff "python3 $TWILIO_PAGER_DIR/pager.py \"hello from \`hostname\`\"" "$STACK_HOSTS"
   echo
 }
 
@@ -135,14 +135,14 @@ post_deploy_kolla () {
 echo; echo "BOOTING ALL STACK HOSTS TO default OS FOR SETUP: $STACK_HOSTS"
 boot_to_target default                            || fail_exit "boot_to_target default"
 
-remediate_hosts                                   || fail_exit "remediate_hosts"
-take_backups 01d_CentOS_8_3_Remediated            || fail_exit "take_backups 01d_CentOS_8_3_Remediated.sh"
+#remediate_hosts                                   || fail_exit "remediate_hosts"
+#take_backups 01c_CentOS_8_3_Remediated            || fail_exit "take_backups 01c_CentOS_8_3_Remediated.sh"
 
 # ASSUME WE COULD BE STARTING FROM A FREEZE-THAW...
 ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSIBLE_CONTROLLER || fail_exit "git pull kolla-ansible"
 
-postmediate_hosts                                 || fail_exit "postmediate_hosts"
-take_backups 01e_CentOS_8_3_Postmediated          || fail_exit "take_backups 01e_CentOS_8_3_Postmediated.sh"
+#postmediate_hosts                                 || fail_exit "postmediate_hosts"
+#take_backups 01d_CentOS_8_3_Postmediated          || fail_exit "take_backups 01d_CentOS_8_3_Postmediated.sh"
 setup_for_installers                              || fail_exit "setup_for_installers"
 take_backups 02a_Kolla-Ansible_Setup              || fail_exit "take_backups 02a_Kolla-Ansible_Setup"
 
