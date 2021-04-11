@@ -69,6 +69,11 @@ fix_kolla_configs () {
   ( [[ -f $XXX.orig ]] || cp $XXX $XXX.orig )
   ( diff $XXX.orig $KOLLA_SETUP_DIR/../files/kolla-swift-templates-proxy-server.conf-orig.yml ) || { echo "$XXX has changed in the upstream!  RESOLVE."; return 1; }
   cp $KOLLA_SETUP_DIR/../files/kolla-swift-templates-proxy-server.conf.yml $XXX || return 1
+
+  XXX=/home/cliff/CODE/venvs/kolla-ansible/share/kolla-ansible/ansible/roles/neutron/templates/ml2_conf.ini.j2
+  ( [[ -f $XXX.orig ]] || cp $XXX $XXX.orig )
+  ( diff $XXX.orig $KOLLA_SETUP_DIR/../files/kolla-ml2_conf.ini-orig.j2 ) || { echo "$XXX has changed in the upstream!  RESOLVE."; return 1; }
+  cp $KOLLA_SETUP_DIR/../files/kolla-ml2_conf.ini.j2 $XXX || return 1
 }
 
 
