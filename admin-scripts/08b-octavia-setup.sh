@@ -18,58 +18,40 @@ SUDO_PASS_FILE=`admin_control_get_sudo_password`    || fail_exit "admin_control_
 setup_octavia_in_globals () {
   cat $SUDO_PASS_FILE | sudo -S ls > /dev/null    || return 1
   echo "octavia_certs_country: US" | sudo tee -a /etc/kolla/globals.yml
-  echo "octavia_certs_state: Oregon" | sudo tee -a /etc/kolla/globals.yml
-  echo "octavia_certs_organization: OpenStack" | sudo tee -a /etc/kolla/globals.yml
+  echo "octavia_certs_state: California" | sudo tee -a /etc/kolla/globals.yml
+  echo "octavia_certs_organization: FeralStack" | sudo tee -a /etc/kolla/globals.yml
   echo "octavia_certs_organizational_unit: Octavia" | sudo tee -a /etc/kolla/globals.yml
 }
 
 configure_octavia_net () {
-  OCTAVIA_MGMT_SUBNET=172.31.0.0/24
-  OCTAVIA_MGMT_SUBNET_START=172.31.0.10
-  OCTAVIA_MGMT_SUBNET_END=172.31.0.254
-  OCTAVIA_MGMT_ROUTER_IP=172.31.0.241/24
-  OCTAVIA_MGMT_VIRTROUTER_IP=172.31.0.1/24
-  OCTAVIA_MGMT_VLAN_ID=131
+  PROVIDER_SUBNET=172.31.0.0/24
+  PROVIDER_SUBNET_START=172.31.0.10
+  PROVIDER_SUBNET_END=172.31.0.254
+  PROVIDER_ROUTER_IP=172.31.0.241/24
+  PROVIDER_VIRTROUTER_IP=172.31.0.1/24
+  PROVIDER_VLAN_ID=131
+  PROVIDER_NETNAME=lbaas
   
   cat $SUDO_PASS_FILE | sudo -S ls > /dev/null    || return 1
   sudo tee -a /etc/kolla/globals.yml << EOT
 octavia_amp_network:
   name: lb-mgmt-net
   provider_network_type: vlan
-  provider_segmentation_id: $OCTAVIA_MGMT_VLAN_ID
+  provider_segmentation_id: $PROVIDER_VLAN_ID
   provider_physical_network: physnet1
   external: false
   shared: false
   subnet:
     name: lb-mgmt-subnet
-    cidr: "$OCTAVIA_MGMT_SUBNET"
-    allocation_pool_start: "$OCTAVIA_MGMT_SUBNET_START"
-    allocation_pool_end: "$OCTAVIA_MGMT_SUBNET_END"
-    gateway_ip: "$OCTAVIA_MGMT_VIRTROUTER_IP"
+    cidr: "$PROVIDER_SUBNET"
+    allocation_pool_start: "$PROVIDER_SUBNET_START"
+    allocation_pool_end: "$PROVIDER_SUBNET_END"
+    gateway_ip: "$PROVIDER_VIRTROUTER_IP"
     enable_dhcp: yes
 EOT
 }
 
 
-setup_octavia_net () {
-  OCTAVIA_MGMT_VLAN_ID=131
-  ssh_control_sync_as_user_these_hosts root $KOLLA_SETUP_DIR/../files/octavia-veth-lbaas.sh /usr/local/bin/veth-lbaas.sh "$CONTROL_HOSTS"  || return 1
-  ssh_control_run_as_user_these_hosts root "chmod 744 /usr/local/bin/veth-lbaas.sh" "$CONTROL_HOSTS"  || return 1
-  for HOST in $CONTROL_HOSTS; do
-    LAST_OCTET=`ssh_control_run_as_user root "ip addr" $HOST | grep 192.168.127 | grep inet | awk '{print $2}' | awk -F'/' '{print $1}' | awk -F'.' '{print $4}'`  || return 1
-    ssh_control_run_as_user root "sed -i 's|__IP__|172.31.0.$LAST_OCTET/24|g' /usr/local/bin/veth-lbaas.sh" $HOST  || return 1
-  done
-
-  ssh_control_sync_as_user_these_hosts root $KOLLA_SETUP_DIR/../files/octavia-veth-lbaas.service /etc/systemd/system/veth-lbaas.service "$CONTROL_HOSTS"  || return 1
-  ssh_control_run_as_user_these_hosts root "chmod 644 /etc/systemd/system/veth-lbaas.service" "$CONTROL_HOSTS"  || return 1
-  
-  ssh_control_run_as_user_these_hosts root "systemctl daemon-reload" "$CONTROL_HOSTS"  || return 1
-  ssh_control_run_as_user_these_hosts root "systemctl enable veth-lbaas.service" "$CONTROL_HOSTS"  || return 1
-  ssh_control_run_as_user_these_hosts root "systemctl start veth-lbaas.service" "$CONTROL_HOSTS"  || return 1
-  
-  ssh_control_run_as_user_these_hosts root "docker exec openvswitch_vswitchd ovs-vsctl --may-exist  add-port \
-                br-ex v-lbaas-vlan tag=$OCTAVIA_MGMT_VLAN_ID" "$CONTROL_HOSTS"  || return 1
-}
 
 configure_octavia () {
   echo "enable_octavia: \"yes\"" >> /etc/kolla/globals.yml
@@ -169,13 +151,6 @@ debug () {
   exit;
 }
 
-enable_provider_vlan () {
-  XXX=/home/cliff/CODE/venvs/kolla-ansible/share/kolla-ansible/ansible/roles/neutron/templates/ml2_conf.ini.j2
-  ( [[ -f $XXX.orig ]] || cp $XXX $XXX.orig )
-  ( diff $XXX.orig $KOLLA_SETUP_DIR/../files/kolla-ml2_conf.ini-orig.j2 ) || { echo "$XXX has changed in the upstream!  RESOLVE."; return 1; }
-  cp $KOLLA_SETUP_DIR/../files/kolla-ml2_conf.ini.j2 $XXX || return 1
-}
-
 
 
 use_venv kolla-ansible
@@ -184,9 +159,8 @@ setup_octavia_in_globals                       || fail_exit "setup_octavia_in_gl
 kolla-ansible octavia-certificates             || fail_exit "kolla-ansible octavia-certificates"
 
 configure_octavia_net                          || fail_exit "configure_octavia_net"
-setup_octavia_net                              || fail_exit "setup_octavia_net"
+setup_provider_net $PROVIDER_NETNAME $PROVIDER_VLAN_ID $PROVIDER_SUBNET $PROVIDER_ROUTER_IP $PROVIDER_SUBNET_START $PROVIDER_SUBNET_END  || fail_exit "setup_provider_net"
 configure_octavia                              || fail_exit "configure_octavia"
-enable_provider_vlan                           || fail_exit "enable_provider_vlan"
 deploy_octavia                                 || fail_exit "deploy_octavia"
 
 #build_amphora                                  || fail_exit "build_amphora"
