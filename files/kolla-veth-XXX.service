@@ -2,7 +2,7 @@
 After=network.service
 
 [Service]
-ExecStart=/usr/local/bin/veth-lbaas.sh
+ExecStart=/usr/local/bin/veth-__NETNAME__.sh
 
 [Install]
 WantedBy=default.target
