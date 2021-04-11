@@ -121,6 +121,8 @@ post_deploy_kolla () {
   # Run: post-deploy-kolla.sh
   echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/08a-post-deploy-kolla.sh ON $ANSIBLE_CONTROLLER"
   ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/08a-post-deploy-kolla.sh > $LOG_DIR/08a-post-deploy-kolla_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 8a: Post-Deploy Kolla"
+  echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/08a-pubnet1-setup.sh ON $ANSIBLE_CONTROLLER"
+  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/08a-pubnet1-setup.sh > $LOG_DIR/08a-pubnet1-setup_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 8a: Pubnet1 Setup"
   echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/08b-octavia-setup.sh ON $ANSIBLE_CONTROLLER"
   ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/08b-octavia-setup.sh > $LOG_DIR/08b-octavia-setup.sh_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 8b: Post-Deploy Octavia"
 }

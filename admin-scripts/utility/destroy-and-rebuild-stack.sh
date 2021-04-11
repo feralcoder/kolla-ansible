@@ -62,7 +62,8 @@ destroy_and_rebuild () {
   kolla-ansible -i $UTILITY_DIR/../../files/kolla-inventory-feralstack destroy     --yes-i-really-really-mean-it &&
   $UTILITY_DIR/../07-deploy-kolla.sh && 
   $UTILITY_DIR/../08a-post-deploy-kolla.sh &&
-  $UTILITY_DIR/../08b-octavia-setup.sh
+  $UTILITY_DIR/../08a-pubnet1-setup.sh &&
+  $UTILITY_DIR/../08b-octavia-setup.sh &&
   $UTILITY_DIR/../09a-setup-test-envs.sh
 }
 
