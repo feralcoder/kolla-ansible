@@ -65,4 +65,5 @@ setup_provider_net () {
   
   ssh_control_run_as_user_these_hosts root "docker exec openvswitch_vswitchd ovs-vsctl --may-exist  add-port \
                 br-ex v-$PROVIDER_NETNAME-vlan tag=$PROVIDER_VLAN_ID" "$CONTROL_HOSTS"  || return 1
+  echo "previous command may error on success..."
 }
