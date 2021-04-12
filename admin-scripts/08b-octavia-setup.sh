@@ -151,6 +151,15 @@ debug () {
   exit;
 }
 
+create_octavia_adminrc () {
+cat /etc/kolla/admin-openrc.sh > /etc/kolla/octavia-openrc.sh
+cat >> /etc/kolla/octavia-openrc.sh  <<EOF
+  export OS_USERNAME=octavia
+  export OS_PASSWORD=$(grep octavia_keystone_password /etc/kolla/passwords.yml | awk '{ print $2}')
+  export OS_PROJECT_NAME=service
+  export OS_TENANT_NAME=service
+EOF
+}
 
 
 use_venv kolla-ansible
