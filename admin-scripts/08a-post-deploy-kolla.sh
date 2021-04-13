@@ -20,6 +20,7 @@ ANSIBLE_CONTROLLER=dmb
 
 post_install_install () {
   pip install python-openstackclient   || return 1
+  pip install python-heatclient        || return 1
   kolla-ansible post-deploy            || return 1
   . /etc/kolla/admin-openrc.sh         || return 1
 }
