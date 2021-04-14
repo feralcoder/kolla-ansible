@@ -11,6 +11,7 @@ use_venv kolla-ansible            || fail_exit "use_venv kolla-ansible"
 ANSIBLE_CONTROLLER=dmb
 
 
+~/CODE/feralcoder/feralstack/01_quotas.sh
 ~/CODE/feralcoder/feralstack/01_upload_images.sh
 ~/CODE/feralcoder/feralstack/02_setup_admin_instances.sh
 #~/CODE/feralcoder/feralstack/02_kubernetes_wordpress.sh
