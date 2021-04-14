@@ -44,9 +44,10 @@ take_backups () {
 
 # Separate function because I'd like to get this stuff into the base image...
 remediate_hosts () {
+  ssh_control_run_as_user_these_hosts cliff "cd ~/CODE/feralcoder/workstation && git pull" "$ALL_HOSTS"
+  ssh_control_run_as_user_these_hosts cliff "~/CODE/feralcoder/workstation/update.sh" "$ALL_HOSTS" || return 1
+
 # Captured in 02aHostSetup.sh and 01b_..._REBUILT
-#  ssh_control_run_as_user_these_hosts cliff "cd ~/CODE/feralcoder/workstation && git pull" "$ALL_HOSTS"
-#  ssh_control_run_as_user_these_hosts cliff "~/CODE/feralcoder/workstation/update.sh" "$ALL_HOSTS" || return 1
 #  ssh_control_run_as_user_these_hosts cliff "python3 $TWILIO_PAGER_DIR/pager.py \"hello from \`hostname\`\"" "$STACK_HOSTS"
 #
 #  ssh_control_run_as_user_these_hosts cliff "( grep 'PATH.*share.bcc.tools' .bash_profile ) && sed -i 's|.*PATH.*share.bcc.tools.*|export PATH=\$PATH:/usr/share/bcc/tools:~cliff/CODE/brendangregg/perf-tools|g' .bash_profile || echo 'export PATH=\$PATH:/usr/share/bcc/tools:~cliff/CODE/brendangregg/perf-tools' >> ~/.bash_profile" "$STACK_HOSTS"
@@ -135,8 +136,8 @@ post_deploy_kolla () {
 echo; echo "BOOTING ALL STACK HOSTS TO default OS FOR SETUP: $STACK_HOSTS"
 boot_to_target default                            || fail_exit "boot_to_target default"
 
-#remediate_hosts                                   || fail_exit "remediate_hosts"
-#take_backups 01c_CentOS_8_3_Remediated            || fail_exit "take_backups 01c_CentOS_8_3_Remediated.sh"
+remediate_hosts                                   || fail_exit "remediate_hosts"
+take_backups 01c_CentOS_8_3_Remediated            || fail_exit "take_backups 01c_CentOS_8_3_Remediated.sh"
 
 # ASSUME WE COULD BE STARTING FROM A FREEZE-THAW...
 ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSIBLE_CONTROLLER || fail_exit "git pull kolla-ansible"
