@@ -23,6 +23,8 @@ post_install_install () {
   pip install python-heatclient        || return 1
   kolla-ansible post-deploy            || return 1
   . /etc/kolla/admin-openrc.sh         || return 1
+
+  sudo dnf install -y libosinfo        || return 1
 }
 
 setup_magnum () {
