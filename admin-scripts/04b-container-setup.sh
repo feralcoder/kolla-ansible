@@ -136,5 +136,5 @@ democratize_docker                                                              
 
 #use_upstream_containers                                                                 || return 1
 use_localized_containers                                                                 || fail_exit "use_localized_containers"
-kolla_ansible_pull_containers                                                            || fail_exit "pull_latest_containers"
+kolla_ansible_pull_containers                                                            || fail_exit "kolla_ansible_pull_containers"
 
