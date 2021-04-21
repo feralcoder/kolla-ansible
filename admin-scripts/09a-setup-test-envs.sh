@@ -9,6 +9,10 @@ source_host_control_scripts       || fail_exit "source_host_control_scripts"
 use_venv kolla-ansible            || fail_exit "use_venv kolla-ansible"
 
 ANSIBLE_CONTROLLER=dmb
+FERALSTACK_SETUP_DIR=~/CODE/feralcoder/feralstack
+
+
+cd $FERALSTACK_SETUP_DIR && git pull || fail_exit "update $FERALSTACK_SETUP_DIR"
 
 
 ~/CODE/feralcoder/feralstack/01_quotas.sh
