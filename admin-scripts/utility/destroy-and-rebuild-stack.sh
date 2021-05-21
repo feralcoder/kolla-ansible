@@ -105,24 +105,30 @@ destroy_vms () {
     openstack server delete $SERVER
   done
 }
+#destroy_lbs () {
+#  set_all_pools_to_active_before_delete
+#  POOLS=`openstack loadbalancer pool list | grep -iv '\-\-\-\-\|project_id' | awk '{print $2}'`
+#  for POOL in $POOLS; do
+#    MEMBERS=`openstack loadbalancer member list $POOL | grep -iv '\-\-\-\-\|project_id' | awk '{print $2}'`
+#    for MEMBER in $MEMBERS; do
+#      openstack loadbalancer member delete $POOL $MEMBER
+#    done
+#    openstack loadbalancer pool delete $POOL
+#  done
+#
+#  set_all_listeners_to_active_before_delete
+#  LISTENERS=`openstack loadbalancer listener list | grep -iv '\-\-\-\-\|project_id' | awk '{print $2}'`
+#  for LISTENER in $LISTENERS; do
+#    openstack loadbalancer listener delete $LISTENER
+#  done
+#
+#  set_all_lbs_to_active_before_delete
+#  LBS=`openstack loadbalancer list | grep -iv '\-\-\-\-\|project_id' | awk '{print $2}'`
+#  for LB in $LBS; do
+#    openstack loadbalancer delete $LB --cascade
+#  done
+#}
 destroy_lbs () {
-  set_all_pools_to_active_before_delete
-  POOLS=`openstack loadbalancer pool list | grep -iv '\-\-\-\-\|project_id' | awk '{print $2}'`
-  for POOL in $POOLS; do
-    MEMBERS=`openstack loadbalancer member list $POOL | grep -iv '\-\-\-\-\|project_id' | awk '{print $2}'`
-    for MEMBER in $MEMBERS; do
-      openstack loadbalancer member delete $POOL $MEMBER
-    done
-    openstack loadbalancer pool delete $POOL
-  done
-
-  set_all_listeners_to_active_before_delete
-  LISTENERS=`openstack loadbalancer listener list | grep -iv '\-\-\-\-\|project_id' | awk '{print $2}'`
-  for LISTENER in $LISTENERS; do
-    openstack loadbalancer listener delete $LISTENER
-  done
-
-  set_all_lbs_to_active_before_delete
   LBS=`openstack loadbalancer list | grep -iv '\-\-\-\-\|project_id' | awk '{print $2}'`
   for LB in $LBS; do
     openstack loadbalancer delete $LB --cascade
@@ -148,8 +154,8 @@ destroy_and_rebuild () {
 
 
 pull_changes            || fail_exit "pull_changes"
-destroy_heat_stacks     || fail_exit "destroy_heat_stacks"
 destroy_lbs             || fail_exit "destroy_lbs"
+destroy_heat_stacks     || fail_exit "destroy_heat_stacks"
 destroy_vms             || fail_exit "destroy_vms"
 destroy_clusters         || fail_exit "destroy_clusters"
 #regenerate_global_conf  || fail_exit "regenerate_global_conf"
