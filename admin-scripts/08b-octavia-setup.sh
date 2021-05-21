@@ -14,16 +14,8 @@ ANSIBLE_CONTROLLER=dmb
 SUDO_PASS_FILE=`admin_control_get_sudo_password`    || fail_exit "admin_control_get_sudo_password"
 
 
-# MOVING TO GLOBALS BEFORE SETUP
-#setup_octavia_in_globals () {
-#  cat $SUDO_PASS_FILE | sudo -S ls > /dev/null    || return 1
-#  echo "octavia_certs_country: US" | sudo tee -a /etc/kolla/globals.yml
-#  echo "octavia_certs_state: California" | sudo tee -a /etc/kolla/globals.yml
-#  echo "octavia_certs_organization: FeralStack" | sudo tee -a /etc/kolla/globals.yml
-#  echo "octavia_certs_organizational_unit: Octavia" | sudo tee -a /etc/kolla/globals.yml
-#}
 
-configure_octavia_net () {
+configure_octavia () {
   PROVIDER_SUBNET=172.31.0.0/24
   PROVIDER_SUBNET_START=172.31.0.10
   PROVIDER_SUBNET_END=172.31.0.254
@@ -32,54 +24,53 @@ configure_octavia_net () {
   PROVIDER_VLAN_ID=131
   PROVIDER_NETNAME=lbaas
 
-# MOVING TO GLOBALS BEFORE SETUP
-#  cat $SUDO_PASS_FILE | sudo -S ls > /dev/null    || return 1
-#  sudo tee -a /etc/kolla/globals.yml << EOT
+# MUST SET UP NETWORK BEFORE INSTALLING OCTAVIA
+  cat $SUDO_PASS_FILE | sudo -S ls > /dev/null    || return 1
+  sudo tee -a /etc/kolla/globals.yml << EOT
+octavia_certs_country: US
+octavia_certs_state: California
+octavia_certs_organization: FeralStack
+octavia_certs_organizational_unit: Octavia
 #octavia_amp_network:
-#  name: lb-mgmt-net
-#  provider_network_type: vlan
-#  provider_segmentation_id: $PROVIDER_VLAN_ID
-#  provider_physical_network: physnet1
-#  external: false
-#  shared: false
-#  subnet:
-#    name: lb-mgmt-subnet
-#    cidr: "$PROVIDER_SUBNET"
-#    allocation_pool_start: "$PROVIDER_SUBNET_START"
-#    allocation_pool_end: "$PROVIDER_SUBNET_END"
-#    gateway_ip: "$PROVIDER_VIRTROUTER_IP"
-#    enable_dhcp: yes
-#EOT
+  name: lb-mgmt-net
+  provider_network_type: vlan
+  provider_segmentation_id: $PROVIDER_VLAN_ID
+  provider_physical_network: physnet1
+  external: false
+  shared: false
+  subnet:
+    name: lb-mgmt-subnet
+    cidr: "$PROVIDER_SUBNET"
+    allocation_pool_start: "$PROVIDER_SUBNET_START"
+    allocation_pool_end: "$PROVIDER_SUBNET_END"
+    gateway_ip: "$PROVIDER_VIRTROUTER_IP"
+    enable_dhcp: yes
+
+enable_octavia: \"yes\"
+octavia_network_interface: v-lbaas
+ 
+octavia_amp_flavor:
+  name: "amphora"
+  is_public: no
+  vcpus: 1
+  ram: 1024
+  disk: 5
+
+EOT
 }
 
 
-
-#configure_octavia () {
-##  echo "enable_octavia: \"yes\"" >> /etc/kolla/globals.yml
-##  echo "octavia_network_interface: v-lbaas" >> /etc/kolla/globals.yml
-## 
-##  # Flavor used when booting an amphora, change as needed
-##  sudo tee -a /etc/kolla/globals.yml << EOT
-##octavia_amp_flavor:
-##  name: "amphora"
-##  is_public: no
-##  vcpus: 1
-##  ram: 1024
-##  disk: 5
-##EOT
-##
+# THIS IS BEING DONE BEFORE KOLLA INSTALL
 #  sudo mkdir -p /etc/kolla/config/octavia
 #  # Use a config drive in the Amphorae for cloud-init
 #  sudo tee /etc/kolla/config/octavia/octavia-worker.conf << EOT
 #[controller_worker]
 #user_data_config_drive = true
-#EOT
-#}
 
 
-#deploy_octavia () {
-#  kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack deploy --tags common,horizon,octavia,neutron
-#}
+deploy_octavia () {
+  kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack deploy --tags common,horizon,octavia,neutron
+}
 
 
 build_amphora () {
@@ -165,13 +156,13 @@ EOF
 
 use_venv kolla-ansible
 cat $SUDO_PASS_FILE | sudo -S ls > /dev/null    || return 1
-#setup_octavia_in_globals                       || fail_exit "setup_octavia_in_globals"
+
+configure_octavia                              || fail_exit "configure_octavia"
+setup_provider_net $PROVIDER_NETNAME $PROVIDER_VLAN_ID $PROVIDER_SUBNET $PROVIDER_ROUTER_IP $PROVIDER_SUBNET_START $PROVIDER_SUBNET_END  || fail_exit "setup_provider_net"
+
 kolla-ansible octavia-certificates             || fail_exit "kolla-ansible octavia-certificates"
 
-configure_octavia_net                          || fail_exit "configure_octavia_net"
-setup_provider_net $PROVIDER_NETNAME $PROVIDER_VLAN_ID $PROVIDER_SUBNET $PROVIDER_ROUTER_IP $PROVIDER_SUBNET_START $PROVIDER_SUBNET_END  || fail_exit "setup_provider_net"
-#configure_octavia                              || fail_exit "configure_octavia"
-#deploy_octavia                                 || fail_exit "deploy_octavia"
+deploy_octavia                                 || fail_exit "deploy_octavia"
 
 #build_amphora                                  || fail_exit "build_amphora"
 upload_amphora                                 || fail_exit "upload_amphora"
