@@ -28,6 +28,7 @@ adjust_firewall
 
 # Reset globals.yml in case it's been updated
 use_localized_containers
+
 # PULL CONTAINER IMAGES AHEAD OF DEPLOY.  Pull twice if needed...
 #kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack pull || kolla-ansible -i $KOLLA_SETUP_DIR../files/kolla-inventory-feralstack pull || fail_exit "kolla-ansible pull"
 
