@@ -65,6 +65,16 @@ set_up_ceph_volumes_and_users () {
   ssh_control_run_as_user root "docker exec $MON_CONTAINER ceph auth get-or-create client.gnocchi -o /etc/ceph/ceph.client.gnocchi.keyring" $CEPH_MON    || return 1
   ssh_control_run_as_user cliff "ssh_control_sync_as_user root /etc/ceph/ceph.client.gnocchi.keyring /etc/ceph/ $ANSIBLE_CONTROLLER" $CEPH_MON    || return 1
 
+  # CLIENT MANILA
+  # https://docs.openstack.org/manila/latest/admin/cephfs_driver.html#authorizing-the-driver-to-communicate-with-ceph
+  # https://docs.ceph.com/en/nautilus/cephfs/
+  ssh_control_run_as_user root "docker exec $MON_CONTAINER ceph auth get-or-create client.manila mon 'allow r' mgr 'allow rw'" $CEPH_MON    || return 1
+  ssh_control_run_as_user root "docker exec $MON_CONTAINER ceph auth get-or-create client.manila -o /etc/ceph/ceph.client.manila.keyring" $CEPH_MON    || return 1
+  ssh_control_run_as_user cliff "ssh_control_sync_as_user root /etc/ceph/ceph.client.manila.keyring /etc/ceph/ $ANSIBLE_CONTROLLER" $CEPH_MON    || return 1
+
+  
+  
+
   cat $SUDO_PASS_FILE | sudo -S ls > /dev/null    || return 1
   sudo mkdir -p /etc/kolla/config/cinder/cinder-backup/ > /dev/null 2>&1    || return 1
   sudo mkdir -p /etc/kolla/config/cinder/cinder-volume/ > /dev/null 2>&1    || return 1
@@ -72,6 +82,7 @@ set_up_ceph_volumes_and_users () {
   sudo mkdir -p /etc/kolla/config/glance/ > /dev/null 2>&1                  || return 1
   sudo mkdir -p /etc/kolla/config/nova/ > /dev/null 2>&1                    || return 1
   sudo mkdir -p /etc/kolla/config/gnocchi/ > /dev/null 2>&1                 || return 1
+  sudo mkdir -p /etc/kolla/config/manila/ > /dev/null 2>&1                  || return 1
   sudo cp /etc/ceph/ceph.client.glance.keyring /etc/kolla/config/glance/                  || return 1
   sudo cp /etc/ceph/ceph.client.cinder-backup.keyring /etc/kolla/config/cinder/cinder-backup/    || return 1
   sudo cp /etc/ceph/ceph.client.cinder.keyring /etc/kolla/config/cinder/cinder-backup/    || return 1
@@ -79,15 +90,20 @@ set_up_ceph_volumes_and_users () {
   sudo cp /etc/ceph/ceph.client.cinder.keyring /etc/kolla/config/nova/                    || return 1
   sudo cp /etc/ceph/ceph.client.nova.keyring /etc/kolla/config/nova/                      || return 1
   sudo cp /etc/ceph/ceph.client.gnocchi.keyring /etc/kolla/config/gnocchi/                || return 1
+  sudo cp /etc/ceph/ceph.client.manila.keyring /etc/kolla/config/manila/                  || return 1
+  # Configs for block devices:
+  # https://docs.ceph.com/en/latest/rbd/rbd-openstack/
   sudo cp $KOLLA_SETUP_DIR/../files/ceph-client-cinder-backup.conf /etc/kolla/config/cinder/cinder-backup.conf    || return 1
   sudo cp $KOLLA_SETUP_DIR/../files/ceph-client-cinder-volume.conf /etc/kolla/config/cinder/cinder-volume.conf    || return 1
   sudo cp $KOLLA_SETUP_DIR/../files/ceph-client-glance-api.conf /etc/kolla/config/glance/glance-api.conf          || return 1
   sudo cp $KOLLA_SETUP_DIR/../files/ceph-client-nova-compute.conf /etc/kolla/config/nova/nova-compute.conf        || return 1
   sudo cp $KOLLA_SETUP_DIR/../files/ceph-client-gnocchi.conf /etc/kolla/config/gnocchi/gnocchi.conf               || return 1
+  sudo cp $KOLLA_SETUP_DIR/../files/ceph-client-manila.conf /etc/kolla/config/manila/manila.conf                  || return 1
   sudo cp /etc/ceph/ceph.conf /etc/kolla/config/cinder/    || return 1
   sudo cp /etc/ceph/ceph.conf /etc/kolla/config/glance/    || return 1
   sudo cp /etc/ceph/ceph.conf /etc/kolla/config/nova/      || return 1
   sudo cp /etc/ceph/ceph.conf /etc/kolla/config/gnocchi/   || return 1
+  sudo cp /etc/ceph/ceph.conf /etc/kolla/config/manila/    || return 1
   cat $KOLLA_SETUP_DIR/../files/ceph-nova-ceph-conf-addl.conf | sudo tee -a /etc/kolla/config/nova/ceph.conf  || return 1
 }
 
