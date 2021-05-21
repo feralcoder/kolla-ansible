@@ -19,6 +19,7 @@ fix_horizon_timeout_config () {
   ssh_control_run_as_user_these_hosts root "(grep SESSION_TIMEOUT /etc/kolla/horizon/local_settings) && sed -i 's/^.*SESSION_TIMEOUT.*/SESSION_TIMEOUT = 86400/g' /etc/kolla/horizon/local_settings || echo 'SESSION_TIMEOUT = 86400' >> /etc/kolla/horizon/local_settings" "$CONTROL_HOSTS"
   ssh_control_run_as_user_these_hosts root "docker container stop horizon; docker container start horizon" "$CONTROL_HOSTS"
 }
+# Following may not be necessary...
 fix_magnum_trust_config () {
   ssh_control_run_as_user_these_hosts root "sed -i 's/^cluster_user_trust.*/cluster_user_trust = True/g' /etc/kolla/magnum-conductor/magnum.conf" "$CONTROL_HOSTS"
   ssh_control_run_as_user_these_hosts root "docker container stop magnum_conductor; docker container start magnum_conductor" "$CONTROL_HOSTS"
