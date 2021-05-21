@@ -8,7 +8,8 @@ public_network: 172.19.2.0/24
 cluster_network: 172.19.3.0/24
 ceph_docker_image: "ceph/daemon"
 #ceph_docker_image_tag: master-86da1a4-nautilus-centos-7
-ceph_docker_image_tag: latest-octopus
+#ceph_docker_image_tag: latest-octopus
+ceph_docker_image_tag: master-4138a4f-octopus-centos-8
 containerized_deployment: true
 ceph_docker_registry: docker.io
 dashboard_admin_password: p@ssw0rd
