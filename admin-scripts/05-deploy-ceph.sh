@@ -13,14 +13,16 @@ CEPH_CODE_DIR=$CODE_DIR/ceph
 CEPH_CHECKOUT_DIR=$CEPH_CODE_DIR/ceph-ansible
 
 # SYNC THIS VERSION WITH ../files/ceph-all.yml: ceph_docker_image_tag
-CEPH_DOCKER_VERSION=master-86da1a4-nautilus-centos-7
+#CEPH_DOCKER_VERSION=master-86da1a4-nautilus-centos-7
 #CEPH_DOCKER_VERSION=latest-nautilus
+CEPH_DOCKER_VERSION=latest-octopus
 
 
 
 # THIS SCRIPT IS MEANT TO RUN AFTER A KOLLA-ANSIBLE SCRIPT
 #  Ansible should already be installed on this host, the ansible controller
-VERSION=4.0 # Nautilus
+#VERSION=4.0 # Nautilus
+VERSION=5.0 # Octopus
 
 adjust_firewall () {
   echo; echo "DISABLING FIREWALL"
@@ -65,8 +67,8 @@ place_ceph_configs () {
 #  cp $CEPH_FILE_DIR/ceph-site.yml $CEPH_CHECKOUT_DIR/site.yml
 #  ( diff $CEPH_CHECKOUT_DIR/group_vars/mons.yml.sample $CEPH_FILE_DIR/ceph-mons-sample.yml ) || { echo "mons.yml.sample has changed in the upstream!  RESOLVE."; return 1; }
 #  cp $CEPH_FILE_DIR/ceph-mons.yml $CEPH_CHECKOUT_DIR/group_vars/mons.yml
-  ( diff $CEPH_CHECKOUT_DIR/site-docker.yml.sample $CEPH_FILE_DIR/ceph-site-docker-sample.yml ) || { echo "site-docker.yml.sample has changed in the upstream!  RESOLVE."; return 1; }
-  cp $CEPH_FILE_DIR/ceph-site-docker.yml $CEPH_CHECKOUT_DIR/site-docker.yml
+  ( diff $CEPH_CHECKOUT_DIR/site-container.yml.sample $CEPH_FILE_DIR/ceph-site-container-sample.yml ) || { echo "site-container.yml.sample has changed in the upstream!  RESOLVE."; return 1; }
+  cp $CEPH_FILE_DIR/ceph-site-container.yml $CEPH_CHECKOUT_DIR/site-container.yml
   cp $CEPH_FILE_DIR/ceph-hosts $CEPH_CHECKOUT_DIR/hosts
 }
 
