@@ -149,7 +149,8 @@ destroy_and_rebuild () {
   $UTILITY_DIR/../08a-post-deploy-kolla.sh &&
   $UTILITY_DIR/../08a-pubnet1-setup.sh &&
   $UTILITY_DIR/../08b-octavia-setup.sh &&
-  $UTILITY_DIR/../09a-setup-test-envs.sh
+  $UTILITY_DIR/../08c-config-fixes.sh &&
+  $UTILITY_DIR/../09a-setup-feralstack.sh
 }
 
 
