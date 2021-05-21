@@ -126,9 +126,10 @@ post_deploy_kolla () {
   ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/08a-pubnet1-setup.sh > $LOG_DIR/08a-pubnet1-setup_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 8a: Pubnet1 Setup"
   echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/08b-octavia-setup.sh ON $ANSIBLE_CONTROLLER"
   ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/08b-octavia-setup.sh > $LOG_DIR/08b-octavia-setup.sh_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 8b: Post-Deploy Octavia"
-# Magnum fix (trust stuff) may not be necessary
-#  echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/08c-config-fixes.sh ON $ANSIBLE_CONTROLLER"
-#  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/08c-config-fixes.sh > $LOG_DIR/08c-config-fixes.sh_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 8c: Config Fixes"
+  echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/08c-config-fixes.sh ON $ANSIBLE_CONTROLLER"
+  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/08c-config-fixes.sh > $LOG_DIR/08c-config-fixes.sh_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 8c: Config Fixes"
+  echo; echo "EXECUTING $KOLLA_ANSIBLE_CHECKOUT/admin-scripts/09a-setup-feralstack.sh ON $ANSIBLE_CONTROLLER"
+  ssh_control_run_as_user cliff "$KOLLA_ANSIBLE_CHECKOUT/admin-scripts/09a-setup-feralstack.sh > $LOG_DIR/09a-setup-feralstack.sh_$NOW.log 2>&1" $ANSIBLE_CONTROLLER || fail_exit "Step 9a: Setup Feralstack"
 }
 
 
