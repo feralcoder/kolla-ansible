@@ -1,6 +1,7 @@
 #!/bin/bash
 KOLLA_SETUP_SOURCE="${BASH_SOURCE[0]}"
 KOLLA_SETUP_DIR=$( realpath `dirname $KOLLA_SETUP_SOURCE` )
+SUDO_PASS_FILE=~/.password
 
 . $KOLLA_SETUP_DIR/common.sh
 [ "${BASH_SOURCE[0]}" -ef "$0" ]  || { echo "Don't source this script!  Run it."; return 1; }
@@ -77,6 +78,25 @@ fix_kolla_configs () {
 }
 
 
+configure_octavia () {
+  cat $SUDO_PASS_FILE | sudo -S ls > /dev/null
+  sudo mkdir -p /etc/kolla/config/octavia
+  # Use a config drive in the Amphorae for cloud-init
+  sudo tee /etc/kolla/config/octavia/octavia-worker.conf << EOT
+[controller_worker]
+user_data_config_drive = true
+EOT
+}
+
+configure_manila () {
+  cat $SUDO_PASS_FILE | sudo -S ls > /dev/null
+  sudo mkdir -p /etc/kolla/config/manila-share.conf
+  sudo tee /etc/kolla/config/manila-share.conf << EOT
+[generic]
+service_instance_flaver_id = 100
+EOT
+}
+
 
 #refetch_api_keys                                                                         || fail_exit "refetch_api_keys"
 kolla-genpwd                                                                             || fail_exit "kolla-genpwd"
@@ -91,3 +111,6 @@ fix_kolla_configs                                                               
 generate_ssl_certs                                                                          || fail_exit "setup_ssl_certs"
 #untar_ssl_certs
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack prechecks          || fail_exit "kolla-ansible prechecks"
+
+configure_octavia
+configure_manila
