@@ -90,7 +90,7 @@ EOT
 
 configure_manila () {
   cat $SUDO_PASS_FILE | sudo -S ls > /dev/null
-  sudo mkdir -p /etc/kolla/config/manila-share.conf
+  sudo mkdir -p /etc/kolla/config/
   sudo tee /etc/kolla/config/manila-share.conf << EOT
 [generic]
 service_instance_flaver_id = 100
