@@ -51,8 +51,8 @@ fetch_kolla_container_source () {
   grep '^#location = .*tar.gz' etc/kolla/kolla-build.conf > $NOW_TARBALLS/locations || return 1
   sed -i 's|^#location = .tarballs_base|wget -P $NOW_TARBALLS https://tarballs.opendev.org|g' $NOW_TARBALLS/locations || return 1
   sed -i 's|^#location = |wget -P $NOW_TARBALLS |g' $NOW_TARBALLS/locations   || return 1
-  sed -E -i 's/^(wget .*)/\1 || return 1/g' $NOW_TARBALLS/locations           || return 1
-  . $NOW_TARBALLS/locations
+  sed -E -i 's/^(wget .*)/\1 || exit 1/g' $NOW_TARBALLS/locations           || return 1
+  . $NOW_TARBALLS/locations  || return 1
 }
 
 build_kolla_containers () {
