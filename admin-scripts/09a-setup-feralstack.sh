@@ -15,6 +15,8 @@ FERALSTACK_SETUP_DIR=~/CODE/feralcoder/feralstack
 cd $FERALSTACK_SETUP_DIR && git pull || fail_exit "update $FERALSTACK_SETUP_DIR"
 
 
+~/CODE/feralcoder/feralstack/01_setup-feralstack.sh
+~/CODE/feralcoder/feralstack/01_flavors.sh
 ~/CODE/feralcoder/feralstack/01_quotas.sh
 ~/CODE/feralcoder/feralstack/01_upload_images.sh
 ~/CODE/feralcoder/feralstack/02a_puppetmaster-setup.sh
