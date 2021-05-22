@@ -32,9 +32,8 @@ install_packages () {
 
 setup_kolla () {
   mkdir -p ~/CODE/openstack && cd ~/CODE/openstack       || return 1
-  git clone https://github.com/openstack/kolla.git       || { cd kolla && git pull; }       || return 1
+  git clone https://github.com/openstack/kolla.git       || { cd kolla && git pull && cd ..; }       || return 1
   git checkout stable/victoria                           || return 1
-pwd
   cd ..
   pip3 install ./kolla                                    || return 1
   pip3 install tox                                       || return 1
