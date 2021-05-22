@@ -156,6 +156,7 @@ EOF
 
 
 use_venv kolla-ansible
+pip install setuptools_rust
 cat $SUDO_PASS_FILE | sudo -S ls > /dev/null    || return 1
 
 configure_octavia                              || fail_exit "configure_octavia"
