@@ -20,7 +20,7 @@ pull_changes () {
 }
 
 regenerate_global_conf () {
-  rm /etc/kolla/globals-octavia.yml
+  rm -f /etc/kolla/globals-octavia.yml
   if ( grep "CONTAINERS FROM FERALCODER"  /etc/kolla/globals.yml ); then
     cat $UTILITY_DIR/../../files/kolla-globals-localpull.yml $UTILITY_DIR/../../files/kolla-globals-remainder.yml > /etc/kolla/globals.yml
   elif ( grep "CONTAINERS FROM DOCKER"  /etc/kolla/globals.yml ); then
