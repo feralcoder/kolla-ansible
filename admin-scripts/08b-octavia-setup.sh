@@ -128,7 +128,7 @@ patch_worker_for_userdata () {
   ssh_control_run_as_user_these_hosts root "docker cp /tmp/user_data_config_drive.template \
                    octavia_worker:/var/lib/kolla/venv/lib/python3.6/site-packages/octavia/common/jinja/templates/user_data_config_drive.template" "$CONTROL_HOSTS"
   ssh_control_run_as_user_these_hosts root "docker cp /tmp/user_data_config_drive.template \
-                   octavia_worker:/octavia-base-source/octavia-7.1.2.dev2/octavia/common/jinja/templates/user_data_config_drive.template" "$CONTROL_HOSTS"
+                   octavia_worker:/octavia-base-source/octavia-7.1.2.dev8/octavia/common/jinja/templates/user_data_config_drive.template" "$CONTROL_HOSTS"
 }
 
 setup_octavia_client () {
