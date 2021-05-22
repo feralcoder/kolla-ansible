@@ -149,4 +149,4 @@ place_ceph_hacks                      || fail_exit "place_ceph_files"
 # export ANSIBLE_VERBOSITY=4
 
 wait_for_docker_pull $DOCKER_PULL_PID || fail_exit "wait_for_docker_pull"
-cd $CEPH_CHECKOUT_DIR && ansible-playbook $CEPH_CHECKOUT_DIR/site-docker.yml -i $CEPH_CHECKOUT_DIR/hosts -e container_package_name=docker-ce || fail_exit "ansible-playbook"
+cd $CEPH_CHECKOUT_DIR && ansible-playbook $CEPH_CHECKOUT_DIR/site-container.yml -i $CEPH_CHECKOUT_DIR/hosts -e container_package_name=docker-ce || fail_exit "ansible-playbook"
