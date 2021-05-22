@@ -31,7 +31,7 @@ octavia_certs_country: US
 octavia_certs_state: California
 octavia_certs_organization: FeralStack
 octavia_certs_organizational_unit: Octavia
-#octavia_amp_network:
+octavia_amp_network:
   name: lb-mgmt-net
   provider_network_type: vlan
   provider_segmentation_id: $PROVIDER_VLAN_ID
