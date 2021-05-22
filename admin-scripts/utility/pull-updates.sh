@@ -9,6 +9,7 @@ UTILITY_DIR=$( realpath `dirname $UTILITY_SOURCE` )
 source_host_control_scripts       || fail_exit "source_host_control_scripts"
 use_venv kolla-ansible            || fail_exit "use_venv kolla-ansible"
 
+
 KOLLA_UTIL_SOURCE="${BASH_SOURCE[0]}"
 KOLLA_UTIL_DIR=$( realpath `dirname $KOLLA_UTIL_SOURCE` )
 KOLLA_SETUP_DIR=$KOLLA_UTIL_DIR/..
@@ -20,13 +21,6 @@ TAG=feralcoder-`date  +%Y%m%d`
 
 
 
-
-refetch_api_keys () {
-  echo; echo "REFETCHING HOST KEYS FOR API NETWORK EVERYWHERE"
-  for HOST in $ALL_HOSTS; do
-    ssh_control_run_as_user cliff "ssh_control_refetch_hostkey_these_hosts \"$STACK_HOSTS_API_NET\"" $HOST 2>/dev/null  || fail_exit "ssh_control_refetch_hostkey_these_hosts"
-  done
-}
 
 use_localized_containers () {
   # Switch back to local (pinned) fetches for deployment
@@ -43,10 +37,18 @@ use_dockerhub_containers () {
 }
 
 localize_latest_containers () {
-  for CONTAINER in `ls $KOLLA_PULL_THRU_CACHE`; do
-    ssh_control_run_as_user root "docker image pull kolla/$CONTAINER:victoria" $PULL_HOST
-    ssh_control_run_as_user root "docker image tag kolla/$CONTAINER:victoria $LOCAL_REGISTRY/feralcoder/$CONTAINER:$TAG" $PULL_HOST
-    ssh_control_run_as_user root "docker image push $LOCAL_REGISTRY/feralcoder/$CONTAINER:$TAG" $PULL_HOST
+  KOLLA_CONTAINERS=`ls $KOLLA_PULL_THRU_CACHE`
+  echo; echo "PULLING UPDATED CONTAINERS"
+  for CONTAINER in $KOLLA_CONTAINERS; do
+    ssh_control_run_as_user root "docker image pull kolla/$CONTAINER:victoria" $PULL_HOST || return 1
+  done
+  echo; echo "RETAGGING UPDATED CONTAINERS"
+  for CONTAINER in $KOLLA_CONTAINERS; do
+    ssh_control_run_as_user root "docker image tag kolla/$CONTAINER:victoria $LOCAL_REGISTRY/feralcoder/$CONTAINER:$TAG" $PULL_HOST || return 1
+  done
+  echo; echo "PUSHING LOCALIZED CONTAINERS"
+  for CONTAINER in $KOLLA_CONTAINERS; do
+    ssh_control_run_as_user root "docker image push $LOCAL_REGISTRY/feralcoder/$CONTAINER:$TAG" $PULL_HOST || return 1
   done
 }
 
