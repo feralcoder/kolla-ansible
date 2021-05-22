@@ -15,8 +15,8 @@ KOLLA_SETUP_DIR=$KOLLA_UTIL_DIR/..
 KOLLA_PULL_THRU_CACHE=/registry/docker/pullthru-registry/docker/registry/v2/repositories/kolla/
 LOCAL_REGISTRY=192.168.127.220:4001
 PULL_HOST=kgn
-TAG=feralcoder-20210324
-#TAG=feralcoder-`date  +%Y%m%d`
+#TAG=feralcoder-20210324
+TAG=feralcoder-`date  +%Y%m%d`
 
 
 
@@ -32,12 +32,14 @@ use_localized_containers () {
   # Switch back to local (pinned) fetches for deployment
   cp $KOLLA_SETUP_DIR/../files/kolla-globals-localpull.yml /etc/kolla/globals.yml         ||  return 1
   cat $KOLLA_SETUP_DIR/../files/kolla-globals-remainder.yml >> /etc/kolla/globals.yml     ||  return 1
+  [[ ! -f /etc/kolla/globals-octavia.yml ]] || cat /etc/kolla/globals-octavia.yml >> /etc/kolla/globals.yml     ||  return 1
 }
 
 use_dockerhub_containers () {
   # We switch to dockerhub container fetches, to get the latest "victoria" containers
   cp $KOLLA_SETUP_DIR/../files/kolla-globals-dockerpull.yml /etc/kolla/globals.yml         ||  return 1
   cat $KOLLA_SETUP_DIR/../files/kolla-globals-remainder.yml >> /etc/kolla/globals.yml      ||  return 1
+  [[ ! -f /etc/kolla/globals-octavia.yml ]] || cat /etc/kolla/globals-octavia.yml >> /etc/kolla/globals.yml     ||  return 1
 }
 
 localize_latest_containers () {
