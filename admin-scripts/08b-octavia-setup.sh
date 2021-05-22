@@ -26,7 +26,7 @@ configure_octavia () {
 
 # MUST SET UP NETWORK BEFORE INSTALLING OCTAVIA
   cat $SUDO_PASS_FILE | sudo -S ls > /dev/null    || return 1
-  sudo tee -a /etc/kolla/globals.yml << EOT
+  sudo tee /etc/kolla/globals-octavia.yml << EOT
 octavia_certs_country: US
 octavia_certs_state: California
 octavia_certs_organization: FeralStack
@@ -55,7 +55,6 @@ octavia_amp_flavor:
   vcpus: 1
   ram: 1024
   disk: 5
-
 EOT
 }
 

@@ -40,6 +40,7 @@ use_localized_containers () {
   # Switch back to local (pinned) fetches for deployment
   cp $KOLLA_SETUP_DIR/../files/kolla-globals-localpull.yml /etc/kolla/globals.yml         ||  return 1
   cat $KOLLA_SETUP_DIR/../files/kolla-globals-remainder.yml >> /etc/kolla/globals.yml     ||  return 1
+  [[ ! -f /etc/kolla/globals-octavia.yml ]] || cat /etc/kolla/globals-octavia.yml >> /etc/kolla/globals.yml     ||  return 1
 }
 
 block_dockerio () {
