@@ -56,6 +56,8 @@ octavia_amp_flavor:
   ram: 1024
   disk: 5
 EOT
+
+  cat /etc/kolla/globals-octavia.yml | sudo tee -a /etc/kolla/globals.yml || return 1
 }
 
 
