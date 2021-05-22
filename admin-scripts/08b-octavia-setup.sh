@@ -46,7 +46,7 @@ octavia_amp_network:
     gateway_ip: "$PROVIDER_VIRTROUTER_IP"
     enable_dhcp: yes
 
-enable_octavia: \"yes\"
+enable_octavia: yes
 octavia_network_interface: v-lbaas
  
 octavia_amp_flavor:
