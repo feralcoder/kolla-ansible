@@ -17,5 +17,6 @@ cd $FERALSTACK_SETUP_DIR && git pull || fail_exit "update $FERALSTACK_SETUP_DIR"
 
 ~/CODE/feralcoder/feralstack/01_quotas.sh
 ~/CODE/feralcoder/feralstack/01_upload_images.sh
-~/CODE/feralcoder/feralstack/02_setup_admin_instances.sh
+~/CODE/feralcoder/feralstack/02a_puppetmaster-setup.sh
+~/CODE/feralcoder/feralstack/02b_admin-setup.sh
 #~/CODE/feralcoder/feralstack/02_kubernetes_wordpress.sh
