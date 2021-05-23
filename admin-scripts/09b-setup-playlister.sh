@@ -15,6 +15,7 @@ FERALSTACK_SETUP_DIR=~/CODE/feralcoder/feralstack
 cd $FERALSTACK_SETUP_DIR && git pull || fail_exit "update $FERALSTACK_SETUP_DIR"
 
 
-~/CODE/feralcoder/playister/01_quotas.sh
-~/CODE/feralcoder/playister/01_upload_images.sh
-~/CODE/feralcoder/playister/02_setup_admin_instances.sh
+~/CODE/feralcoder/playlister-orchestrator/01a_setup_playlister.sh
+~/CODE/feralcoder/playlister-orchestrator/01b_playlister-quotas.sh
+~/CODE/feralcoder/playlister-orchestrator/02_deploy_heatstack.sh
+#~/CODE/feralcoder/playlister-orchestrator/03_manage_heatstack.sh
