@@ -22,7 +22,9 @@ dashboard_enabled: True
 # FIX BY DISABLING dashboard_frontend_vip...
 #dashboard_frontend_vip: '172.19.2.10'
 # (fixes 500 error popups)
-# Performance links still broken with self-signed certs, fix with (on mgr node): ceph --cluster ceph dashboard set-grafana-api-ssl-verify False
+# Performance links still broken with self-signed certs, fix with (on mgr node): 
+#     ceph --cluster ceph dashboard set-grafana-api-ssl-verify False
+#     ceph --cluster ceph dashboard grafana dashboards update
 dashboard_protocol: https
 dashboard_port: 8443
 # HTTP PROBLEM: successful login redirects to login page
