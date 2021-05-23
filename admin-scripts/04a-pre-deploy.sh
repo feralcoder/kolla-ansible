@@ -94,7 +94,21 @@ configure_manila () {
   sudo mkdir -p /etc/kolla/config/
   sudo tee /etc/kolla/config/manila-share.conf << EOT
 [generic]
-service_instance_flaver_id = 100
+service_instance_flav0r_id = 100
+[DEFAULT]
+debug = True
+EOT
+  sudo tee /etc/kolla/config/manila-api.conf << EOT
+[DEFAULT]
+debug = True
+EOT
+  sudo tee /etc/kolla/config/manila-data.conf << EOT
+[DEFAULT]
+debug = True
+EOT
+  sudo tee /etc/kolla/config/manila-scheduler.conf << EOT
+[DEFAULT]
+debug = True
 EOT
 }
 
