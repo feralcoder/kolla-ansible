@@ -10,4 +10,4 @@
 docker_registry:
 docker_registry_username: feralcoder
 docker_namespace: "kolla"
-openstack_release: "victoria"
+openstack_release: "wallaby"
