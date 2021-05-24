@@ -73,7 +73,7 @@ set_up_ceph_volumes_and_users () {
   # CLIENT MANILA
   # https://docs.openstack.org/manila/latest/admin/cephfs_driver.html#authorizing-the-driver-to-communicate-with-ceph
   # https://docs.ceph.com/en/nautilus/cephfs/
-  ssh_control_run_as_user root "docker exec $MON_CONTAINER ceph auth get-or-create client.manila mon 'allow r' mgr 'allow rw'" $CEPH_MON    || return 1
+  ssh_control_run_as_user root "docker exec $MON_CONTAINER ceph auth get-or-create client.manila mon 'allow *' mgr 'allow *' osd 'allow *' mds 'allow *'" $CEPH_MON    || return 1
   ssh_control_run_as_user root "docker exec $MON_CONTAINER ceph auth get-or-create client.manila -o /etc/ceph/ceph.client.manila.keyring" $CEPH_MON    || return 1
   ssh_control_run_as_user cliff "ssh_control_sync_as_user root /etc/ceph/ceph.client.manila.keyring /etc/ceph/ $ANSIBLE_CONTROLLER" $CEPH_MON    || return 1
 
