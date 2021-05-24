@@ -15,8 +15,9 @@ INSTALL_TYPE=$2
 
 [[ $NOW != "" ]]  ||  NOW=`date +%Y%m%d_%H%M`
 [[ $INSTALL_TYPE != "" ]]  ||  { "echo INSTALL_TYPE not provided!"; exit 1; }
-TAG=feralcoder-$NOW
-NOW_TARBALLS=/registry/kolla_tarballs/victoria_$NOW
+OS_RELEASE=wallaby
+TAG=feralcoder-$OS_RELEASE-$NOW
+NOW_TARBALLS=/registry/kolla_tarballs/$OS_RELEASE-$NOW
 
 LOCAL_DOCKER_REGISTRY=192.168.127.220:4001
 KOLLA_CODE_DIR=~/CODE/openstack/kolla
@@ -68,10 +69,10 @@ tag_as_latest () {
   # This function strips $LOCAL_DOCKER_REGISTRY/feralcoder/, then adds again
   # This will allow easier repo-renaming and other distribution changes
   for CONTAINER in `docker image list | grep "\-${INSTALL_TYPE}\-" | grep $TAG | awk '{print $1}' | awk -F'/' '{print $(NF)}'`; do
-    docker tag $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:$TAG $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:latest              || return 1
-    docker push $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:latest                             || return 1
-    docker tag $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:$TAG $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:feralcoder-latest   || return 1
-    docker push $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:feralcoder-latest                  || return 1
+    docker tag $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:$TAG $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:$OS_RELEASE-latest              || return 1
+    docker push $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:$OS_RELEASE-latest                             || return 1
+    docker tag $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:$TAG $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:feralcoder-$OS_RELEASE-latest   || return 1
+    docker push $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:feralcoder-$OS_RELEASE-latest                  || return 1
     docker tag $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:$TAG $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:$TAG                || return 1
     docker push $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:$TAG                               || return 1
   done
