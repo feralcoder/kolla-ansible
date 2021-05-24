@@ -144,7 +144,7 @@ remediate_hosts                                   || fail_exit "remediate_hosts"
 #take_backups 01c_CentOS_8_3_Remediated            || fail_exit "take_backups 01c_CentOS_8_3_Remediated.sh"
 
 # ASSUME WE COULD BE STARTING FROM A FREEZE-THAW...
-ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSIBLE_CONTROLLER || fail_exit "git pull kolla-ansible"
+ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull; git checkout wallaby-testing" $ANSIBLE_CONTROLLER || fail_exit "git pull kolla-ansible"
 
 #postmediate_hosts                                 || fail_exit "postmediate_hosts"
 #take_backups 01d_CentOS_8_3_Postmediated          || fail_exit "take_backups 01d_CentOS_8_3_Postmediated.sh"
@@ -152,14 +152,14 @@ setup_for_installers                              || fail_exit "setup_for_instal
 #take_backups 02a_Kolla-Ansible_Setup              || fail_exit "take_backups 02a_Kolla-Ansible_Setup"
 
 # ASSUME WE COULD BE STARTING FROM A FREEZE-THAW...
-ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSIBLE_CONTROLLER || fail_exit "git pull kolla-ansible"
+ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull; git checkout wallaby-testing" $ANSIBLE_CONTROLLER || fail_exit "git pull kolla-ansible"
 
 deploy_ceph                                       || fail_exit "deploy_ceph"
 #take_backups 02b_Ceph_Setup                       || fail_exit "take_backups 02b_Ceph_Setup"
 # NEED CEPH EXPORT FUNCTION
 
 # ASSUME WE COULD BE STARTING FROM A FREEZE-THAW...
-ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSIBLE_CONTROLLER || fail_exit "git pull kolla-ansible"
+ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull; git checkout wallaby-testing" $ANSIBLE_CONTROLLER || fail_exit "git pull kolla-ansible"
 
 deploy_kolla                                      || fail_exit "deploy_kolla"
 post_deploy_kolla                                 || fail_exit "post_deploy_kolla"
