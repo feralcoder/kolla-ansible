@@ -76,7 +76,7 @@ setup_for_installers () {
   # Checkout / update kolla-ansible on ansible controller
   echo; echo "CHECKING OUT / UPDATING ~CODE/feralcoder/kolla-ansible ON ANSIBLE_CONTROLLER: $ANSIBLE_CONTROLLER"
   ssh_control_run_as_user cliff "cd CODE/feralcoder; [[ -d kolla-ansible ]] || git clone https://feralcoder:`cat ~/.git_password`@github.com/feralcoder/kolla-ansible" $ANSIBLE_CONTROLLER || exit 1
-  ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull" $ANSIBLE_CONTROLLER || exit 1
+  ssh_control_run_as_user cliff "cd CODE/feralcoder/kolla-ansible; git pull; git checkout wallaby-testing" $ANSIBLE_CONTROLLER || exit 1
  
   # Set up stack user password
   echo; echo "SETTING stack USER PASSWORD ON ANSIBLE_CONTROLLER: $ANSIBLE_CONTROLLER"
