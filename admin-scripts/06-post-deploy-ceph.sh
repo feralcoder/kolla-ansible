@@ -15,8 +15,13 @@ ANSIBLE_CONTROLLER=dmb
 set_up_ceph_volumes_and_users () {
   CEPH_MON=`echo "$CEPH_MON_HOSTS" | tr ' ' '\n' | head -n 1`                                                                                     || return 1
   MON_CONTAINER=`ssh_control_run_as_user root "docker container list" $CEPH_MON | grep ' ceph-mon-' | awk '{print $1}'`                           || return 1
+  MGR_CONTAINER=`ssh_control_run_as_user root "docker container list" $CEPH_MON | grep ' ceph-mgr-' | awk '{print $1}'`                           || return 1
 
   ( grep auth_cluster_required /etc/ceph/ceph.conf ) || ( echo "mon initial members = strange-api,merlin-api,gandalf-api" && echo "auth_cluster_required = cephx" && echo "auth_service_required = cephx" && echo "auth_client_required = cephx" ) | sudo tee -a /etc/ceph/ceph.conf    || return 1
+
+  # Grafana / Prometheus Pages Fail With Self-Signed Certs
+  ssh_control_run_as_user root "docker exec $MGR_CONTAINER ceph --cluster ceph dashboard set-grafana-api-ssl-verify False" $CEPH_MON
+  ssh_control_run_as_user root "docker exec $MGR_CONTAINER ceph --cluster ceph dashboard grafana dashboards update" $CEPH_MON
 
   # Default Pools Have Too Few Page Groups
   ssh_control_run_as_user root "docker exec $MON_CONTAINER ceph osd pool set cephfs_data pg_num 16" $CEPH_MON                                     || return 1
@@ -68,7 +73,7 @@ set_up_ceph_volumes_and_users () {
   # CLIENT MANILA
   # https://docs.openstack.org/manila/latest/admin/cephfs_driver.html#authorizing-the-driver-to-communicate-with-ceph
   # https://docs.ceph.com/en/nautilus/cephfs/
-  ssh_control_run_as_user root "docker exec $MON_CONTAINER ceph auth get-or-create client.manila mon 'allow r' mgr 'allow rw' mds 'allow rw' osd 'allow rw'" $CEPH_MON    || return 1
+  ssh_control_run_as_user root "docker exec $MON_CONTAINER ceph auth get-or-create client.manila mon 'allow r' mgr 'allow rw'" $CEPH_MON    || return 1
   ssh_control_run_as_user root "docker exec $MON_CONTAINER ceph auth get-or-create client.manila -o /etc/ceph/ceph.client.manila.keyring" $CEPH_MON    || return 1
   ssh_control_run_as_user cliff "ssh_control_sync_as_user root /etc/ceph/ceph.client.manila.keyring /etc/ceph/ $ANSIBLE_CONTROLLER" $CEPH_MON    || return 1
 
