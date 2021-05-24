@@ -38,20 +38,23 @@ use_dockerhub_containers () {
 }
 
 localize_latest_containers () {
-  # FAILURE CASE: victoria / wallaby may (do) have different containers
-  # This iterates over the union of them, will fail out when one's container NX in the other
-  KOLLA_CONTAINERS=`ls $KOLLA_PULL_THRU_CACHE`
+  # victoria / wallaby may (do) have different containers
+  # This finds them all, then tests which ones are in our $OS_RELEASE
+  ALL_KOLLA_CONTAINERS=`ls $KOLLA_PULL_THRU_CACHE`
+  KOLLA_CONTAINERS_THIS_RELEASE="$(for CONTAINER in $ALL_KOLLA_CONTAINERS; do
+    if [[ -d $KOLLA_PULL_THRU_CACHE/$CONTAINER/_manifests/tags/$OS_RELEASE ]]; then echo $CONTAINER; fi
+  done)"
   echo; echo "PULLING UPDATED CONTAINERS"
-  for CONTAINER in $KOLLA_CONTAINERS; do
+  for CONTAINER in $KOLLA_CONTAINERS_THIS_RELEASE; do
     ssh_control_run_as_user root "docker image pull kolla/$CONTAINER:$OS_RELEASE" $PULL_HOST || return 1
   done
   echo; echo "RETAGGING UPDATED CONTAINERS"
-  for CONTAINER in $KOLLA_CONTAINERS; do
+  for CONTAINER in $KOLLA_CONTAINERS_THIS_RELEASE; do
     ssh_control_run_as_user root "docker image tag kolla/$CONTAINER:$OS_RELEASE $LOCAL_REGISTRY/feralcoder/$CONTAINER:$TAG" $PULL_HOST || return 1
     ssh_control_run_as_user root "docker image tag kolla/$CONTAINER:$OS_RELEASE $LOCAL_REGISTRY/feralcoder/$CONTAINER:feralcoder-$OS_RELEASE-latest" $PULL_HOST || return 1
   done
   echo; echo "PUSHING LOCALIZED CONTAINERS"
-  for CONTAINER in $KOLLA_CONTAINERS; do
+  for CONTAINER in $KOLLA_CONTAINERS_THIS_RELEASE; do
     ssh_control_run_as_user root "docker image push $LOCAL_REGISTRY/feralcoder/$CONTAINER:$TAG" $PULL_HOST || return 1
     ssh_control_run_as_user root "docker image push $LOCAL_REGISTRY/feralcoder/$CONTAINER:feralcoder-$OS_RELEASE-latest" $PULL_HOST || return 1
   done
@@ -63,6 +66,7 @@ kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack bootstrap-
 # Set globals.yml to dockerhub to inform package fetch names (kolla/*:$OS_RELEASE)
 # But do not re-bootstrap!
 use_dockerhub_containers                                                                 || fail_exit "use_dockerhub_containers"
+# MAKE SURE container settings in globals.yml match those here (victoria vs wallaby?)
 kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack pull               || fail_exit "kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack pull"
 use_localized_containers                                                                 || fail_exit "use_localized_containers"
 localize_latest_containers                                                               || fail_exit "localize_latest_containers"
