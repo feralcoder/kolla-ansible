@@ -12,10 +12,13 @@ SUDO_PASS_FILE=~/.password
 
 NOW=$1
 INSTALL_TYPE=$2
+OS_RELEASE=$3
+SKIP_DL=$4
+
 
 [[ $NOW != "" ]]  ||  NOW=`date +%Y%m%d_%H%M`
 [[ $INSTALL_TYPE != "" ]]  ||  { "echo INSTALL_TYPE not provided!"; exit 1; }
-OS_RELEASE=wallaby
+[[ $OS_RELEASE != "" ]]  ||  OS_RELEASE=wallaby
 TAG=feralcoder-$OS_RELEASE-$NOW
 NOW_TARBALLS=/registry/kolla_tarballs/$OS_RELEASE-$NOW
 
@@ -46,6 +49,7 @@ generate_kolla_build_configs () {
 }
 
 fetch_kolla_container_source () {
+  if [[ $SKIP_DL != "" ]]; then return; fi
   cd $KOLLA_CODE_DIR                                                          || return 1
   cat $SUDO_PASS_FILE | sudo -S ls > /dev/null                                || return 1
   sudo mkdir -p $NOW_TARBALLS && sudo chown cliff:cliff $NOW_TARBALLS         || return 1
