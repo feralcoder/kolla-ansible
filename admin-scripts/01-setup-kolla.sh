@@ -88,7 +88,7 @@ install_prereqs () {
 
 install_kolla_for_admin () {
   echo; echo "INSTALLING KOLLA FOR ADMINISTRATION"
-  pip install kolla-ansible                                                               ||  return 1
+  pip install 'kolla-ansible==12.0.0.0rc1'                                                               ||  return 1
   test_sudo || return 1
   sudo mkdir -p /etc/kolla
   sudo chown $USER:$USER /etc/kolla
