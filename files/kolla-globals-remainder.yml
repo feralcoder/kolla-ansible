@@ -25,7 +25,7 @@ docker_custom_config:
 kolla_install_type: "source"
 
 # Do not override this unless you know what you are doing.
-#openstack_release: "victoria"
+#openstack_release: "master"
 
 # Docker image tag used by default.
 #openstack_tag: "{{ openstack_release ~ openstack_tag_suffix }}"
@@ -232,6 +232,7 @@ neutron_external_interface: "bond2"
 # Backend options
 ##################
 #kolla_httpd_keep_alive: "60"
+#kolla_httpd_timeout: "60"
 
 #####################
 # Backend TLS options
@@ -273,6 +274,8 @@ neutron_external_interface: "bond2"
 # These roles are required for Kolla to be operation, however a savvy deployer
 # could disable some of these required roles and run their own services.
 #enable_glance: "{{ enable_openstack_core | bool }}"
+#enable_hacluster: "no"
+#enable_hacluster: "yes"
 #enable_haproxy: "yes"
 #enable_keepalived: "{{ enable_haproxy | bool }}"
 #enable_keystone: "{{ enable_openstack_core | bool }}"
@@ -286,7 +289,6 @@ neutron_external_interface: "bond2"
 # OpenStack services can be enabled or disabled with these options
 #enable_aodh: "no"
 enable_aodh: "yes"
-# Enabling barbican may break octavia for missing region...
 #enable_barbican: "no"
 #enable_blazar: "no"
 #enable_ceilometer: "no"
@@ -295,7 +297,7 @@ enable_ceilometer: "yes"
 #enable_cells: "no"
 #enable_central_logging: "no"
 enable_central_logging: "yes"
-#enable_chrony: "yes"
+#enable_chrony: "no"
 #enable_cinder: "no"
 enable_cinder: "yes"
 #enable_cinder_backup: "yes"
@@ -310,7 +312,7 @@ enable_cinder: "yes"
 #enable_cyborg: "no"
 #enable_designate: "no"
 #enable_destroy_images: "no"
-#enable_elasticsearch: "{{ 'yes' if enable_central_logging | bool or enable_osprofiler | bool or enable_skydive | bool or enable_monasca | bool else 'no' }}"
+#enable_elasticsearch: "{{ 'yes' if enable_central_logging | bool or enable_osprofiler | bool or enable_skydive | bool or enable_monasca | bool or (enable_cloudkitty | bool and cloudkitty_storage_backend == 'elasticsearch') else 'no' }}"
 #enable_elasticsearch_curator: "no"
 enable_elasticsearch_curator: "yes"
 #enable_etcd: "no"
@@ -329,7 +331,6 @@ enable_grafana: "yes"
 #enable_horizon_freezer: "{{ enable_freezer | bool }}"
 #enable_horizon_heat: "{{ enable_heat | bool }}"
 #enable_horizon_ironic: "{{ enable_ironic | bool }}"
-#enable_horizon_karbor: "{{ enable_karbor | bool }}"
 #enable_horizon_magnum: "{{ enable_magnum | bool }}"
 #enable_horizon_manila: "{{ enable_manila | bool }}"
 #enable_horizon_masakari: "{{ enable_masakari | bool }}"
@@ -338,9 +339,7 @@ enable_grafana: "yes"
 #enable_horizon_murano: "{{ enable_murano | bool }}"
 #enable_horizon_neutron_vpnaas: "{{ enable_neutron_vpnaas | bool }}"
 #enable_horizon_octavia: "{{ enable_octavia | bool }}"
-#enable_horizon_qinling: "{{ enable_qinling | bool }}"
 #enable_horizon_sahara: "{{ enable_sahara | bool }}"
-#enable_horizon_searchlight: "{{ enable_searchlight | bool }}"
 #enable_horizon_senlin: "{{ enable_senlin | bool }}"
 #enable_horizon_solum: "{{ enable_solum | bool }}"
 #enable_horizon_tacker: "{{ enable_tacker | bool }}"
@@ -354,7 +353,6 @@ enable_grafana: "yes"
 #enable_ironic_neutron_agent: "{{ enable_neutron | bool and enable_ironic | bool }}"
 #enable_ironic_pxe_uefi: "no"
 #enable_iscsid: "{{ (enable_cinder | bool and enable_cinder_backend_iscsi | bool) or enable_ironic | bool }}"
-#enable_karbor: "no"
 #enable_kafka: "{{ enable_monasca | bool }}"
 #enable_kibana: "{{ 'yes' if enable_central_logging | bool or enable_monasca | bool else 'no' }}"
 #enable_kuryr: "no"
@@ -369,6 +367,7 @@ enable_manila_backend_generic: "yes"
 enable_manila_backend_cephfs_native: "yes"
 #enable_manila_backend_cephfs_nfs: "no"
 enable_manila_backend_cephfs_nfs: "yes"
+#enable_manila_backend_glusterfs_nfs: "no"
 #enable_mariabackup: "no"
 enable_mariabackup: "yes"
 #enable_masakari: "no"
@@ -393,7 +392,7 @@ enable_neutron_provider_networks: "yes"
 #enable_nova_serialconsole_proxy: "no"
 #enable_nova_ssh: "yes"
 #enable_octavia: "no"
-#enable_octavia: "yes"
+#enable_octavia_driver_agent: "{{ enable_octavia | bool and neutron_plugin_agent == 'ovn' }}"
 #enable_openvswitch: "{{ enable_neutron | bool and neutron_plugin_agent != 'linuxbridge' }}"
 #enable_ovn: "{{ enable_neutron | bool and neutron_plugin_agent == 'ovn' }}"
 #enable_ovs_dpdk: "no"
@@ -402,11 +401,9 @@ enable_neutron_provider_networks: "yes"
 #enable_placement: "{{ enable_nova | bool or enable_zun | bool }}"
 #enable_prometheus: "no"
 #enable_qdrouterd: "{{ 'yes' if om_rpc_transport == 'amqp' else 'no' }}"
-#enable_qinling: "no"
 #enable_rally: "no"
 #enable_redis: "no"
 #enable_sahara: "no"
-#enable_searchlight: "no"
 #enable_senlin: "no"
 #enable_skydive: "no"
 #enable_solum: "no"
@@ -530,6 +527,7 @@ glance_backend_ceph: "yes"
 # Valid options are [ file, ceph, swift ]
 #gnocchi_backend_storage: "{% if enable_swift | bool %}swift{% else %}file{% endif %}"
 gnocchi_backend_storage: "rbd"
+
 # Valid options are [redis, '']
 #gnocchi_incoming_storage: "{{ 'redis' if enable_redis | bool else '' }}"
 
@@ -600,6 +598,9 @@ nova_backend_ceph: "yes"
 # Enable distributed floating ip for OVN deployments
 #neutron_ovn_distributed_fip: "no"
 
+# Enable DHCP agent(s) to use with OVN
+#neutron_ovn_dhcp_agent: "no"
+
 #############################
 # Horizon - Dashboard Options
 #############################
@@ -636,6 +637,37 @@ nova_backend_ceph: "yes"
 #hnas_evs_id:
 #hnas_evs_ip:
 #hnas_file_system_name:
+
+# Gluster backend configuration
+# The option of glusterfs share layout can be directory or volume
+# The default option of share layout is 'volume'
+#manila_glusterfs_share_layout:
+# The default option of nfs server type is 'Gluster'
+#manila_glusterfs_nfs_server_type:
+
+# Volume layout Options (required)
+# If the glusterfs server requires remote ssh, then you need to fill
+# in 'manila_glusterfs_servers', ssh user 'manila_glusterfs_ssh_user', and ssh password
+# 'manila_glusterfs_ssh_password'.
+# 'manila_glusterfs_servers' value List of GlusterFS servers which provide volumes,
+# the format is for example:
+#   - 10.0.1.1
+#   - 10.0.1.2
+#manila_glusterfs_servers:
+#manila_glusterfs_ssh_user:
+#manila_glusterfs_ssh_password:
+# Used to filter GlusterFS volumes for share creation.
+# Examples: manila-share-volume-\\d+$, manila-share-volume-#{size}G-\\d+$;
+#manila_glusterfs_volume_pattern:
+
+# Directory layout Options
+# If the glusterfs server is on the local node of the manila share,
+# it’s of the format <glustervolserver>:/<glustervolid>
+# If the glusterfs server is on a remote node,
+# it’s of the format <username>@<glustervolserver>:/<glustervolid> ,
+# and define 'manila_glusterfs_ssh_password'
+#manila_glusterfs_target:
+#manila_glusterfs_mount_point_base:
 
 ################################
 # Swift - Object Storage Options
@@ -709,6 +741,9 @@ nova_backend_ceph: "yes"
 #  - host1:port1
 #  - host2:port2
 
+# Whether to keep using Prometheus server v1 (due to no data-preserving migration path to v2)
+#prometheus_use_v1: no
+
 #########
 # Freezer
 #########
@@ -728,7 +763,7 @@ nova_backend_ceph: "yes"
 ##########################################
 # Octavia - openstack loadbalancer Options
 ##########################################
-# Whether to run Kolla-Ansible's automatic configuration for Octavia.
+# Whether to run Kolla Ansible's automatic configuration for Octavia.
 # NOTE: if you upgrade from Ussuri, you must set `octavia_auto_configure` to `no`
 # and keep your other Octavia config like before.
 #octavia_auto_configure: yes
@@ -782,6 +817,9 @@ nova_backend_ceph: "yes"
 # - gateway_ip (optional)
 # - name
 # - no_gateway_ip (optional)
+# - ip_version (optional)
+# - ipv6_address_mode (optional)
+# - ipv6_ra_mode (optional)
 #octavia_amp_network:
 #  name: lb-mgmt-net
 #  shared: false
@@ -790,27 +828,9 @@ nova_backend_ceph: "yes"
 #    cidr: "{{ octavia_amp_network_cidr }}"
 #    no_gateway_ip: yes
 #    enable_dhcp: yes
-#octavia_amp_network:
-#  name: lb-mgmt-net
-#  provider_network_type: vlan
-#  provider_segmentation_id: 131
-#  provider_physical_network: bond2
-##  provider_physical_network: physnet1
-#  external: false
-#  shared: false
-#  gateway_ip: 172.31.0.241
-#  subnet:
-#    name: lb-mgmt-subnet
-#    cidr: "172.31.0.0/24"
-#    allocation_pool_start: 172.31.0.100
-#    allocation_pool_end: 172.31.0.199
-#    gateway_ip: 172.31.0.241
-##    no_gateway_ip: no
-#    enable_dhcp: yes
-##octavia_amp_network_cidr: 172.17.0.0/24
 
 # Octavia management network subnet CIDR.
-#octavia_amp_network_cidr: 10.0.0.0/24
+#octavia_amp_network_cidr: 10.1.0.0/24
 
 #octavia_amp_image_tag: "amphora"
 
@@ -822,3 +842,10 @@ nova_backend_ceph: "yes"
 #octavia_amp_boot_network_list:
 #octavia_amp_secgroup_list:
 #octavia_amp_flavor_id:
+
+####################
+# Corosync options
+####################
+
+# this is UDP port
+#hacluster_corosync_port: 5405
