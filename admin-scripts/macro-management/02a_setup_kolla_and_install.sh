@@ -48,7 +48,7 @@ remediate_hosts () {
   # ADD SETUP to pull shared.wiki
   ssh_control_run_as_user_these_hosts cliff "~/CODE/feralcoder/workstation/setup.sh" "$ALL_HOSTS" || return 1
   ssh_control_run_as_user_these_hosts cliff "~/CODE/feralcoder/workstation/update.sh" "$ALL_HOSTS" || return 1
-  ssh_control_run_as_user cliff "mkdir ~/LOGS/" $ANSIBLE_CONTROLLER || return 1
+  ssh_control_run_as_user cliff "mkdir -p ~/LOGS/" $ANSIBLE_CONTROLLER || return 1
   ssh_control_run_as_user root "echo 'Refresh Fastly Caches Daily at 1AM' > /etc/cron.d/refresh_fastly" $ANSIBLE_CONTROLLER || return 1
   ssh_control_run_as_user root "echo '0 1 * * * cliff /home/cliff/CODE/feralcoder/host_control/scripts/fastly_refresh.sh > /home/cliff/LOGS/fastly_refresh_\`date +\%Y\%m\%d_\%H\%M\`.log 2>&1 ' >> /etc/cron.d/refresh_fastly" $ANSIBLE_CONTROLLER || return 1
 
