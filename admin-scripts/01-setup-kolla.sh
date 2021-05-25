@@ -100,19 +100,20 @@ install_kolla_for_admin () {
   # cp ~/CODE/venvs/kolla-ansible/share/kolla-ansible/ansible/inventory/* .
 }
 
-install_kolla_for_dev () {
-  echo; echo "INSTALLING KOLLA FOR DEVELOPMENT"
-  git clone https://github.com/openstack/kolla
-  git clone https://github.com/openstack/kolla-ansible
-  pip install ./kolla
-  pip install ./kolla-ansible
-  test_sudo || return 1
-  sudo mkdir -p /etc/kolla
-  sudo chown $USER:$USER /etc/kolla
-  cp -r ~/CODE/feralcoder/kolla-ansible/etc/kolla/* /etc/kolla &&
-  cp ~/CODE/feralcoder/kolla-ansible/ansible/inventory/* .     &&
-  cp $KOLLA_SETUP_DIR/../files/kolla-globals.yml /etc/kolla/globals.yml                   || return 1
-}
+# Following is out of step with many subsequent changes
+#install_kolla_for_dev () {
+#  echo; echo "INSTALLING KOLLA FOR DEVELOPMENT"
+#  git clone https://github.com/openstack/kolla
+#  git clone https://github.com/openstack/kolla-ansible
+#  pip install ./kolla
+#  pip install ./kolla-ansible
+#  test_sudo || return 1
+#  sudo mkdir -p /etc/kolla
+#  sudo chown $USER:$USER /etc/kolla
+#  cp -r ~/CODE/feralcoder/kolla-ansible/etc/kolla/* /etc/kolla &&
+#  cp ~/CODE/feralcoder/kolla-ansible/ansible/inventory/* .     &&
+#  cp $KOLLA_SETUP_DIR/../files/kolla-globals.yml /etc/kolla/globals.yml                   || return 1
+#}
 
 disable_firewall () {
   echo; echo "DISABLE FIREWALLD"
