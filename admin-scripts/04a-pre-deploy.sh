@@ -17,6 +17,10 @@ if [[ $(group_logic_get_short_name `hostname`) != $REGISTRY_HOST ]]; then
 fi
 
 
+check_config_updates () {
+  XXX=/home/cliff/CODE/venvs/kolla-ansible/share/kolla-ansible/ansible/inventory/multinode
+  ( diff $XXX $KOLLA_SETUP_DIR/../files/kolla-inventory-wallaby ) || { echo "$XXX has changed in the upstream!  RESOLVE."; return 1; }
+}
 
 
 refetch_api_keys () {
@@ -35,7 +39,6 @@ use_localized_containers () {
 
 generate_ssl_certs () {
   kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack certificates                                           || return 1
-
 }
 
 untar_ssl_certs () {
@@ -113,6 +116,7 @@ EOT
 }
 
 
+check_config_updates                                                                     || fail_exit "check_config_updates"
 #refetch_api_keys                                                                         || fail_exit "refetch_api_keys"
 kolla-genpwd                                                                             || fail_exit "kolla-genpwd"
 ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack all -m ping              || fail_exit "ansible ping"
