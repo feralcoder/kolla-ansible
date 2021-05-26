@@ -68,6 +68,12 @@ EOT
 #[controller_worker]
 #user_data_config_drive = true
 
+setup_working_octavia_api_container () {
+  # RIGHT NOW, locally built octavia api images fail start - missing certs, bad /var/run perms, etc...
+  docker pull 192.168.127.220:4001/feralcoder/centos-source-octavia-api:feralcoder-wallaby-latest-actually-kolla-upstream
+  docker tag 192.168.127.220:4001/feralcoder/centos-source-octavia-api:feralcoder-wallaby-latest-actually-kolla-upstream 192.168.127.220:4001/feralcoder/centos-source-octavia-api:feralcoder-wallaby-latest
+  docker push 192.168.127.220:4001/feralcoder/centos-source-octavia-api:feralcoder-wallaby-latest
+}
 
 deploy_octavia () {
   kolla-ansible -i $KOLLA_SETUP_DIR/../files/kolla-inventory-feralstack deploy --tags common,horizon,octavia,neutron
@@ -164,6 +170,7 @@ setup_provider_net $PROVIDER_NETNAME $PROVIDER_VLAN_ID $PROVIDER_SUBNET $PROVIDE
 
 kolla-ansible octavia-certificates             || fail_exit "kolla-ansible octavia-certificates"
 
+setup_working_octavia_api_container            || fail_exit "setup_working_octavia_api_container"
 deploy_octavia                                 || fail_exit "deploy_octavia"
 
 #build_amphora                                  || fail_exit "build_amphora"
