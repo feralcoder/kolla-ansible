@@ -376,6 +376,7 @@ nfs_obj_gw: true
 
 ## OSD options
 #
+#lvmetad_disabled: false
 #is_hci: false
 #hci_safety_factor: 0.2
 #non_hci_safety_factor: 0.7
