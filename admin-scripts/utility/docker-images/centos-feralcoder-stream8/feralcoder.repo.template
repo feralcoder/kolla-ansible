@@ -1,0 +1,42 @@
+[baseos]
+name=CentOS Stream $releasever - BaseOS
+baseurl=http://<<REPOIP>>/$contentdir/$stream/BaseOS/$basearch/os/
+gpgcheck=0
+enabled=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial
+
+[appstream]
+name=CentOS Stream $releasever - AppStream
+baseurl=http://<<REPOIP>>/$contentdir/$stream/AppStream/$basearch/os/
+gpgcheck=0
+enabled=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial
+
+[extras]
+name=CentOS Stream $releasever - Extras
+baseurl=http://<<REPOIP>>/$contentdir/$stream/extras/$basearch/os/
+gpgcheck=0
+enabled=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial
+
+[powertools]
+name=CentOS Stream $releasever - PowerTools
+baseurl=http://<<REPOIP>>/$contentdir/$stream/PowerTools/$basearch/os/
+gpgcheck=0
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial
+
+[ha]
+name=CentOS Stream $releasever - HighAvailability
+baseurl=http://<<REPOIP>>/$contentdir/$stream/HighAvailability/$basearch/os/
+gpgcheck=0
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial
+
+[rt]
+name=CentOS Stream $releasever - RealTime
+baseurl=http://<<REPOIP>>/$contentdir/$stream/RT/$basearch/os/
+gpgcheck=0
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial
+

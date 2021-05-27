@@ -1,0 +1,4 @@
+FROM <<REGISTRY>>/feralcoder/centos-feralcoder:8
+
+RUN dnf -y update
+
