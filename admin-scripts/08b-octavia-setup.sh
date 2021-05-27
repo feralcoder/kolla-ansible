@@ -170,7 +170,8 @@ setup_provider_net $PROVIDER_NETNAME $PROVIDER_VLAN_ID $PROVIDER_SUBNET $PROVIDE
 
 kolla-ansible octavia-certificates             || fail_exit "kolla-ansible octavia-certificates"
 
-setup_working_octavia_api_container            || fail_exit "setup_working_octavia_api_container"
+# REBUILT ACTUAL WALLABY CONTAINERS, may not be needed...
+#setup_working_octavia_api_container            || fail_exit "setup_working_octavia_api_container"
 deploy_octavia                                 || fail_exit "deploy_octavia"
 
 #build_amphora                                  || fail_exit "build_amphora"
