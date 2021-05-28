@@ -13,16 +13,16 @@ CEPH_CODE_DIR=$CODE_DIR/ceph
 CEPH_CHECKOUT_DIR=$CEPH_CODE_DIR/ceph-ansible
 
 # SYNC THIS VERSION WITH ../files/ceph-all.yml: ceph_docker_image_tag
-#CEPH_DOCKER_VERSION=master-86da1a4-nautilus-centos-7
+CEPH_DOCKER_VERSION=master-86da1a4-nautilus-centos-7
 #CEPH_DOCKER_VERSION=latest-nautilus
-CEPH_DOCKER_VERSION=latest-octopus
+#CEPH_DOCKER_VERSION=latest-octopus
 
 
 
 # THIS SCRIPT IS MEANT TO RUN AFTER A KOLLA-ANSIBLE SCRIPT
 #  Ansible should already be installed on this host, the ansible controller
-#VERSION=4.0 # Nautilus
-VERSION=5.0 # Octopus
+VERSION=4.0 # Nautilus
+#VERSION=5.0 # Octopus
 
 adjust_firewall () {
   echo; echo "DISABLING FIREWALL"
