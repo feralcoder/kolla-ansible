@@ -66,7 +66,8 @@ fetch_kolla_container_source () {
 
 patch_kolla_container_source () {
   # manila_share needs to be patched to not use mon-mgr target (it's an octopus thing, wallaby's not ready for octopus
-  $UTILITY_DIR/../../files/kolla-manila-driver-patch.py
+  # PATCH /registry/kolla_tarballs/wallaby_XXX/manila_debugging/manila-12.0.1.dev15/manila/share/drivers/cephfs/driver.py
+  #$UTILITY_DIR/../../files/kolla-manila-driver-patch.py
 }
 
 build_kolla_containers () {
