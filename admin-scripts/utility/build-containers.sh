@@ -14,6 +14,7 @@ NOW=$1
 INSTALL_TYPE=$2
 OS_RELEASE=$3
 SKIP_DL=$4
+CONTAINER_REGEX=$5
 
 
 [[ $NOW != "" ]]  ||  NOW=`date +%Y%m%d_%H%M`
@@ -64,16 +65,15 @@ fetch_kolla_container_source () {
 build_kolla_containers () {
   cd $KOLLA_CODE_DIR   || return 1
   cat etc/kolla/kolla-build.conf | sed -E 's/#type = url/type = local/g' |  sed -E "s|^#location = .tarballs_base.*/([^/]*.tar.gz)|location = $NOW_TARBALLS/\1|g" | sed -E "s|^#location = .*/([^/]*.tar.gz)|location = $NOW_TARBALLS/\1|g" > etc/kolla/kolla-build-local.conf
-  docker image pull $LOCAL_DOCKER_REGISTRY/feralcoder/centos-feralcoder:8
-  # kolla will use tag "8" with following base image...
+  # kolla will use tag "8" or "stream8" with following base image (for victoria / wallaby)...
   BASE_IMAGE="--base-image $LOCAL_DOCKER_REGISTRY/feralcoder/centos-feralcoder"
-  kolla-build -t $INSTALL_TYPE -b centos $BASE_IMAGE --push --registry $LOCAL_DOCKER_REGISTRY -n feralcoder --tag $TAG   --config-file etc/kolla/kolla-build-local.conf || return 1
+  kolla-build -t $INSTALL_TYPE -b centos $BASE_IMAGE --push --registry $LOCAL_DOCKER_REGISTRY -n feralcoder --tag $TAG   --config-file etc/kolla/kolla-build-local.conf $CONTAINER_REGEX || return 1
 }
 
 tag_as_latest () {
   # This function strips $LOCAL_DOCKER_REGISTRY/feralcoder/, then adds again
   # This will allow easier repo-renaming and other distribution changes
-  for CONTAINER in `docker image list | grep "\-${INSTALL_TYPE}\-" | grep $TAG | awk '{print $1}' | awk -F'/' '{print $(NF)}'`; do
+  for CONTAINER in `docker image list | grep "\-${INSTALL_TYPE}\-" | grep $TAG | grep $CONTAINER_REGEX | awk '{print $1}' | awk -F'/' '{print $(NF)}'`; do
     docker tag $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:$TAG $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:$OS_RELEASE-latest              || return 1
     docker push $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:$OS_RELEASE-latest                             || return 1
     docker tag $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:$TAG $LOCAL_DOCKER_REGISTRY/feralcoder/$CONTAINER:feralcoder-$OS_RELEASE-latest   || return 1
