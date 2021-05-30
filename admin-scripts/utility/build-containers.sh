@@ -62,6 +62,11 @@ fetch_kolla_container_source () {
   . $NOW_TARBALLS/locations  || return 1
 }
 
+patch_kolla_container_source () {
+  # manila_share needs to be patched to not use mon-mgr target (it's an octopus thing, wallaby's not ready for octopus
+  $UTILITY_DIR/../../files/kolla-manila-driver-patch.py
+}
+
 build_kolla_containers () {
   cd $KOLLA_CODE_DIR   || return 1
   cat etc/kolla/kolla-build.conf | sed -E 's/#type = url/type = local/g' |  sed -E "s|^#location = .tarballs_base.*/([^/]*.tar.gz)|location = $NOW_TARBALLS/\1|g" | sed -E "s|^#location = .*/([^/]*.tar.gz)|location = $NOW_TARBALLS/\1|g" > etc/kolla/kolla-build-local.conf
